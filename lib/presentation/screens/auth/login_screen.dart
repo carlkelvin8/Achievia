@@ -3,6 +3,7 @@ import 'package:achievia/presentation/widgets/forms/login_form.dart';
 import 'package:achievia/presentation/widgets/headers/header1.dart';
 import 'package:achievia/presentation/widgets/headers/header2.dart';
 import 'package:achievia/presentation/widgets/headers/sub_header.dart';
+import 'package:achievia/presentation/widgets/placeholder_gestures/placeholder_gesture.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -12,7 +13,21 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,29 +36,49 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: level1,
           child: Column(
             children: <Widget>[
-              const SizedBox(height: 60,),
+              const SizedBox(height: 60),
               Center(
-                child: SizedBox(
-                  width: 130,
-                  height: 130,
-                  child: CircleAvatar(),
-                ),
+                child: SizedBox(width: 130, height: 130, child: CircleAvatar()),
               ),
               Center(
                 child: Header1(title1: 'Achie', title2: 'via'),
               ),
-              Center(
-                child: Header2(title: 'AWAKEN ACADEMIC AMBITION',),
+              Center(child: Header2(title: 'AWAKEN ACADEMIC AMBITION')),
+              const SizedBox(height: 20),
+              SubHeader(
+                title:
+                    "The Philippines' premier e-learning platform for board exam preparation.",
               ),
-              const SizedBox(height: 20,),
-              SubHeader(title: "The Philippines' premier e-learning platform for board exam preparation."),
+              const SizedBox(height: 30),
 
-              const SizedBox(height: 30,),
-              LoginForm()
+              TabBar(
+                controller: _tabController,
+                labelColor: Colors.blue,
+                indicator: const BoxDecoration(),
+                splashFactory: NoSplash.splashFactory,
+                unselectedLabelColor: Colors.grey,
+                tabs: const [
+                  Tab(text: "LOG IN"),
+                  Tab(text: "SIGN UP"),
+                ],
+              ),
+              SizedBox(
+                height: 290,
+                child: TabBarView(
+                  controller: _tabController,
+                  children: const [
+                    LoginForm(),
+                    Center(child: Text('Upcoming...')),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              PlaceholderGesture(),
+              
             ],
           ),
         ),
-      )
+      ),
     );
   }
 }
