@@ -1,6 +1,7 @@
 import 'package:achievia/injection.dart';
 import 'package:achievia/presentation/provider/auth/event/auth_state_provider.dart';
 import 'package:achievia/presentation/screens/auth/login_screen.dart';
+import 'package:achievia/presentation/screens/auth/onboarding_screen.dart';
 import 'package:achievia/presentation/screens/auth_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,8 +25,10 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Achievia',
         debugShowCheckedModeBanner: false,
-        home: LoginScreen(),
-        routes: {},
+        home: OnboardingScreen(),
+        routes: {
+          '/login': (_) => LoginScreen()
+        },
       ),
     );
   }
