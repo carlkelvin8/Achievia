@@ -1,6 +1,8 @@
 import 'package:achievia/core/constants/app_paddings.dart';
+import 'package:achievia/presentation/widgets/forms/login_form.dart';
 import 'package:achievia/presentation/widgets/headers/header1.dart';
 import 'package:achievia/presentation/widgets/headers/header2.dart';
+import 'package:achievia/presentation/widgets/headers/sub_header.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -33,6 +35,11 @@ class _LoginScreenState extends State<LoginScreen> {
               Center(
                 child: Header2(title: 'AWAKEN ACADEMIC AMBITION',),
               ),
+              const SizedBox(height: 20,),
+              SubHeader(title: "The Philippines' premier e-learning platform for board exam preparation."),
+
+              const SizedBox(height: 30,),
+              LoginForm()
             ],
           ),
         ),
