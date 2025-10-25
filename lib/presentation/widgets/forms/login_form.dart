@@ -58,15 +58,28 @@ class _LoginFormState extends State<LoginForm> {
                 return null;
               },
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(height: 10),
             ReusableButton(
-              title: 'Log in', 
-              onPressed: (){}, 
-              width: MediaQuery.of(context).size.width, 
+              title: 'Log in',
+              onPressed: () {
+                // Simple login logic - in real app, validate credentials
+                if (_userName.text.isNotEmpty && _password.text.isNotEmpty) {
+                  provider.login(_userName.text);
+                  Navigator.pushReplacementNamed(context, '/main');
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter username and password'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              width: MediaQuery.of(context).size.width,
               height: 50,
               backgroundColor: const Color.fromARGB(255, 0, 219, 248),
               textColor: Colors.white,
-              ),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -80,8 +93,8 @@ class _LoginFormState extends State<LoginForm> {
                     isChecked: agreedToTerms,
                   ),
                 ),
-                const SizedBox(width: 30,),
-                Expanded(child: Text('Forgot Password?'))
+                const SizedBox(width: 30),
+                Expanded(child: Text('Forgot Password?')),
               ],
             ),
           ],
