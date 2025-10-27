@@ -1,6 +1,7 @@
 import 'package:achievia/presentation/widgets/appbar/main_appbar.dart';
 import 'package:achievia/presentation/widgets/navigation/bottom_nav_bar.dart';
 import 'package:achievia/core/constants/routers/tab_navigation_provider.dart';
+import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,13 +9,8 @@ class MainScreen extends ConsumerWidget {
   const MainScreen({super.key});
 
   void _onNotificationTap(BuildContext context) {
-    // Handle notification tap
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Notifications feature coming soon!'),
-        duration: Duration(seconds: 2),
-      ),
-    );
+    // Navigate to notifications screen
+    NavigationService.goToNotifications();
   }
 
   @override

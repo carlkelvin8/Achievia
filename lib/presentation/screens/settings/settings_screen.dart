@@ -20,12 +20,19 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Theme.of(context).colorScheme.primary,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: Theme.of(context).colorScheme.primary,
+              size: 24,
+            ),
+            alignment: Alignment.center,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+            onPressed: () => NavigationService.pop(),
           ),
-          onPressed: () => NavigationService.pop(),
         ),
         title: Text(
           'Settings',
@@ -35,14 +42,21 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.settings,
-              color: Theme.of(context).colorScheme.primary,
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              icon: Icon(
+                Icons.settings,
+                color: Theme.of(context).colorScheme.primary,
+                size: 24,
+              ),
+              alignment: Alignment.center,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+              onPressed: () {
+                // Additional settings action
+              },
             ),
-            onPressed: () {
-              // Additional settings action
-            },
           ),
         ],
       ),

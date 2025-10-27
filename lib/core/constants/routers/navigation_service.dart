@@ -81,4 +81,8 @@ class NavigationService {
   static Future<dynamic> goToSettings() {
     return pushNamed(RouteConstants.settings);
   }
+
+  static Future<dynamic> goToNotifications() {
+    return pushNamed(RouteConstants.notifications);
+  }
 }

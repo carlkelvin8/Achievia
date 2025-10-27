@@ -9,7 +9,10 @@ class PlaceholderGesture extends StatelessWidget {
       child: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
-          style: const TextStyle(fontSize: 12, color: Colors.indigo),
+          style: TextStyle(
+            fontSize: 12,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           children: [
             TextSpan(
               text: 'Terms and conditions\n',
