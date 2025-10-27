@@ -37,17 +37,50 @@ class _TabBarProfileState extends State<TabBarProfile>
         TabBar(
           controller: _controller,
           tabs: _tabs,
-          labelColor: const Color.fromARGB(255, 5, 43, 75),
-          unselectedLabelColor: Colors.blueAccent,
+          labelColor: Theme.of(context).colorScheme.primary,
+          unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
+          indicatorColor: Theme.of(context).colorScheme.primary,
+          labelStyle: Theme.of(
+            context,
+          ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600),
+          unselectedLabelStyle: Theme.of(context).textTheme.labelMedium,
         ),
         Expanded(
           child: TabBarView(
             controller: _controller,
-            children: const [
-              Center(child: Text('Profile')),
-              Center(child: Text('Progress')),
-              Center(child: Text('Tasks')),
-              Center(child: Text('Notes')),
+            children: [
+              Center(
+                child: Text(
+                  'Profile',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
+              Center(
+                child: Text(
+                  'Progress',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
+              Center(
+                child: Text(
+                  'Tasks',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
+              Center(
+                child: Text(
+                  'Notes',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
             ],
           ),
         ),

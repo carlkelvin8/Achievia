@@ -7,6 +7,7 @@ import 'package:achievia/presentation/screens/main/messages_screen.dart';
 import 'package:achievia/presentation/screens/main/home_screen.dart';
 import 'package:achievia/presentation/screens/main/profile_screen.dart';
 import 'package:achievia/presentation/screens/main/about_screen.dart';
+import 'package:achievia/presentation/screens/settings/settings_screen.dart';
 import 'route_constants.dart';
 
 class AppRouter {
@@ -58,6 +59,12 @@ class AppRouter {
       case RouteConstants.about:
         return MaterialPageRoute(
           builder: (_) => const AboutScreen(),
+          settings: settings,
+        );
+
+      case RouteConstants.settings:
+        return MaterialPageRoute(
+          builder: (_) => const SettingsScreen(),
           settings: settings,
         );
 

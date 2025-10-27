@@ -17,16 +17,6 @@ class MainScreen extends ConsumerWidget {
     );
   }
 
-  void _onSettingsTap(BuildContext context) {
-    // Handle settings tap
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Settings feature coming soon!'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(tabIndexProvider);
@@ -35,7 +25,7 @@ class MainScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: MainAppbar(
-        onSettingsTap: () => _onSettingsTap(context),
+        onSettingsTap: () {}, // Not used anymore, but keeping for compatibility
         onNotificationTap: () => _onNotificationTap(context),
         notificationCount: notificationCount,
         username: 'Charles Joven',

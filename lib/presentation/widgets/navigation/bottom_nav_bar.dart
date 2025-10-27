@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:achievia/core/constants/app_colors.dart';
 
 class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -14,12 +13,12 @@ class AppBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            offset: Offset(0, -2),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
+            offset: const Offset(0, -2),
             blurRadius: 4,
           ),
         ],
@@ -31,22 +30,30 @@ class AppBottomNavBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildNavItem(
+                context,
                 icon: Icons.menu_book_outlined,
                 label: 'Reviewers',
                 index: 0,
               ),
               _buildNavItem(
+                context,
                 icon: Icons.chat_bubble_outline,
                 label: 'Messages',
                 index: 1,
               ),
-              _buildNavItem(icon: Icons.home, label: 'Home', index: 2),
+              _buildNavItem(context, icon: Icons.home, label: 'Home', index: 2),
               _buildNavItem(
+                context,
                 icon: Icons.folder_outlined,
                 label: 'You',
                 index: 3,
               ),
-              _buildNavItem(icon: Icons.info_outline, label: 'About', index: 4),
+              _buildNavItem(
+                context,
+                icon: Icons.info_outline,
+                label: 'About',
+                index: 4,
+              ),
             ],
           ),
         ),
@@ -54,7 +61,8 @@ class AppBottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem({
+  Widget _buildNavItem(
+    BuildContext context, {
     required IconData icon,
     required String label,
     required int index,
@@ -70,22 +78,25 @@ class AppBottomNavBar extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
+            SizedBox(
               width: 24,
               height: 24,
               child: Icon(
                 icon,
-                color: isSelected ? headerColor2 : Colors.grey[600],
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
                 size: 24,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 12,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected ? headerColor2 : Colors.grey[600],
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
               maxLines: 1,

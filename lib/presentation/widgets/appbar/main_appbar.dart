@@ -1,6 +1,4 @@
-import 'package:achievia/core/constants/app_colors.dart';
-import 'package:achievia/presentation/widgets/headers/app_header.dart';
-import 'package:achievia/presentation/widgets/tabs/profile/tab_bar_profile.dart';
+import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:flutter/material.dart';
 
 class MainAppbar extends StatelessWidget implements PreferredSizeWidget {
@@ -9,23 +7,36 @@ class MainAppbar extends StatelessWidget implements PreferredSizeWidget {
   final int notificationCount;
   final String username;
   final String profileImageUrl;
-  const MainAppbar({super.key, required this.onSettingsTap, required this.onNotificationTap, required this.notificationCount, required this.username, required this.profileImageUrl});
+  const MainAppbar({
+    super.key,
+    required this.onSettingsTap,
+    required this.onNotificationTap,
+    required this.notificationCount,
+    required this.username,
+    required this.profileImageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      foregroundColor: Theme.of(context).colorScheme.onSurface,
       title: Row(
         children: [
           // Profile Picture
           CircleAvatar(
             radius: 20,
-            backgroundColor: headerColor2,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             backgroundImage: profileImageUrl.isNotEmpty
                 ? NetworkImage(profileImageUrl)
                 : null,
             child: profileImageUrl.isEmpty
-                ? const Icon(Icons.person, color: Colors.white, size: 24)
+                ? Icon(
+                    Icons.person,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    size: 24,
+                  )
                 : null,
           ),
           const SizedBox(width: 12),
@@ -33,10 +44,9 @@ class MainAppbar extends StatelessWidget implements PreferredSizeWidget {
           Expanded(
             child: Text(
               username,
-              style: const TextStyle(
-                fontSize: 16,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: headerColor,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
@@ -45,9 +55,9 @@ class MainAppbar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               IconButton(
                 onPressed: onNotificationTap,
-                icon: const Icon(
+                icon: Icon(
                   Icons.notifications_outlined,
-                  color: headerColor2,
+                  color: Theme.of(context).colorScheme.primary,
                   size: 24,
                 ),
               ),
@@ -80,10 +90,10 @@ class MainAppbar extends StatelessWidget implements PreferredSizeWidget {
           ),
           // Settings Icon
           IconButton(
-            onPressed: onSettingsTap,
-            icon: const Icon(
+            onPressed: () => NavigationService.goToSettings(),
+            icon: Icon(
               Icons.settings_outlined,
-              color: headerColor2,
+              color: Theme.of(context).colorScheme.primary,
               size: 24,
             ),
           ),
@@ -91,7 +101,7 @@ class MainAppbar extends StatelessWidget implements PreferredSizeWidget {
       ),
     );
   }
-  
+
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

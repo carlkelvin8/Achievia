@@ -6,6 +6,7 @@ import 'package:achievia/presentation/widgets/headers/sub_header.dart';
 import 'package:achievia/presentation/widgets/placeholder_gestures/placeholder_gesture.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -13,7 +14,8 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -31,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SingleChildScrollView(
         child: Padding(
           padding: level1,
@@ -38,7 +41,18 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             children: <Widget>[
               const SizedBox(height: 60),
               Center(
-                child: SizedBox(width: 130, height: 130, child: CircleAvatar()),
+                child: SizedBox(
+                  width: 130,
+                  height: 130,
+                  child: CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: Icon(
+                      Icons.school,
+                      size: 60,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                ),
               ),
               Center(
                 child: Header1(title1: 'Achie', title2: 'via'),
@@ -53,10 +67,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
               TabBar(
                 controller: _tabController,
-                labelColor: Colors.blue,
+                labelColor: Theme.of(context).colorScheme.primary,
                 indicator: const BoxDecoration(),
                 splashFactory: NoSplash.splashFactory,
-                unselectedLabelColor: Colors.grey,
+                unselectedLabelColor: Theme.of(
+                  context,
+                ).colorScheme.onSurfaceVariant,
                 tabs: const [
                   Tab(text: "LOG IN"),
                   Tab(text: "SIGN UP"),
@@ -68,27 +84,34 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   controller: _tabController,
                   children: [
                     LoginForm(),
-                    const Center(child: Text('Upcoming...')),
+                    Center(
+                      child: Text(
+                        'Upcoming...',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
               const SizedBox(height: 10),
               PlaceholderGesture(),
               Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  FaIcon(FontAwesomeIcons.facebook, size: 30),
-                  SizedBox(width: 16),
-                  FaIcon(FontAwesomeIcons.xTwitter, size: 30),
-                  SizedBox(width: 16),
-                  FaIcon(FontAwesomeIcons.instagram, size: 30),
-                  SizedBox(width: 16),
-                  FaIcon(FontAwesomeIcons.tiktok, size: 30),
-                ],
+                padding: const EdgeInsets.only(top: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    FaIcon(FontAwesomeIcons.facebook, size: 30),
+                    SizedBox(width: 16),
+                    FaIcon(FontAwesomeIcons.xTwitter, size: 30),
+                    SizedBox(width: 16),
+                    FaIcon(FontAwesomeIcons.instagram, size: 30),
+                    SizedBox(width: 16),
+                    FaIcon(FontAwesomeIcons.tiktok, size: 30),
+                  ],
+                ),
               ),
-              )
             ],
           ),
         ),

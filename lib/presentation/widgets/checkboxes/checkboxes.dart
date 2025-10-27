@@ -1,5 +1,3 @@
-import 'package:achievia/core/constants/app_colors.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class Checkboxes extends StatefulWidget {
@@ -16,13 +14,16 @@ class _CheckboxesState extends State<Checkboxes> {
   Widget build(BuildContext context) {
     return CheckboxListTile(
       controlAffinity: ListTileControlAffinity.leading,
-      activeColor: headerColor3,
+      activeColor: Theme.of(context).colorScheme.primary,
       title: RichText(
         text: TextSpan(
           children: [
-            const TextSpan(
+            TextSpan(
               text: "Keep me logged in",
-              style: TextStyle(fontSize: 12, color: Colors.black),
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ],
         ),

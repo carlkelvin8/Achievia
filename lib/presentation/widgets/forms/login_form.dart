@@ -1,4 +1,3 @@
-import 'package:achievia/core/constants/app_colors.dart';
 import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/presentation/provider/auth/event/auth_state_provider.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';

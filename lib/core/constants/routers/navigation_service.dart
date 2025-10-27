@@ -77,4 +77,8 @@ class NavigationService {
   static Future<dynamic> goToReviewers() {
     return pushReplacementNamed(RouteConstants.reviewers);
   }
+
+  static Future<dynamic> goToSettings() {
+    return pushNamed(RouteConstants.settings);
+  }
 }
