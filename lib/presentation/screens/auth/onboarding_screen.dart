@@ -2,6 +2,7 @@ import 'package:achievia/core/constants/app_colors.dart';
 import 'package:achievia/presentation/widgets/headers/header1.dart';
 import 'package:achievia/presentation/widgets/headers/header2.dart';
 import 'package:achievia/presentation/widgets/headers/sub_header.dart';
+import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingScreen extends StatelessWidget {
@@ -9,7 +10,7 @@ class OnboardingScreen extends StatelessWidget {
   static const _bg = Color(0xFFF5EEFF);
   static const _text = Color(0xFF1E1E1E);
 
-  void _toLogin(BuildContext c) => Navigator.pushNamed(c, '/login');
+  void _toLogin(BuildContext c) => NavigationService.goToLogin();
 
   @override
   Widget build(BuildContext context) {

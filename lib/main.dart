@@ -1,30 +1,27 @@
-import 'package:achievia/presentation/provider/auth/event/auth_state_provider.dart';
-import 'package:achievia/presentation/screens/auth/login_screen.dart';
-import 'package:achievia/presentation/screens/auth/onboarding_screen.dart';
-import 'package:achievia/presentation/screens/main/main_screen.dart';
+import 'package:achievia/core/constants/routers/app_router.dart';
+import 'package:achievia/core/constants/routers/navigation_service.dart';
+import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'injection.dart' as di;
 
 void main() {
-  runApp(const MyApp());
   di.init();
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Achievia',
-        debugShowCheckedModeBanner: false,
-        home: MainScreen(),
-        routes: {
-          '/login': (_) => const LoginScreen(),
-          '/main': (_) => const MainScreen(),
-        },
-      );
+      title: 'Achievia',
+      debugShowCheckedModeBanner: false,
+      navigatorKey: NavigationService.navigatorKey,
+      initialRoute: RouteConstants.main,
+      onGenerateRoute: AppRouter.generateRoute,
+      onUnknownRoute: AppRouter.unknownRoute,
+    );
   }
 }

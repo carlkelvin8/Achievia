@@ -4,6 +4,7 @@ import 'package:achievia/presentation/provider/auth/event/auth_state_provider.da
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/checkboxes/checkboxes.dart';
 import 'package:achievia/presentation/widgets/inputs/reusable_form_field.dart';
+import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,10 +28,7 @@ class LoginForm extends ConsumerWidget {
       child: Form(
         child: Column(
           children: [
-            ReusableField(
-              hintText: 'Username',
-              controller: _userName,
-            ),
+            ReusableField(hintText: 'Username', controller: _userName),
             const SizedBox(height: 10),
             ReusableField(
               hintText: 'Password',
@@ -48,7 +46,7 @@ class LoginForm extends ConsumerWidget {
               title: 'Log in',
               onPressed: () {
                 if (_userName.text.isNotEmpty && _password.text.isNotEmpty) {
-                  Navigator.pushReplacementNamed(context, '/main');
+                  NavigationService.goToMain();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
