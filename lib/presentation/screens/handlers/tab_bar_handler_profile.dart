@@ -7,7 +7,9 @@ class TabBarHandlerProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(children: [Expanded(child: TabBarProfile())]),
+      body: Column(children: [
+        Expanded(child: TabBarProfile())]
+      ),
     );
   }
 }
