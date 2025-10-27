@@ -1,38 +1,48 @@
-import 'package:achievia/presentation/provider/states/tab_service_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TabBarProfile extends ConsumerStatefulWidget {
+class TabBarProfile extends StatefulWidget {
   const TabBarProfile({super.key});
 
   @override
-  ConsumerState<TabBarProfile> createState() => _TabBarProfileState();
+  State<TabBarProfile> createState() => _TabBarProfileState();
 }
 
-class _TabBarProfileState extends ConsumerState<TabBarProfile>
+class _TabBarProfileState extends State<TabBarProfile>
     with SingleTickerProviderStateMixin {
   final _tabs = const [
     Tab(text: 'Profile'),
     Tab(text: 'Progress'),
     Tab(text: 'Tasks'),
-    Tab(text: 'Notes',)
+    Tab(text: 'Notes'),
   ];
+
+  late TabController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final controller = ref.watch(tabControllerProvider);
-
     return Column(
       children: [
         TabBar(
-          controller: controller,
+          controller: _controller,
           tabs: _tabs,
           labelColor: const Color.fromARGB(255, 5, 43, 75),
           unselectedLabelColor: Colors.blueAccent,
         ),
         Expanded(
           child: TabBarView(
-            controller: controller,
+            controller: _controller,
             children: const [
               Center(child: Text('Profile')),
               Center(child: Text('Progress')),
