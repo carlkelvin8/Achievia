@@ -1,32 +1,26 @@
+import 'package:achievia/presentation/provider/states/tab_service_provider.dart';
+import 'package:achievia/presentation/widgets/tabs/profile/tab_bar_profile.dart';
 import 'package:flutter/material.dart';
-import 'package:achievia/core/constants/app_colors.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.folder_outlined, size: 80, color: headerColor2),
-            SizedBox(height: 16),
-            Text(
-              'You',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: headerColor,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Your profile and progress!',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
+    return ProviderScope(
+      overrides: [
+        tabVSyncProvider.overrideWithValue(this),
+      ],
+      child: Scaffold(
+        body: Column(
+          children:  [
+            Expanded(child: TabBarProfile()),
           ],
         ),
       ),

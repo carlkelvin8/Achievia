@@ -1,5 +1,5 @@
+import 'package:achievia/presentation/widgets/appbar/main_appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:achievia/presentation/widgets/headers/app_header.dart';
 import 'package:achievia/presentation/widgets/navigation/bottom_nav_bar.dart';
 import 'package:achievia/presentation/screens/main/reviewers_screen.dart';
 import 'package:achievia/presentation/screens/main/messages_screen.dart';
@@ -49,15 +49,10 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: MainAppbar(onSettingsTap: _onSettingsTap, onNotificationTap: _onNotificationTap, notificationCount: _notificationCount, username: 'Charles Joven', profileImageUrl: '',),
       body: Column(
         children: [
-          // Header with profile info
-          AppHeader(
-            username: 'Charlesjoven',
-            notificationCount: _notificationCount,
-            onNotificationTap: _onNotificationTap,
-            onSettingsTap: _onSettingsTap,
-          ),
+          
           // Main content area
           Expanded(child: _screens[_currentIndex]),
         ],

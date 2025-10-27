@@ -17,27 +17,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => di.sl<AuthStateProvider>()),
-      ],
-      child: MaterialApp(
+    return MaterialApp(
         title: 'Achievia',
         debugShowCheckedModeBanner: false,
-        home: Consumer<AuthStateProvider>(
-          builder: (context, authProvider, child) {
-            if (authProvider.isLoggedIn) {
-              return const MainScreen();
-            } else {
-              return const OnboardingScreen();
-            }
-          },
-        ),
+        home: MainScreen(),
         routes: {
           '/login': (_) => const LoginScreen(),
           '/main': (_) => const MainScreen(),
         },
-      ),
-    );
+      );
   }
 }
