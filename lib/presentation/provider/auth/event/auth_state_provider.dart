@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AuthStateProvider with ChangeNotifier {
-  bool _isShow = true;
-
-  bool get isShow => _isShow;
-
-  void showText() {
-    _isShow = !_isShow;
-    notifyListeners();
-  }
+class AuthNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+  void toggle()=> state = !state;
+  
 }
+
+final toggleProvider = NotifierProvider<AuthNotifier, bool>(AuthNotifier.new);

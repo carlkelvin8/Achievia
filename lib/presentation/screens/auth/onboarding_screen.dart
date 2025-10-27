@@ -1,22 +1,18 @@
-import 'package:achievia/core/constants/app_colors.dart';
 import 'package:achievia/presentation/widgets/headers/header1.dart';
 import 'package:achievia/presentation/widgets/headers/header2.dart';
 import 'package:achievia/presentation/widgets/headers/sub_header.dart';
+import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
-  static const _bg = Color(0xFFF5EEFF);
-  static const _text = Color(0xFF1E1E1E);
 
-  void _toLogin(BuildContext c) => Navigator.pushNamed(c, '/login');
+  void _toLogin(BuildContext c) => NavigationService.goToLogin();
 
   @override
   Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -52,8 +48,8 @@ class OnboardingScreen extends StatelessWidget {
                   height: 52,
                   child: FilledButton(
                     style: FilledButton.styleFrom(
-                      backgroundColor: headerColor2,
-                      foregroundColor: Colors.white,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -72,9 +68,12 @@ class OnboardingScreen extends StatelessWidget {
                   height: 52,
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: _text,
-                      side: const BorderSide(color: Colors.black, width: 1),
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      foregroundColor: Theme.of(context).colorScheme.onSurface,
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.outline,
+                        width: 1,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

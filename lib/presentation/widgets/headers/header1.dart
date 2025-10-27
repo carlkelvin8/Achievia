@@ -1,4 +1,3 @@
-import 'package:achievia/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,10 +11,11 @@ class Header1 extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(title1,
-        style: GoogleFonts.poppins(
+        Text(
+          title1,
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
-            color: headerColor,
+            color: Theme.of(context).colorScheme.onSurface,
             letterSpacing: 4,
             fontSize: 50,
           ),
@@ -24,11 +24,12 @@ class Header1 extends StatelessWidget {
           title2,
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
-            color: headerColor2,
+            color: Theme.of(context).colorScheme.primary,
             letterSpacing: 4,
             fontSize: 50,
           ),
         ),
-      ]);
+      ],
+    );
   }
 }
