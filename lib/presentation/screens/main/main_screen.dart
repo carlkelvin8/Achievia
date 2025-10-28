@@ -1,3 +1,9 @@
+import 'package:achievia/presentation/provider/tabs/event/tab_event.dart';
+import 'package:achievia/presentation/screens/main/about_screen.dart';
+import 'package:achievia/presentation/screens/main/home_screen.dart';
+import 'package:achievia/presentation/screens/main/messages_screen.dart';
+import 'package:achievia/presentation/screens/main/profile_screen.dart';
+import 'package:achievia/presentation/screens/main/reviewers_screen.dart';
 import 'package:achievia/presentation/widgets/appbar/main_appbar.dart';
 import 'package:achievia/presentation/widgets/navigation/bottom_nav_bar.dart';
 import 'package:achievia/core/constants/routers/tab_navigation_provider.dart';
@@ -15,8 +21,8 @@ class MainScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = ref.watch(tabIndexProvider);
-    final currentScreen = ref.watch(currentScreenProvider);
+    final currentIndex = ref.watch(indexProvider);
+    final reader = ref.read(indexProvider.notifier);
     const notificationCount = 1; // Example notification count
 
     return Scaffold(
@@ -27,15 +33,19 @@ class MainScreen extends ConsumerWidget {
         username: 'Charles Joven',
         profileImageUrl: '',
       ),
-      body: Column(
+      body: IndexedStack(
+        index: currentIndex,
         children: [
-          // Main content area
-          Expanded(child: currentScreen),
+          const ReviewersScreen(),
+          const MessagesScreen(),
+          const HomeScreen(),
+          const ProfileScreen(),
+          const AboutScreen(),
         ],
       ),
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: currentIndex,
-        onTap: (index) => TabNavigationService.changeTab(ref, index),
+        onTap: (index) => reader.changeIndex(index),
       ),
     );
   }

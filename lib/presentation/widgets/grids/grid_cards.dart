@@ -22,10 +22,10 @@ class GridCards extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10),
             itemCount: reminders.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // Two columns
+              crossAxisCount: 2,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
-              childAspectRatio: 1,
+              childAspectRatio: 2,
             ),
             itemBuilder: (context, index) {
               final reminder = reminders[index];

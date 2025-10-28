@@ -35,3 +35,32 @@ final List<RemindersEntity> reminders = [
     '2',
   ),
 ];
+
+
+final List<Map<String, dynamic>> messages = [
+    {
+      'name': 'Achievian RMT',
+      'message': 'Mga paturo naman kung paano madaliang tandaan yu...',
+      'isGroup': true,
+    },
+    {
+      'name': 'Achievian August 2025 Takers',
+      'message': 'Lax: goodluck guys, kaya yan. 34 days nalang madami p...',
+      'isGroup': true,
+    },
+    {
+      'name': 'Khim Jaen Magtibay',
+      'message': 'anong sagot dun sa delta bilirubin something?',
+      'isGroup': false,
+    },
+    {
+      'name': 'Jersy Lima Lopez',
+      'message': 'tara magsagot ng exam sa clin chem. pataasan tayo!',
+      'isGroup': false,
+    },
+    {
+      'name': 'Lei Jossa Lat',
+      'message': 'ang toxic sa labi di na naubos ubos ang pasyente aa',
+      'isGroup': false,
+    },
+  ];
