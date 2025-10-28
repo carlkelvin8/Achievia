@@ -2,8 +2,6 @@ import 'package:achievia/domain/entities/examination_results_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
-
 class ExaminationResultsCard extends StatelessWidget {
   final List<ExaminationResult>? results;
   final String description;
@@ -26,10 +24,10 @@ class ExaminationResultsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.dividerColor.withOpacity(0.2)),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.05),
+            color: theme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -38,7 +36,7 @@ class ExaminationResultsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-                    // Header
+          // Header
           Text(
             title,
             style: theme.textTheme.titleMedium?.copyWith(
@@ -76,7 +74,7 @@ class ExaminationResultsCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Center(
@@ -92,7 +90,10 @@ class ExaminationResultsCard extends StatelessWidget {
     );
   }
 
-  Widget _buildResultsList(ThemeData theme, List<ExaminationResult> examResults) {
+  Widget _buildResultsList(
+    ThemeData theme,
+    List<ExaminationResult> examResults,
+  ) {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -124,9 +125,12 @@ class ExaminationResultsCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: passColor.withOpacity(0.15),
+                    color: passColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -170,7 +174,7 @@ class ExaminationResultsCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 value: result.score / 100,
-                backgroundColor: theme.colorScheme.surfaceVariant,
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 valueColor: AlwaysStoppedAnimation(passColor),
                 minHeight: 8,
               ),
