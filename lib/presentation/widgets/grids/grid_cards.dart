@@ -8,34 +8,31 @@ class GridCards extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildReminder(context),
         const SizedBox(height: 15),
         GridView.builder(
-            shrinkWrap: true, 
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            itemCount: reminders.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // Two columns
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1,
-            ),
-            itemBuilder: (context, index) {
-              final reminder = reminders[index];
-              return ReusableCard(
-                icon: reminder.icon,
-                label: reminder.title,
-                count: int.tryParse(reminder.status) ?? 0,
-              );
-            },
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          itemCount: reminders.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, // Two columns
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1,
           ),
+          itemBuilder: (context, index) {
+            final reminder = reminders[index];
+            return ReusableCard(
+              icon: reminder.icon,
+              label: reminder.title,
+              count: int.tryParse(reminder.status) ?? 0,
+            );
+          },
+        ),
       ],
     );
   }

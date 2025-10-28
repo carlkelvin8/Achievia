@@ -89,12 +89,7 @@ class SettingsScreen extends ConsumerWidget {
             // Examination
             SettingsCard(
               onTap: () {
-                // Navigate to Examination settings
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Examination settings coming soon!'),
-                  ),
-                );
+                NavigationService.goToExamination();
               },
               child: SettingsItem(
                 icon: Icons.assignment_outlined,

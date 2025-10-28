@@ -11,7 +11,8 @@ class ProfileScreenContent extends ConsumerStatefulWidget {
   const ProfileScreenContent({super.key});
 
   @override
-  ConsumerState<ProfileScreenContent> createState() => _ProfileScreenContentState();
+  ConsumerState<ProfileScreenContent> createState() =>
+      _ProfileScreenContentState();
 }
 
 class _ProfileScreenContentState extends ConsumerState<ProfileScreenContent> {
@@ -40,13 +41,16 @@ class _ProfileScreenContentState extends ConsumerState<ProfileScreenContent> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),
@@ -65,9 +69,12 @@ class _ProfileScreenContentState extends ConsumerState<ProfileScreenContent> {
               const SizedBox(height: 20),
               const MantraCard(),
               const SizedBox(height: 20),
-              ExaminationResultsCard(results: results, title: 'Examination Results:',),
+              ExaminationResultsCard(
+                results: results,
+                title: 'Examination Results:',
+              ),
               const SizedBox(height: 20),
-              ExaminationResultsCard( title: 'Mock Boards Result:',),
+              ExaminationResultsCard(title: 'Mock Boards Result:'),
             ],
           ),
         ),
