@@ -10,6 +10,7 @@ import 'package:achievia/presentation/screens/main/about_screen.dart';
 import 'package:achievia/presentation/screens/settings/settings_screen.dart';
 import 'package:achievia/presentation/screens/notifications/notifications_screen.dart';
 import 'package:achievia/presentation/screens/examination/examination_screen.dart';
+import 'package:achievia/presentation/screens/settings/pomodoro_timer_screen.dart';
 import 'route_constants.dart';
 
 class AppRouter {
@@ -79,6 +80,12 @@ class AppRouter {
       case RouteConstants.examination:
         return MaterialPageRoute(
           builder: (_) => const ExaminationScreen(),
+          settings: settings,
+        );
+
+      case RouteConstants.pomodoroTimer:
+        return MaterialPageRoute(
+          builder: (_) => const PomodoroTimerScreen(),
           settings: settings,
         );
 

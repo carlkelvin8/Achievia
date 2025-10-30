@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/presentation/widgets/cards/profile_status_card.dart';
+import 'package:achievia/presentation/provider/home/home_provider.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  int? _selectedQotdIndex;
-  bool _goalChecked = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final qotd = ref.watch(qotdProvider);
+    final goal = ref.watch(goalProvider);
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -30,13 +26,20 @@ class _HomeScreenState extends State<HomeScreen> {
               const _SectionLabel(title: 'Question of the day'),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: _buildQuestionOfTheDay(context),
+                child: _buildQuestionOfTheDay(context, ref, qotd.selectedIndex),
               ),
               const SizedBox(height: 12),
               const _SectionLabel(title: "Today's Achievian Goal"),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: _buildTodaysGoal(context),
+                child: _buildTodaysGoal(
+                  context,
+                  ref,
+                  goal.date,
+                  goal.title,
+                  goal.details,
+                  goal.isChecked,
+                ),
               ),
               const SizedBox(height: 12),
               Center(
@@ -88,14 +91,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Question of the day card
-  Widget _buildQuestionOfTheDay(BuildContext context) {
+  Widget _buildQuestionOfTheDay(
+    BuildContext context,
+    WidgetRef ref,
+    int? selectedIndex,
+  ) {
     final theme = Theme.of(context);
-    final options = const [
-      'Physiologic jaundice of the newborn',
-      'Dubin-Johnson syndrome and Rotor syndrome',
-      'Crigler-Najjar syndrome',
-      'Gilbert syndrome',
-    ];
+    final qotd = ref.watch(qotdProvider);
+    final options = qotd.options;
 
     return Container(
       decoration: BoxDecoration(
@@ -108,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'What conditions are associated with a secretory defect in bilirubin metabolism?',
+            qotd.question,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w600,
@@ -118,11 +121,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ...List.generate(options.length, (index) {
             return RadioListTile<int>(
               value: index,
-              groupValue: _selectedQotdIndex,
+              groupValue: selectedIndex,
               dense: true,
               visualDensity: VisualDensity.compact,
               contentPadding: EdgeInsets.zero,
-              onChanged: (v) => setState(() => _selectedQotdIndex = v),
+              onChanged: (v) {
+                if (v != null) {
+                  ref.read(qotdProvider.notifier).selectOption(v);
+                }
+              },
               title: Text(
                 options[index],
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -137,7 +144,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Today's goal card
-  Widget _buildTodaysGoal(BuildContext context) {
+  Widget _buildTodaysGoal(
+    BuildContext context,
+    WidgetRef ref,
+    DateTime date,
+    String title,
+    String details,
+    bool isChecked,
+  ) {
     final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
@@ -152,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             children: [
               Text(
-                'July 5, 2025',
+                _formatDate(date),
                 style: theme.textTheme.titleSmall?.copyWith(
                   color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.w700,
@@ -163,19 +177,19 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 8),
           RadioListTile<bool>(
             value: true,
-            groupValue: _goalChecked,
-            onChanged: (_) => setState(() => _goalChecked = !_goalChecked),
+            groupValue: isChecked,
+            onChanged: (_) => ref.read(goalProvider.notifier).toggleChecked(),
             dense: true,
             visualDensity: VisualDensity.compact,
             contentPadding: EdgeInsets.zero,
             title: Text(
-              'Hematology topic 1',
+              title,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface,
               ),
             ),
             subtitle: Text(
-              'Page 1 - page 12\nJuly 5, 2025',
+              details,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
                 height: 1.2,
@@ -185,6 +199,25 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    final m = months[date.month - 1];
+    return '$m ${date.day}, ${date.year}';
   }
 
   Widget _buildTopListTitle(BuildContext context, String title) {
