@@ -85,7 +85,7 @@ class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
 }
 
 final pomodoroSettingsProvider =
-    NotifierProvider<PomodoroSettingsNotifier, PomodoroSettingsEntity>(
+    NotifierProvider.autoDispose<PomodoroSettingsNotifier, PomodoroSettingsEntity>(
       () => PomodoroSettingsNotifier(),
     );
 

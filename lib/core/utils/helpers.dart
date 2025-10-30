@@ -1,4 +1,5 @@
 import 'package:achievia/domain/entities/examination_results_entity.dart';
+import 'package:achievia/domain/entities/pdf_entity.dart';
 import 'package:achievia/domain/entities/reminders_entity.dart';
 import 'package:flutter/material.dart';
 
@@ -64,3 +65,31 @@ final List<Map<String, dynamic>> messages = [
       'isGroup': false,
     },
   ];
+
+final tabs = const [
+    Tab(text: 'Mother Notes'),
+    Tab(text: 'Questions'),
+    Tab(text: 'Supplementals'),
+  ];
+
+final List<PdfEntity> list = [
+  PdfEntity(text: 'Clinical Chemistry'),
+  PdfEntity(text: 'Hemathology'),
+  PdfEntity(text: 'Microbiology'),
+  PdfEntity(text: 'AUBF'),
+  PdfEntity(text: 'Immunology'),
+  PdfEntity(text: 'Serology'),
+  PdfEntity(text: 'Blood Banking'),
+  PdfEntity(text: 'Histopathology'),
+];
+
+final List<PdfEntity> list2 = [
+  PdfEntity(text: 'Clinical Chemistry'),
+  PdfEntity(text: 'Hemathology'),
+  PdfEntity(text: 'Microbiology'),
+];
+final List<PdfEntity> list3 = [
+  PdfEntity(text: 'Serology'),
+  PdfEntity(text: 'Blood Banking'),
+  PdfEntity(text: 'Histopathology'),
+];

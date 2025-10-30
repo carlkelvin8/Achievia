@@ -41,6 +41,6 @@ class MessageListItem extends StatelessWidget {
           },
         );
       },
-    );;
+    );
   }
 }
