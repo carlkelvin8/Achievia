@@ -17,4 +17,5 @@ class RouteConstants {
   static const String examination = '/examination';
   static const String forgotPassword = '/forgot-password';
   static const String signUp = '/sign-up';
+  static const String pomodoroTimer = '/pomodoro-timer';
 }
