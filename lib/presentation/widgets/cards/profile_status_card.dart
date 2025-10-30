@@ -77,22 +77,22 @@ class ProfileStatusCard extends ConsumerWidget {
                       Text(
                         'Republic of the Philippines',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       Text(
                         'ACHIEVIA REVIEW',
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryVariant,
-                            ),
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryVariant,
+                        ),
                       ),
                       Text(
                         'PROFESSIONAL IDENTIFICATION CARD',
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -151,9 +151,9 @@ class ProfileStatusCard extends ConsumerWidget {
               'MEDICAL TECHNOLOGIST',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
 

@@ -68,12 +68,7 @@ class SettingsScreen extends ConsumerWidget {
             // Pomodoro Timer
             SettingsCard(
               onTap: () {
-                // Navigate to Pomodoro settings
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Pomodoro Timer settings coming soon!'),
-                  ),
-                );
+                NavigationService.goToPomodoroTimer();
               },
               child: SettingsItem(
                 icon: Icons.timer_outlined,
@@ -89,12 +84,7 @@ class SettingsScreen extends ConsumerWidget {
             // Examination
             SettingsCard(
               onTap: () {
-                // Navigate to Examination settings
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Examination settings coming soon!'),
-                  ),
-                );
+                NavigationService.goToExamination();
               },
               child: SettingsItem(
                 icon: Icons.assignment_outlined,

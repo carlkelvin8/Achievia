@@ -14,6 +14,8 @@ class RouteConstants {
   // Additional routes (for future use)
   static const String settings = '/settings';
   static const String notifications = '/notifications';
+  static const String examination = '/examination';
   static const String forgotPassword = '/forgot-password';
   static const String signUp = '/sign-up';
+  static const String pomodoroTimer = '/pomodoro-timer';
 }
