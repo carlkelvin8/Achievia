@@ -17,6 +17,7 @@ class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
     if (timer.phase == PomodoroPhase.focus && !timer.isRunning) {
       ref.read(pomodoroProvider.notifier).syncWithSettings();
     }
+    _updateDefaultFlag();
   }
 
   void setShortBreakMinutes(int minutes) {
@@ -25,6 +26,7 @@ class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
     if (timer.phase == PomodoroPhase.shortBreak && !timer.isRunning) {
       ref.read(pomodoroProvider.notifier).syncWithSettings();
     }
+    _updateDefaultFlag();
   }
 
   void setLongBreakMinutes(int minutes) {
@@ -33,14 +35,40 @@ class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
     if (timer.phase == PomodoroPhase.longBreak && !timer.isRunning) {
       ref.read(pomodoroProvider.notifier).syncWithSettings();
     }
+    _updateDefaultFlag();
   }
 
   void setSessionsBeforeLong(int sessions) {
     state = state.copyWith(sessionsBeforeLongBreak: sessions);
+    _updateDefaultFlag();
   }
 
   void toggleDefault(bool value) {
-    state = state.copyWith(defaultEnabled: value);
+    // When turned on, immediately apply default durations
+    if (value) {
+      state = state.copyWith(
+        defaultEnabled: true,
+        focusDuration: const Duration(minutes: 25),
+        shortBreakDuration: const Duration(minutes: 5),
+        longBreakDuration: const Duration(minutes: 30),
+        sessionsBeforeLongBreak: 3,
+      );
+      // If timer is paused, sync remaining with current phase
+      ref.read(pomodoroProvider.notifier).syncWithSettings();
+    } else {
+      state = state.copyWith(defaultEnabled: false);
+    }
+  }
+
+  void _updateDefaultFlag() {
+    final isDefault =
+        state.focusDuration == const Duration(minutes: 25) &&
+        state.shortBreakDuration == const Duration(minutes: 5) &&
+        state.longBreakDuration == const Duration(minutes: 30) &&
+        state.sessionsBeforeLongBreak == 3;
+    if (state.defaultEnabled != isDefault) {
+      state = state.copyWith(defaultEnabled: isDefault);
+    }
   }
 
   void togglePomodoroMusic(bool value) {
