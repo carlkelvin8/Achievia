@@ -2,7 +2,8 @@ import 'package:achievia/domain/entities/examination_results_entity.dart';
 import 'package:achievia/domain/entities/pdf_entity.dart';
 import 'package:achievia/domain/entities/reminders_entity.dart';
 import 'package:flutter/material.dart';
-import 'package:achievia/domain/entities/progress_entity.dart';
+import 'package:achievia/domain/entities/reminder_entity.dart';
+import 'package:achievia/domain/entities/author_entity.dart';
 
 final List<ExaminationResult> results = [
   ExaminationResult(
@@ -93,24 +94,48 @@ final List<PdfEntity> list3 = [
   PdfEntity(text: 'Histopathology'),
 ];
 
-// Demo data for Progress screen
-const List<ProgressEntity> demoProgressItems = [
-  ProgressEntity(
+// Demo data for Reminder screen
+const List<ReminderEntity> demoReminderItems = [
+  ReminderEntity(
     title: 'Hematology topic 1',
     subtitle: 'Page 1 - page 32',
     dueDateLabel: 'July 6, 2025',
     progress: 0.1,
   ),
-  ProgressEntity(
+  ReminderEntity(
     title: 'Parasitology Lecture',
     subtitle: 'Study protozoans until nematodes',
     dueDateLabel: 'July 7, 2025',
     progress: 0.45,
   ),
-  ProgressEntity(
+  ReminderEntity(
     title: 'DAT Procedure',
     subtitle: 'Need to memorize every reagents and measurement',
     dueDateLabel: 'July 9, 2025',
     progress: 0.0,
+  ),
+];
+
+// Demo data for Author screen
+const List<AuthorEntity> demoAuthorItems = [
+  AuthorEntity(
+    image:
+        'https://imgs.search.brave.com/06y_UGpqC2WO7A0wUNodf1gbBVQFeVd4B6Wx2VLw8oQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvNTAwcC8y/Ni80MC9wcm9maWxl/LXBsYWNlaG9sZGVy/LWltYWdlLWdyYXkt/c2lsaG91ZXR0ZS12/ZWN0b3ItMjIxMjI2/NDAuanBn',
+    name: 'Rosell Marie H. Trinidad',
+    university: 'Holy Angel University',
+    achievement: 'Top 1, March 2025 MTLE',
+    greeting: 'Hi, Achievian RMTs!',
+    message:
+        'I\'m honored to be the Top 1 of the March 2025 MTLE-but more than the title, it\'s the journey, the discipline, and the faith that brought me here. I created these practice questions to help you believe in your own potential. Every item, every explanation, and every challenge was made with one goal in mind: to help you become the next topnotcher.\n\nKeep going. Trust the process. You\'re closer than you think.',
+  ),
+  AuthorEntity(
+    image:
+        'https://imgs.search.brave.com/06y_UGpqC2WO7A0wUNodf1gbBVQFeVd4B6Wx2VLw8oQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvNTAwcC8y/Ni80MC9wcm9maWxl/LXBsYWNlaG9sZGVy/LWltYWdlLWdyYXkt/c2lsaG91ZXR0ZS12/ZWN0b3ItMjIxMjI2/NDAuanBn',
+    name: 'Janette G. Madrigal',
+    university: 'Saint Louis University',
+    achievement: 'Top 1, August 2023 MTLE',
+    greeting: 'Hello Future RMTs!',
+    message:
+        'Your journey to becoming an RMT is filled with challenges, but remember that every question you answer, every concept you master, brings you one step closer to your goal. Believe in yourself and keep pushing forward!',
   ),
 ];
