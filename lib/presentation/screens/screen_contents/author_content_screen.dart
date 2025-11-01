@@ -1,20 +1,23 @@
 import 'package:achievia/core/constants/app_paddings.dart';
-import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/presentation/provider/about/about_provider.dart';
 import 'package:achievia/domain/entities/author_entity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AuthorContentScreen extends StatelessWidget {
+class AuthorContentScreen extends ConsumerWidget {
   const AuthorContentScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authors = ref.watch(authorItemsProvider);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
           padding: level2,
           child: Column(
             children: [
-              ...demoAuthorItems.asMap().entries.map((entry) {
+              ...authors.asMap().entries.map((entry) {
                 final index = entry.key;
                 final author = entry.value;
                 return Column(

@@ -1,22 +1,16 @@
 import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/presentation/widgets/list_items/expandable_item.dart';
+import 'package:achievia/presentation/provider/about/about_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AchieviaContentScreen extends StatefulWidget {
+class AchieviaContentScreen extends ConsumerWidget {
   const AchieviaContentScreen({super.key});
 
   @override
-  State<AchieviaContentScreen> createState() => _AchieviaContentScreenState();
-}
-
-class _AchieviaContentScreenState extends State<AchieviaContentScreen> {
-  final Map<int, bool> _expandedItems = {
-    0: true,
-  }; // First item expanded by default
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final expandedState = ref.watch(expandableItemsProvider);
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -115,11 +109,11 @@ class _AchieviaContentScreenState extends State<AchieviaContentScreen> {
                 title: 'Official Logo',
                 description:
                     'The letter A symbolizes not just our name, but our aim for excellence — to help learners become A+ achievers. It stands tall, representing ambition, aspiration, and the start of a successful academic journey.',
-                isExpanded: _expandedItems[0] ?? false,
+                isExpanded: expandedState.expandedItems[0] ?? false,
                 onExpandedChanged: (expanded) {
-                  setState(() {
-                    _expandedItems[0] = expanded;
-                  });
+                  ref
+                      .read(expandableItemsProvider.notifier)
+                      .setExpanded(0, expanded);
                 },
                 imagePath: 'assets/images/logo.png',
               ),
@@ -127,11 +121,11 @@ class _AchieviaContentScreenState extends State<AchieviaContentScreen> {
               ExpandableItem(
                 title: 'Peak',
                 description: '',
-                isExpanded: _expandedItems[1] ?? false,
+                isExpanded: expandedState.expandedItems[1] ?? false,
                 onExpandedChanged: (expanded) {
-                  setState(() {
-                    _expandedItems[1] = expanded;
-                  });
+                  ref
+                      .read(expandableItemsProvider.notifier)
+                      .setExpanded(1, expanded);
                 },
                 imagePath: 'assets/images/logo.png',
               ),
@@ -139,11 +133,11 @@ class _AchieviaContentScreenState extends State<AchieviaContentScreen> {
               ExpandableItem(
                 title: 'Ups and Downs',
                 description: '',
-                isExpanded: _expandedItems[2] ?? false,
+                isExpanded: expandedState.expandedItems[2] ?? false,
                 onExpandedChanged: (expanded) {
-                  setState(() {
-                    _expandedItems[2] = expanded;
-                  });
+                  ref
+                      .read(expandableItemsProvider.notifier)
+                      .setExpanded(2, expanded);
                 },
                 imagePath: 'assets/images/logo.png',
               ),
@@ -151,11 +145,11 @@ class _AchieviaContentScreenState extends State<AchieviaContentScreen> {
               ExpandableItem(
                 title: 'Mistakes and Curiosity',
                 description: '',
-                isExpanded: _expandedItems[3] ?? false,
+                isExpanded: expandedState.expandedItems[3] ?? false,
                 onExpandedChanged: (expanded) {
-                  setState(() {
-                    _expandedItems[3] = expanded;
-                  });
+                  ref
+                      .read(expandableItemsProvider.notifier)
+                      .setExpanded(3, expanded);
                 },
                 imagePath: 'assets/images/logo.png',
               ),
@@ -163,11 +157,11 @@ class _AchieviaContentScreenState extends State<AchieviaContentScreen> {
               ExpandableItem(
                 title: 'Corrections and Improvements',
                 description: '',
-                isExpanded: _expandedItems[4] ?? false,
+                isExpanded: expandedState.expandedItems[4] ?? false,
                 onExpandedChanged: (expanded) {
-                  setState(() {
-                    _expandedItems[4] = expanded;
-                  });
+                  ref
+                      .read(expandableItemsProvider.notifier)
+                      .setExpanded(4, expanded);
                 },
                 imagePath: 'assets/images/logo.png',
               ),
