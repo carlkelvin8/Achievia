@@ -1,4 +1,5 @@
 import 'package:achievia/domain/entities/examination_results_entity.dart';
+import 'package:achievia/domain/entities/notes_entity.dart';
 import 'package:achievia/domain/entities/pdf_entity.dart';
 import 'package:achievia/domain/entities/reminders_entity.dart';
 import 'package:flutter/material.dart';
@@ -138,4 +139,16 @@ const List<AuthorEntity> demoAuthorItems = [
     message:
         'Your journey to becoming an RMT is filled with challenges, but remember that every question you answer, every concept you master, brings you one step closer to your goal. Believe in yourself and keep pushing forward!',
   ),
+];
+
+
+final List<NotesEntity> notes = [
+  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'WBC anomalies'),
+  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'Transfusion Reactions'),
+  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: ' Protozoans'),
+];
+
+
+final List<NotesEntity> notes2 = [
+  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: ' Crystals in urine'),
 ];

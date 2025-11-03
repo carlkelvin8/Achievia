@@ -1,3 +1,4 @@
+import 'package:achievia/presentation/screens/screen_contents/notes_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/profile_screen_content.dart';
 import 'package:achievia/presentation/screens/screen_contents/task_screen_content.dart';
 import 'package:flutter/material.dart';
@@ -61,14 +62,7 @@ class _TabBarProfileState extends State<TabBarProfile>
                 ),
               ),
               TaskScreenContent(),
-              Center(
-                child: Text(
-                  'Notes',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-              ),
+              NotesScreen()
             ],
           ),
         ),
