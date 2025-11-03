@@ -93,4 +93,8 @@ class NavigationService {
   static Future<dynamic> goToPomodoroTimer() {
     return pushNamed(RouteConstants.pomodoroTimer);
   }
+
+  static Future<dynamic> goToReminder() {
+    return pushNamed(RouteConstants.reminder);
+  }
 }

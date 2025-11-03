@@ -16,9 +16,16 @@ class GridBadges extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Center(
-          child: ReusableButton(title: 'Mock Boards', onPressed: (){}, width: 200, height: 50, backgroundColor: const Color.fromARGB(255, 43, 221, 221), textColor: Colors.white,),
+          child: ReusableButton(
+            title: 'Mock Boards',
+            onPressed: () {},
+            width: 200,
+            height: 30,
+            backgroundColor: theme.colorScheme.primary,
+            textColor: Colors.white,
+          ),
         ),
-        const SizedBox(height: 24,),
+        const SizedBox(height: 24),
         Text(
           text,
           style: theme.textTheme.bodyMedium?.copyWith(
@@ -37,14 +44,11 @@ class GridBadges extends StatelessWidget {
             mainAxisSpacing: 12,
             childAspectRatio: 1, // ensures all squares
           ),
-          itemBuilder: (context, index) => PdfBadge(
-            tabType: 'questions',
-            text: list2[index].text,
-          ),
+          itemBuilder: (context, index) =>
+              PdfBadge(tabType: 'questions', text: list2[index].text),
         ),
 
         const SizedBox(height: 24), // spacing between first and second grids
-
         // ---------- SECOND DAY ----------
         Text(
           text2,
@@ -57,18 +61,16 @@ class GridBadges extends StatelessWidget {
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          
+
           itemCount: list3.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 1, 
+            childAspectRatio: 1,
           ),
-          itemBuilder: (context, index) => PdfBadge(
-            tabType: 'questions',
-            text: list3[index].text,
-          ),
+          itemBuilder: (context, index) =>
+              PdfBadge(tabType: 'questions', text: list3[index].text),
         ),
       ],
     );
