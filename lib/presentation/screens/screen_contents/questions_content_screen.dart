@@ -1,6 +1,4 @@
 import 'package:achievia/core/constants/app_paddings.dart';
-import 'package:achievia/core/utils/helpers.dart';
-import 'package:achievia/presentation/widgets/badges/pdf_badge.dart';
 import 'package:achievia/presentation/widgets/grids/grid_badges.dart';
 import 'package:flutter/material.dart';
 

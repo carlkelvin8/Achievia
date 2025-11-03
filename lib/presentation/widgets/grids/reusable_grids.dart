@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:achievia/core/utils/helpers.dart';
 import 'package:achievia/presentation/widgets/cards/notes_card.dart';
-import 'package:achievia/presentation/widgets/cards/reusable_card.dart';
 
 class ReusableGrids extends ConsumerWidget {
   final int crossAxisCount;
