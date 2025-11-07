@@ -1,7 +1,6 @@
-import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/core/utils/tabs_helpers.dart';
 import 'package:achievia/presentation/provider/tabs/event/tab_event.dart';
-import 'package:achievia/presentation/widgets/tabs/reusable/resusable_tabs.dart';
+import 'package:achievia/presentation/screens/screen_contents/semi/mnemonics_semi_content.dart';
 import 'package:achievia/presentation/widgets/tabs/reusable/reusable_semi_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,7 +27,17 @@ class _SupplementalsContentScreenState extends ConsumerState<SupplementalsConten
     return Scaffold(
       body: Column(
           children: [
-            ReusableSemiTab(controller: controller, tabs: tabsSemi)
+            ReusableSemiTab(controller: controller, tabs: tabsSemi),
+            Expanded(
+              child: TabBarView(
+                controller: controller,
+                children: [
+                      MnemonicsSemiContent(),
+                      Text('test'),
+                      Text('text')
+                  ]
+                )
+            )
           ],
         ),
     );

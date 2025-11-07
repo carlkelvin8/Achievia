@@ -1,6 +1,7 @@
 import 'package:achievia/presentation/screens/screen_contents/contents/notes_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/profile_screen_content.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/task_screen_content.dart';
+import 'package:achievia/presentation/screens/screen_contents/progress_screen_content.dart';
 import 'package:flutter/material.dart';
 
 class TabBarProfile extends StatefulWidget {
@@ -52,15 +53,8 @@ class _TabBarProfileState extends State<TabBarProfile>
           child: TabBarView(
             controller: _controller,
             children: [
-              ProfileScreenContent(),
-              Center(
-                child: Text(
-                  'Progress',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-              ),
+              const ProfileScreenContent(),
+              const ProgressScreenContent(),
               TaskScreenContent(),
               NotesScreen()
             ],

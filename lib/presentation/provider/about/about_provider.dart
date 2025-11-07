@@ -23,7 +23,6 @@ class ExpandableItemsState {
 class ExpandableItemsNotifier extends Notifier<ExpandableItemsState> {
   @override
   ExpandableItemsState build() {
-    // First item expanded by default
     return ExpandableItemsState(expandedItems: {0: true});
   }
 
