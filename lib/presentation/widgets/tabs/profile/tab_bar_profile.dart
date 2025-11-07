@@ -1,6 +1,6 @@
-import 'package:achievia/presentation/screens/screen_contents/notes_screen.dart';
-import 'package:achievia/presentation/screens/screen_contents/profile_screen_content.dart';
-import 'package:achievia/presentation/screens/screen_contents/task_screen_content.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/notes_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/profile_screen_content.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/task_screen_content.dart';
 import 'package:flutter/material.dart';
 
 class TabBarProfile extends StatefulWidget {

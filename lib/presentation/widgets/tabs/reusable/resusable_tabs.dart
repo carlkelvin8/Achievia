@@ -14,6 +14,7 @@ class _ResusableTabsState extends ConsumerState<ResusableTabs> {
   @override
   Widget build(BuildContext context) {
     return TabBar(
+          
           controller: widget.controller,
           tabs: widget.tabs,
           labelColor: Theme.of(context).colorScheme.primary,

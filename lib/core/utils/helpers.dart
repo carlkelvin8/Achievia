@@ -67,11 +67,7 @@ final List<Map<String, dynamic>> messages = [
   },
 ];
 
-final tabs = const [
-  Tab(text: 'Mother Notes'),
-  Tab(text: 'Questions'),
-  Tab(text: 'Supplementals'),
-];
+
 
 final List<PdfEntity> list = [
   PdfEntity(text: 'Clinical Chemistry'),

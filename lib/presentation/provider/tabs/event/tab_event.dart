@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final tabProvider = NotifierProvider.autoDispose<TabEvent, TabController?>(TabEvent.new);
 final tabProviderReviewer = NotifierProvider.autoDispose<ReviewerEvent, TabController?>(ReviewerEvent.new);
 final indexProvider = NotifierProvider.autoDispose<IndexEvent, int>(IndexEvent.new);
+final tabProviderSemi = NotifierProvider.autoDispose<SupplementalsEvent, TabController?>(SupplementalsEvent.new);
 
 class TabEvent extends Notifier<TabController?> {
   @override
@@ -17,6 +18,22 @@ class TabEvent extends Notifier<TabController?> {
     });
   }
   void jumpTo(int index) => state?.animateTo(index);
+}
+
+class SupplementalsEvent extends Notifier<TabController?> {
+  @override
+  TabController? build()=> null;
+
+  void createController(TickerProvider vsync, int lenght){
+    final controller = TabController(length: lenght, vsync: vsync);
+    state = controller;
+
+    ref.onDispose((){
+      controller.dispose();
+    });
+
+  }
+  
 }
 
 class ReviewerEvent extends Notifier<TabController?>{

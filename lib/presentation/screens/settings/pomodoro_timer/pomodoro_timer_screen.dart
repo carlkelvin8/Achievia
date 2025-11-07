@@ -159,7 +159,6 @@ class _CustomizeCard extends ConsumerWidget {
   final ThemeData theme;
   final dynamic settings; // PomodoroSettingsEntity
   final WidgetRef ref;
-
   const _CustomizeCard({
     required this.theme,
     required this.ref,
