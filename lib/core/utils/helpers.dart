@@ -4,6 +4,7 @@ import 'package:achievia/domain/entities/reminders_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:achievia/domain/entities/reminder_entity.dart';
 import 'package:achievia/domain/entities/author_entity.dart';
+import 'package:achievia/domain/entities/progress_entity.dart';
 
 final List<ExaminationResult> results = [
   ExaminationResult(
@@ -137,5 +138,137 @@ const List<AuthorEntity> demoAuthorItems = [
     greeting: 'Hello Future RMTs!',
     message:
         'Your journey to becoming an RMT is filled with challenges, but remember that every question you answer, every concept you master, brings you one step closer to your goal. Believe in yourself and keep pushing forward!',
+  ),
+];
+
+// Demo data for Progress screen
+final ProgressEntity demoProgressData = ProgressEntity(
+  currentScore: 90.0,
+  level: 'Achievian Topnotcher Potential',
+  message:
+      'Excellent work! You\'re on topnotcher path - keep pushing and stay sharp.',
+  strengthWeakness: const StrengthWeakness(
+    bestSubject: 'Clinical Chemistry',
+    bestAverage: 88.00,
+    weakestSubject: 'Hematology',
+    weakestAverage: 57.18,
+  ),
+  scoreHistory: [
+    ScoreData(date: DateTime(2025, 7, 15), score: 86.0),
+    ScoreData(date: DateTime(2025, 7, 18), score: 82.0),
+    ScoreData(date: DateTime(2025, 7, 21), score: 89.0),
+    ScoreData(date: DateTime(2025, 7, 27), score: 93.0),
+    ScoreData(date: DateTime(2025, 7, 28), score: 90.0),
+  ],
+  screentimeData: ScreentimeData(
+    dailyAverage: 228,
+    longestScreentime: 390,
+    shortestScreentime: 75,
+    dailyBreakdown: [
+      DailyScreentime(date: DateTime(2025, 7, 20), minutes: 250),
+      DailyScreentime(date: DateTime(2025, 7, 21), minutes: 180),
+      DailyScreentime(date: DateTime(2025, 7, 22), minutes: 320),
+      DailyScreentime(date: DateTime(2025, 7, 23), minutes: 390),
+      DailyScreentime(date: DateTime(2025, 7, 24), minutes: 150),
+      DailyScreentime(date: DateTime(2025, 7, 25), minutes: 200),
+      DailyScreentime(date: DateTime(2025, 7, 26), minutes: 175),
+    ],
+  ),
+  calendarData: CalendarData(
+    currentMonth: DateTime(2025, 1),
+    thisMonthStreak: 10,
+    longestStreak: 18,
+    days: _generateCalendarDays(DateTime(2025, 1)),
+  ),
+);
+
+// Helper function to generate calendar days for a month
+List<CalendarDay> _generateCalendarDays(DateTime month) {
+  final days = <CalendarDay>[];
+  final firstDay = DateTime(month.year, month.month, 1);
+  final lastDay = DateTime(month.year, month.month + 1, 0);
+  final firstWeekday = firstDay.weekday; // 1 = Monday, 7 = Sunday
+
+  // Add days from previous month to fill the first week
+  final prevMonthLastDay = DateTime(month.year, month.month, 0);
+  for (int i = firstWeekday - 1; i > 0; i--) {
+    days.add(
+      CalendarDay(
+        date: DateTime(
+          prevMonthLastDay.year,
+          prevMonthLastDay.month,
+          prevMonthLastDay.day - i + 1,
+        ),
+        status: DayStatus.inactive,
+      ),
+    );
+  }
+
+  // Add days of current month
+  for (int day = 1; day <= lastDay.day; day++) {
+    final date = DateTime(month.year, month.month, day);
+    DayStatus status;
+
+    if (day <= 17) {
+      status = DayStatus.completed; // Dark blue with white AX
+    } else if (day <= 19) {
+      status = DayStatus.current; // White with light blue AX
+    } else {
+      status = DayStatus.inactive; // Light gray
+    }
+
+    days.add(CalendarDay(date: date, status: status));
+  }
+
+  // Fill remaining days to complete the last week
+  final remainingDays = 42 - days.length; // 6 weeks * 7 days
+  for (int day = 1; day <= remainingDays; day++) {
+    days.add(
+      CalendarDay(
+        date: DateTime(month.year, month.month + 1, day),
+        status: DayStatus.inactive,
+      ),
+    );
+  }
+
+  return days;
+}
+
+// Grading brackets data
+const List<GradingBracket> gradingBrackets = [
+  GradingBracket(
+    scoreRange: 'Below 50%',
+    level: 'Recharge & Refocus',
+    message:
+        'Double your effort. Revisit the basics and rebuild your foundation.',
+  ),
+  GradingBracket(
+    scoreRange: '50% - 64%',
+    level: 'Warming Up',
+    message: 'Progress is showing. Strengthen weak areas and stay consistent.',
+  ),
+  GradingBracket(
+    scoreRange: '65% - 74%',
+    level: 'Almost There',
+    message:
+        'You\'re on the right track. Improve accuracy and keep practicing.',
+  ),
+  GradingBracket(
+    scoreRange: '75% - 84%',
+    level: 'Solid Achievian',
+    message:
+        'Strong performance! Focus on high-yield topics and aim even higher.',
+  ),
+  GradingBracket(
+    scoreRange: '85% - 89%',
+    level: 'Board Ready',
+    message:
+        'You\'re nearly there. Sharpen your details and maintain your momentum.',
+  ),
+  GradingBracket(
+    scoreRange: '90% and Above',
+    level: 'Achievian Topnotcher Potential',
+    message:
+        'Excellent work! You\'re on topnotcher path - keep pushing and stay sharp.',
   ),
 ];
