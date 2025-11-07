@@ -31,14 +31,13 @@ class _PdfBadgeState extends State<PdfBadge> {
       child: Container(
         padding: const EdgeInsets.all(8),
         width: double.infinity,
-        // ✅ Add decoration for visual separation (optional)
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: themeColor.primary.withOpacity(0.3)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center, // ✅ centers contents
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Flexible(
               flex: 2,
