@@ -1,4 +1,5 @@
 import 'package:achievia/domain/entities/examination_results_entity.dart';
+import 'package:achievia/domain/entities/medical_abbreviation_entity.dart';
 import 'package:achievia/domain/entities/notes_entity.dart';
 import 'package:achievia/domain/entities/pdf_entity.dart';
 import 'package:achievia/domain/entities/reminders_entity.dart';
@@ -279,4 +280,49 @@ const List<GradingBracket> gradingBrackets = [
     message:
         'Excellent work! You\'re on topnotcher path - keep pushing and stay sharp.',
   ),
+];
+
+
+final List<MedicalAbbreviation> medicalAbbreviations = [
+  const MedicalAbbreviation(abbreviation: 'AC', expansion: 'adenylyl cyclase'),
+  const MedicalAbbreviation(abbreviation: 'ADP', expansion: 'adenosine diphosphate'),
+  const MedicalAbbreviation(abbreviation: 'ADPR', expansion: 'adenosine diphosphate ribose'),
+  const MedicalAbbreviation(abbreviation: 'AIDS', expansion: 'acquired immune deficiency syndrome'),
+  const MedicalAbbreviation(abbreviation: 'ALT', expansion: 'alanine transaminase'),
+  const MedicalAbbreviation(abbreviation: 'AST', expansion: 'aspartate transaminase'),
+  const MedicalAbbreviation(abbreviation: 'ATP', expansion: 'adenosine triphosphate'),
+  const MedicalAbbreviation(abbreviation: 'BPP', expansion: 'Baclofen phosphate'),
+  const MedicalAbbreviation(abbreviation: 'cAMP', expansion: 'cyclic 3\'-adenosine monophosphate'),
+  const MedicalAbbreviation(abbreviation: 'CNS', expansion: 'central nervous system'),
+  const MedicalAbbreviation(abbreviation: 'DAP', expansion: 'diaminopimelic acid'),
+  const MedicalAbbreviation(abbreviation: 'EBV', expansion: 'Epstein-Barr virus'),
+  const MedicalAbbreviation(abbreviation: 'EF-2', expansion: 'elongation factor 2'),
+  const MedicalAbbreviation(abbreviation: 'EIEC', expansion: 'enteroinvasive Escherichia coli'),
+  const MedicalAbbreviation(abbreviation: 'ELISA', expansion: 'enzyme-linked immunosorbent assay'),
+  const MedicalAbbreviation(abbreviation: 'ETEC', expansion: 'enterotoxigenic Escherichia coli'),
+  const MedicalAbbreviation(abbreviation: 'fMET', expansion: 'N-formyl-methionine'),
+  const MedicalAbbreviation(abbreviation: 'GABA', expansion: 'γ-aminobutyric acid'),
+  const MedicalAbbreviation(abbreviation: 'GI', expansion: 'gastrointestinal'),
+  const MedicalAbbreviation(abbreviation: 'GTP', expansion: 'guanosine-5\'-triphosphate'),
+  const MedicalAbbreviation(abbreviation: 'GU', expansion: 'genitourinary'),
+  const MedicalAbbreviation(abbreviation: 'HBsAg', expansion: 'hepatitis B surface antigen'),
+];
+
+final List<NotesEntity> mnemonics = [
+  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'NFPA Symbol'),
+  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'ISBT Blood Groups'),
+  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'Radial Immunodiffusion'),
+  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'DNA Viruses'),
+  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'Gram Positive Bacilli'),
+];
+
+final List<PdfEntity> procedures = [
+  PdfEntity(text: 'DAT'),
+  PdfEntity(text: 'Blood Typing'),
+  PdfEntity(text: 'Manual CBC'),
+  PdfEntity(text: 'Manual RBC Count'),
+  PdfEntity(text: 'Manual Platelet Count'),
+  PdfEntity(text: 'Manual Crossmatching'),
+  PdfEntity(text: 'Manual CBC'),
+  PdfEntity(text: 'Manual RBC Count'),
 ];

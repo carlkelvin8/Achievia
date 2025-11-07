@@ -1,6 +1,8 @@
 import 'package:achievia/core/utils/tabs_helpers.dart';
 import 'package:achievia/presentation/provider/tabs/event/tab_event.dart';
+import 'package:achievia/presentation/screens/screen_contents/semi/abbreviations_semi_content.dart';
 import 'package:achievia/presentation/screens/screen_contents/semi/mnemonics_semi_content.dart';
+import 'package:achievia/presentation/screens/screen_contents/semi/procedures_semi_content.dart';
 import 'package:achievia/presentation/widgets/tabs/reusable/reusable_semi_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,8 +35,8 @@ class _SupplementalsContentScreenState extends ConsumerState<SupplementalsConten
                 controller: controller,
                 children: [
                       MnemonicsSemiContent(),
-                      Text('test'),
-                      Text('text')
+                      AbbreviationsSemiContent(),
+                      ProceduresSemiContent(),
                   ]
                 )
             )
