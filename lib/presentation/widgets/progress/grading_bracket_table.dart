@@ -1,4 +1,4 @@
-import 'package:achievia/domain/entities/progress_entity.dart';
+import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 import 'package:flutter/material.dart';
 
 class GradingBracketTable extends StatelessWidget {
@@ -67,7 +67,7 @@ class GradingBracketTable extends StatelessWidget {
                   // Header Row
                   TableRow(
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceVariant.withValues(
+                      color: theme.colorScheme.surfaceContainerHighest.withValues(
                         alpha: 0.5,
                       ),
                     ),

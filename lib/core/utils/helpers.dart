@@ -1,12 +1,12 @@
-import 'package:achievia/domain/entities/examination_results_entity.dart';
-import 'package:achievia/domain/entities/medical_abbreviation_entity.dart';
-import 'package:achievia/domain/entities/notes_entity.dart';
-import 'package:achievia/domain/entities/pdf_entity.dart';
-import 'package:achievia/domain/entities/reminders_entity.dart';
+import 'package:achievia/domain/entities/widgets/examination_results_entity.dart';
+import 'package:achievia/domain/entities/widgets/medical_abbreviation_entity.dart';
+import 'package:achievia/domain/entities/widgets/notes_entity.dart';
+import 'package:achievia/domain/entities/widgets/pdf_entity.dart';
+import 'package:achievia/domain/entities/widgets/reminders_entity.dart';
 import 'package:flutter/material.dart';
-import 'package:achievia/domain/entities/reminder_entity.dart';
-import 'package:achievia/domain/entities/author_entity.dart';
-import 'package:achievia/domain/entities/progress_entity.dart';
+import 'package:achievia/domain/entities/widgets/reminder_entity.dart';
+import 'package:achievia/domain/entities/widgets/author_entity.dart';
+import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 
 final List<ExaminationResult> results = [
   ExaminationResult(

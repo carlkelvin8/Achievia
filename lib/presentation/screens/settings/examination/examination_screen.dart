@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/presentation/widgets/examination/examination_info_card.dart';
 import 'package:achievia/presentation/widgets/examination/examination_config_card.dart';
 import 'package:achievia/presentation/provider/examination/examination_provider.dart';
-import 'package:achievia/domain/entities/examination_config_entity.dart';
+import 'package:achievia/domain/entities/widgets/examination_config_entity.dart';
 
 class ExaminationScreen extends ConsumerStatefulWidget {
   const ExaminationScreen({super.key});

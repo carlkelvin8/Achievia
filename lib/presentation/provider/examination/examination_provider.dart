@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:achievia/domain/entities/examination_config_entity.dart';
+import 'package:achievia/domain/entities/widgets/examination_config_entity.dart';
 
 // Examination configuration provider
 final examinationConfigProvider =

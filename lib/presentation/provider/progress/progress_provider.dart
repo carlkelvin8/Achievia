@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:achievia/domain/entities/progress_entity.dart';
+import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 import 'package:achievia/core/utils/helpers.dart';
 
 class ProgressNotifier extends Notifier<ProgressEntity> {

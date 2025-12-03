@@ -1,4 +1,4 @@
-import 'package:achievia/domain/entities/progress_entity.dart';
+import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -308,7 +308,7 @@ class _CalendarCardState extends State<CalendarCard> {
         );
       case DayStatus.inactive:
         return (
-          theme.colorScheme.surfaceVariant.withValues(alpha: 0.3),
+          theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
           theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           null,
         );
@@ -326,7 +326,7 @@ class _CalendarCardState extends State<CalendarCard> {
           width: 20,
           height: 200,
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.2),
+            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Stack(

@@ -1,6 +1,6 @@
 import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/presentation/provider/about/about_provider.dart';
-import 'package:achievia/domain/entities/author_entity.dart';
+import 'package:achievia/domain/entities/widgets/author_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

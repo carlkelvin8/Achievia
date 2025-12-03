@@ -6,7 +6,6 @@ import 'package:achievia/presentation/screens/main/profile_screen.dart';
 import 'package:achievia/presentation/screens/main/reviewers_screen.dart';
 import 'package:achievia/presentation/widgets/appbar/main_appbar.dart';
 import 'package:achievia/presentation/widgets/navigation/bottom_nav_bar.dart';
-import 'package:achievia/core/constants/routers/tab_navigation_provider.dart';
 import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

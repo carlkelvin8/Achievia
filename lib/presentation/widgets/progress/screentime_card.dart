@@ -1,4 +1,4 @@
-import 'package:achievia/domain/entities/progress_entity.dart';
+import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 import 'package:achievia/presentation/widgets/charts/progress/screentime_bar_chart.dart';
 import 'package:achievia/presentation/widgets/progress/metric_item.dart';
 import 'package:flutter/material.dart';

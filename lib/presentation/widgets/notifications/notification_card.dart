@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:achievia/domain/entities/notification_entity.dart';
+import 'package:achievia/domain/entities/widgets/notification_entity.dart';
 
 class NotificationCard extends StatelessWidget {
   final NotificationEntity notification;

@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:achievia/domain/entities/notification_entity.dart';
+import 'package:achievia/domain/entities/widgets/notification_entity.dart';
 
 // Mock data for notifications
 final List<NotificationEntity> _mockNotifications = [
