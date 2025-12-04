@@ -7,24 +7,24 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'questions_dto.g.dart';
 
-@HiveType(typeId: 0)
+@HiveType(typeId: 1)
 @JsonSerializable()
 class QuestionsDto {
 
   @HiveField(0)
-  final String id;
+  final int id;
 
   @HiveField(1)
   final String title;
 
   @HiveField(2)
-  final String courseId;
+  final int courseId;
 
   @HiveField(3)
   final String description;
 
   @HiveField(4)
-  final String image;
+  final String? image; // nullable
 
   @HiveField(5)
   final String day_subject;
@@ -37,7 +37,7 @@ class QuestionsDto {
     required this.title,
     required this.courseId,
     required this.description,
-    required this.image,
+    this.image,
     required this.day_subject,
     required this.createdAt,
   });
@@ -46,21 +46,20 @@ class QuestionsDto {
 
   Map<String, dynamic> toJson() => _$QuestionsDtoToJson(this);
 
-
   QuestionsEntity toEntity() => QuestionsEntity(
-      id: id,
+      id: id.toString(),  // convert int to String if entity expects String
       title: title,
-      courseId: courseId,
+      courseId: courseId.toString(),
       description: description,
-      image: image,
+      image: image ?? '',
       day_subject: day_subject,
       createdAt: createdAt,
     );
 
   static QuestionsDto fromEntity(QuestionsEntity entity) => QuestionsDto(
-      id: entity.id,
+      id: int.parse(entity.id),   // convert back to int
       title: entity.title,
-      courseId: entity.courseId,
+      courseId: int.parse(entity.courseId),
       description: entity.description,
       image: entity.image,
       day_subject: entity.day_subject,

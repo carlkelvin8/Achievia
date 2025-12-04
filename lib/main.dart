@@ -12,7 +12,6 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   final appDirectory = await path.getApplicationDocumentsDirectory();
   Hive.init(appDirectory.path);
-  Hive.openBox('question');
   await configureDependencies();
   runApp(const ProviderScope(child: MyApp()));
 }
