@@ -20,7 +20,7 @@ class QuestionsRepositoryImpl implements QuestionsRepository{
       if (connectivity) {
         final remoteQuestions = await remoteDatasource.getAllQuestions(token, id);
         print('Repository - Remote questions received: $remoteQuestions');
-        //await local.cachePost(remoteQuestions);
+        await local.cachePost(remoteQuestions);
         final mapped = remoteQuestions.map((e)=>e.toEntity()).toList();
         print('Repository - Mapped to entities: $mapped');
         return mapped;

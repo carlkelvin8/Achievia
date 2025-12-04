@@ -1,8 +1,9 @@
+import 'package:achievia/core/constants/app_theme.dart';
 import 'package:achievia/core/constants/routers/app_router.dart';
 import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:achievia/core/constants/routers/route_constants.dart';
-import 'package:achievia/core/constants/app_theme.dart';
 import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:achievia/presentation/provider/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +13,8 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   final appDirectory = await path.getApplicationDocumentsDirectory();
   Hive.init(appDirectory.path);
+  Hive.registerAdapter(QuestionsDtoAdapter());
+  Hive.openBox('question_box');
   await configureDependencies();
   runApp(const ProviderScope(child: MyApp()));
 }
