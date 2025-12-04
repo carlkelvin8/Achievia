@@ -11,8 +11,6 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:achievia/core/di/local_storage_service.dart' as _i982;
 import 'package:achievia/core/di/shared_pref.dart' as _i644;
-import 'package:achievia/data/data_source/repository_data_source/home/question_repo_data_source.dart'
-    as _i396;
 import 'package:achievia/data/data_source/repository_data_source_impl/home/questions_remote_datasource.dart'
     as _i322;
 import 'package:get_it/get_it.dart' as _i174;
@@ -34,7 +32,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i982.LocalStorageService>(
       () => _i982.LocalStorageService(gh<_i460.SharedPreferences>()),
     );
-    gh.lazySingleton<_i396.QuestionRepoDataSource>(
+    gh.lazySingleton<_i322.QuestionRepoDataSource>(
       () => _i322.QuestionsRemoteDatasource(),
     );
     return this;
