@@ -1,6 +1,8 @@
 import 'package:achievia/const.dart';
 import 'package:dio/dio.dart';
-
+import 'package:injectable/injectable.dart';
+@lazySingleton
+@injectable
 class DioClient {
   final Dio dio;
 
