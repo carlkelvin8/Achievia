@@ -2,7 +2,7 @@ import 'package:achievia/data/data_source/repository_data_source/home/question_r
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:injectable/injectable.dart';
 
-@singleton
+@LazySingleton(as: QuestionRepoDataSource)
 class QuestionsRemoteDatasource implements QuestionRepoDataSource{
   @override
   Future<QuestionsDto> getAllQuestions(QuestionsDto dto) {

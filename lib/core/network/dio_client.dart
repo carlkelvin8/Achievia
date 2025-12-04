@@ -1,21 +1,15 @@
 import 'package:achievia/const.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cache_plus/dio_cache_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-final dio = Dio(
-  BaseOptions(
-    baseUrl: BASE_URL,
-    connectTimeout: Duration(seconds: 5),
-    receiveTimeout: Duration(seconds: 5),
-    headers: {
-      "Content-Type":"application/json"
-    }
-  )
-);
+class DioClient {
+  final Dio dio;
 
-final cache = SharedPreferencesWithCacheOptions(
-  
-);
-
-
+  DioClient()
+      : dio = Dio(
+          BaseOptions(
+            baseUrl: BASE_URL,
+            connectTimeout: const Duration(seconds: 10),
+            receiveTimeout: const Duration(seconds: 10),
+          ),
+        );
+}

@@ -6,9 +6,13 @@ import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/presentation/provider/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart' as path;
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  final appDirectory = await path.getApplicationDocumentsDirectory();
+  Hive.init(appDirectory.path);
+  Hive.openBox('question');
   await configureDependencies();
   runApp(const ProviderScope(child: MyApp()));
 }

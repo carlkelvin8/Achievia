@@ -2,15 +2,36 @@
 import 'dart:convert';
 
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
+import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'questions_dto.g.dart';
+
+@HiveType(typeId: 0)
+@JsonSerializable()
 class QuestionsDto {
+
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String title;
+
+  @HiveField(2)
   final String courseId;
+
+  @HiveField(3)
   final String description;
+
+  @HiveField(4)
   final String image;
+
+  @HiveField(5)
   final String day_subject;
+
+  @HiveField(6)
   final String createdAt;
+
   QuestionsDto({
     required this.id,
     required this.title,
@@ -21,39 +42,37 @@ class QuestionsDto {
     required this.createdAt,
   });
 
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'id': id,
-      'title': title,
-      'courseId': courseId,
-      'description': description,
-      'image': image,
-      'day_subject': day_subject,
-      'createdAt': createdAt,
-    };
-  }
+  factory QuestionsDto.fromJson(Map<String, dynamic> json) =>
+      _$QuestionsDtoFromJson(json);
 
-  factory QuestionsDto.fromMap(Map<String, dynamic> map) {
-    return QuestionsDto(
-      id: map['id'] as String,
-      title: map['title'] as String,
-      courseId: map['courseId'] as String,
-      description: map['description'] as String,
-      image: map['image'] as String,
-      day_subject: map['day_subject'] as String,
-      createdAt: map['createdAt'] as String,
+  Map<String, dynamic> toJson() => _$QuestionsDtoToJson(this);
+
+  factory QuestionsDto.fromJsonString(String source) =>
+      QuestionsDto.fromJson(json.decode(source) as Map<String, dynamic>);
+
+  String toJsonString() => json.encode(toJson());
+
+  QuestionsEntity toEntity() {
+    return QuestionsEntity(
+      id: id,
+      title: title,
+      courseId: courseId,
+      description: description,
+      image: image,
+      day_subject: day_subject,
+      createdAt: createdAt,
     );
   }
 
-  String toJson() => json.encode(toMap());
-
-  factory QuestionsDto.fromJson(String source) => QuestionsDto.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  QuestionsEntity toEntity(){
-    return QuestionsEntity(id: id, title: title, courseId: courseId, description: description, image: image, day_subject: day_subject, createdAt: createdAt);
-  }
-
-  static QuestionsDto fromEntity(QuestionsEntity entity){
-    return QuestionsDto(id: entity.id, title: entity.title, courseId: entity.courseId, description: entity.description, image: entity.image, day_subject: entity.day_subject, createdAt: entity.createdAt);
+  static QuestionsDto fromEntity(QuestionsEntity entity) {
+    return QuestionsDto(
+      id: entity.id,
+      title: entity.title,
+      courseId: entity.courseId,
+      description: entity.description,
+      image: entity.image,
+      day_subject: entity.day_subject,
+      createdAt: entity.createdAt,
+    );
   }
 }
