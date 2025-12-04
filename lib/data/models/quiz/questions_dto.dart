@@ -42,18 +42,12 @@ class QuestionsDto {
     required this.createdAt,
   });
 
-  factory QuestionsDto.fromJson(Map<String, dynamic> json) =>
-      _$QuestionsDtoFromJson(json);
+  factory QuestionsDto.fromJson(Map<String, dynamic> json) => _$QuestionsDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$QuestionsDtoToJson(this);
 
-  factory QuestionsDto.fromJsonString(String source) =>
-      QuestionsDto.fromJson(json.decode(source) as Map<String, dynamic>);
 
-  String toJsonString() => json.encode(toJson());
-
-  QuestionsEntity toEntity() {
-    return QuestionsEntity(
+  QuestionsEntity toEntity() => QuestionsEntity(
       id: id,
       title: title,
       courseId: courseId,
@@ -62,10 +56,8 @@ class QuestionsDto {
       day_subject: day_subject,
       createdAt: createdAt,
     );
-  }
 
-  static QuestionsDto fromEntity(QuestionsEntity entity) {
-    return QuestionsDto(
+  static QuestionsDto fromEntity(QuestionsEntity entity) => QuestionsDto(
       id: entity.id,
       title: entity.title,
       courseId: entity.courseId,
@@ -74,5 +66,4 @@ class QuestionsDto {
       day_subject: entity.day_subject,
       createdAt: entity.createdAt,
     );
-  }
 }
