@@ -14,6 +14,8 @@ import 'package:achievia/core/di/shared_pref.dart' as _i644;
 import 'package:achievia/core/network/conntectivity.dart' as _i790;
 import 'package:achievia/core/network/dio_client.dart' as _i344;
 import 'package:achievia/core/registration/register_modules.dart' as _i790;
+import 'package:achievia/data/data_source/repository_data_source_impl/auth/user_remote_datasource.dart'
+    as _i426;
 import 'package:achievia/data/data_source/repository_data_source_impl/cache/cache_data_source_impl.dart'
     as _i692;
 import 'package:achievia/data/data_source/repository_data_source_impl/home/questions_remote_datasource.dart'
@@ -27,6 +29,7 @@ import 'package:achievia/domain/use_cases/questions/questions_use_case.dart'
     as _i803;
 import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:dio/dio.dart' as _i361;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:hive/hive.dart' as _i979;
 import 'package:injectable/injectable.dart' as _i526;
@@ -49,6 +52,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i344.DioClient>(() => _i344.DioClient());
     gh.lazySingleton<_i361.Dio>(() => registerModules.dio);
     gh.lazySingleton<_i895.Connectivity>(() => registerModules.connectivity);
+    gh.lazySingleton<_i558.FlutterSecureStorage>(
+      () => registerModules.tokenStorage,
+    );
     gh.singleton<_i982.LocalStorageService>(
       () => _i982.LocalStorageService(gh<_i460.SharedPreferences>()),
     );
@@ -77,6 +83,9 @@ extension GetItInjectableX on _i174.GetIt {
         day_subject: gh<String>(),
         createdAt: gh<String>(),
       ),
+    );
+    gh.factory<_i426.UserRemoteDatasource>(
+      () => _i426.UserRemoteDatasource(dio: gh<_i361.Dio>()),
     );
     gh.factory<_i692.CacheDataSourceImpl>(
       () => _i692.CacheDataSourceImpl(

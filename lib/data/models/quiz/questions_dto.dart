@@ -1,5 +1,4 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
 
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:hive/hive.dart';
@@ -49,7 +48,7 @@ class QuestionsDto {
   QuestionsEntity toEntity() => QuestionsEntity(
       id: id.toString(),  // convert int to String if entity expects String
       title: title,
-      courseId: courseId.toString(),
+      courseId: courseId.toString(), 
       description: description,
       image: image ?? '',
       day_subject: day_subject,
@@ -57,7 +56,7 @@ class QuestionsDto {
     );
 
   static QuestionsDto fromEntity(QuestionsEntity entity) => QuestionsDto(
-      id: int.parse(entity.id),   // convert back to int
+      id: int.parse(entity.id),
       title: entity.title,
       courseId: int.parse(entity.courseId),
       description: entity.description,

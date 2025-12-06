@@ -9,14 +9,10 @@ final getQuestions = Provider<QuestionsUseCase>((ref){
 
 final getQuestionsProviderState = FutureProvider.family<List<QuestionsEntity>, ({String token, String id})>((ref, params) async {
   final gtQuestions = ref.read(getQuestions);
-  print('Fetching questions with params: $params');
   try {
     final result = await gtQuestions.getQuestions(params.token, params.id);
-    print('Provider result: $result');
     return result;
-  } catch (e, st) {
-    print('Provider error: $e');
-    print('StackTrace: $st');
+  } catch (e) {
     rethrow;
   }
 });

@@ -1,3 +1,4 @@
+import 'package:achievia/const.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -12,10 +13,9 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource{
   QuestionsRemoteDatasource(this.dio);
  @override
 Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
-  print('API call started...');
   try {
     final response = await dio.get(
-      'http://10.0.2.2:5000/tasks/getQuiz?id=$id',
+      '$BASE_URL/tasks/getQuiz?id=$id',
       options: Options(
         headers: {
           'Content-Type': 'application/json',
@@ -24,20 +24,12 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
         },
       ),
     );
-    print('Response received: ${response.data}');
-
-    // Extract the single question from the response
     final questionData = response.data['data']['response'] as Map<String, dynamic>;
-    print('Question data extracted: $questionData');
 
-    // Wrap it in a list for repository compatibility
     final questionsList = [QuestionsDto.fromJson(questionData)];
-    print('DTO created successfully: $questionsList');
 
     return questionsList;
-  } catch (e, st) {
-    print('API error: $e');
-    print('StackTrace: $st');
+  } catch (e) {
     rethrow;
   }
 }

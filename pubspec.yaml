@@ -49,6 +49,7 @@ dependencies:
   json_serializable: ^6.11.2
   json_annotation: ^4.9.0
   connectivity_plus: ^7.0.0
+  flutter_secure_storage: ^4.2.1
 
 dev_dependencies:
   flutter_test:
