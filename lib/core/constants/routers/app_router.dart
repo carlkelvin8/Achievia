@@ -11,7 +11,7 @@ import 'package:achievia/presentation/screens/settings/settings_screen.dart';
 import 'package:achievia/presentation/screens/notifications/notifications_screen.dart';
 import 'package:achievia/presentation/screens/settings/examination/examination_screen.dart';
 import 'package:achievia/presentation/screens/settings/pomodoro_timer/pomodoro_timer_screen.dart';
-import 'package:achievia/presentation/screens/screen_contents/reminder_screen_content.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/reminder_screen_content.dart';
 import 'route_constants.dart';
 
 class AppRouter {

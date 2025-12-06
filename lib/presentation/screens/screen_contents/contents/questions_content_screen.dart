@@ -18,7 +18,7 @@ class _QuestionsContentScreenState extends State<QuestionsContentScreen> {
         child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-            GridBadges(text: 'First Day Subjects', text2: 'Second Day Sybjects',)
+            GridBadges(token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInVzZXJuYW1lIjoiam9obmRvZSIsImVtYWlsIjoic3R1ZGVudEBleGFtcGxlLmNvbSIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzY0ODU4Mzg3LCJleHAiOjE3NjU0NjMxODd9.LI1lgijxN0jsMhWl3fG1GkfOTYjkajNrvSB7yTdw_3I', id: '1', title: 'Day 1',)
             ],
           ),
         )

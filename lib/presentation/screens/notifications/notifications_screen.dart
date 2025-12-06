@@ -42,12 +42,24 @@ class NotificationsScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: Stack(
+              clipBehavior: Clip.none,
               children: [
                 IconButton(
-                  icon: Icon(
-                    Icons.notifications,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 24,
+                  icon: Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 2,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.notifications_outlined,
+                      color: Color(0xFF90CAF9),
+                      size: 24,
+                    ),
                   ),
                   alignment: Alignment.center,
                   padding: EdgeInsets.zero,
@@ -62,26 +74,28 @@ class NotificationsScreen extends ConsumerWidget {
                 ),
                 if (unreadCount > 0)
                   Positioned(
-                    right: 8,
-                    top: 8,
+                    right: 6,
+                    top: 6,
                     child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.error,
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFE53935),
                         shape: BoxShape.circle,
                       ),
                       constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
+                        minWidth: 18,
+                        minHeight: 18,
                       ),
-                      child: Text(
-                        unreadCount.toString(),
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onError,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
+                      child: const Center(
+                        child: Text(
+                          '1',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),

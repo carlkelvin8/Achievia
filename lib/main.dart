@@ -1,14 +1,21 @@
+import 'package:achievia/core/constants/app_theme.dart';
 import 'package:achievia/core/constants/routers/app_router.dart';
 import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:achievia/core/constants/routers/route_constants.dart';
-import 'package:achievia/core/constants/app_theme.dart';
+import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:achievia/presentation/provider/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'injection.dart' as di;
-
-void main() {
-  di.init();
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart' as path;
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  final appDirectory = await path.getApplicationDocumentsDirectory();
+  Hive.init(appDirectory.path);
+  Hive.registerAdapter(QuestionsDtoAdapter());
+  Hive.openBox('question_box');
+  await configureDependencies();
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -18,7 +25,6 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
-
     return MaterialApp(
       title: 'Achievia',
       debugShowCheckedModeBanner: false,

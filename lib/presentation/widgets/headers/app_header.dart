@@ -54,37 +54,51 @@ class AppHeader extends StatelessWidget {
           ),
           // Notification Icon
           Stack(
+            clipBehavior: Clip.none,
             children: [
               IconButton(
                 onPressed: onNotificationTap,
-                icon: const Icon(
-                  Icons.notifications_outlined,
-                  color: headerColor2,
-                  size: 24,
+                icon: Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.notifications_outlined,
+                    color: Color(0xFF90CAF9), // Light blue/grey-blue
+                    size: 24,
+                  ),
                 ),
               ),
               if (notificationCount > 0)
                 Positioned(
-                  right: 8,
-                  top: 8,
+                  right: 6,
+                  top: 6,
                   child: Container(
-                    padding: const EdgeInsets.all(2),
+                    padding: const EdgeInsets.all(4),
                     decoration: const BoxDecoration(
-                      color: Colors.red,
+                      color: Color(0xFFE53935), // Red badge
                       shape: BoxShape.circle,
                     ),
                     constraints: const BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
+                      minWidth: 18,
+                      minHeight: 18,
                     ),
-                    child: Text(
-                      notificationCount.toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                    child: Center(
+                      child: Text(
+                        notificationCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),

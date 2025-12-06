@@ -1,4 +1,4 @@
-import 'package:achievia/domain/entities/examination_results_entity.dart';
+import 'package:achievia/domain/entities/widgets/examination_results_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

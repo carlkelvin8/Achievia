@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:achievia/domain/entities/pomodoro_settings_entity.dart';
-import 'package:achievia/domain/entities/pomodoro_state_entity.dart';
+import 'package:achievia/domain/entities/widgets/pomodoro_settings_entity.dart';
+import 'package:achievia/domain/entities/widgets/pomodoro_state_entity.dart';
 
 class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
   @override

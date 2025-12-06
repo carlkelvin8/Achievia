@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:achievia/domain/entities/qotd_entity.dart';
-import 'package:achievia/domain/entities/goal_entity.dart';
+import 'package:achievia/domain/entities/widgets/qotd_entity.dart';
+import 'package:achievia/domain/entities/widgets/goal_entity.dart';
 
 class QotdNotifier extends Notifier<QotdEntity> {
   @override

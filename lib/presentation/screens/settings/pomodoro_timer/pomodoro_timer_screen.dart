@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/presentation/provider/pomodoro/pomodoro_providers.dart';
-import 'package:achievia/domain/entities/pomodoro_state_entity.dart';
+import 'package:achievia/domain/entities/widgets/pomodoro_state_entity.dart';
 
 class PomodoroTimerScreen extends ConsumerWidget {
   const PomodoroTimerScreen({super.key});
@@ -159,7 +159,6 @@ class _CustomizeCard extends ConsumerWidget {
   final ThemeData theme;
   final dynamic settings; // PomodoroSettingsEntity
   final WidgetRef ref;
-
   const _CustomizeCard({
     required this.theme,
     required this.ref,

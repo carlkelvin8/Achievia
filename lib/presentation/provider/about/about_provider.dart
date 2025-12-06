@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/core/utils/helpers.dart';
-import 'package:achievia/domain/entities/author_entity.dart';
+import 'package:achievia/domain/entities/widgets/author_entity.dart';
 
 // Author items provider
 final authorItemsProvider = Provider<List<AuthorEntity>>((ref) {
@@ -23,7 +23,6 @@ class ExpandableItemsState {
 class ExpandableItemsNotifier extends Notifier<ExpandableItemsState> {
   @override
   ExpandableItemsState build() {
-    // First item expanded by default
     return ExpandableItemsState(expandedItems: {0: true});
   }
 

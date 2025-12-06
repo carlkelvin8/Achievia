@@ -1,5 +1,5 @@
-import 'package:achievia/presentation/screens/screen_contents/author_content_screen.dart';
-import 'package:achievia/presentation/screens/screen_contents/achievia_content_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/author_content_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/achievia_content_screen.dart';
 import 'package:flutter/material.dart';
 
 class TabBarAbout extends StatefulWidget {

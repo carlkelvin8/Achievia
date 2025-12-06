@@ -1,7 +1,8 @@
-import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/core/utils/tabs_helpers.dart';
 import 'package:achievia/presentation/provider/tabs/event/tab_event.dart';
-import 'package:achievia/presentation/screens/screen_contents/mother_notes_content.dart';
-import 'package:achievia/presentation/screens/screen_contents/questions_content_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/mother_notes_content.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/questions_content_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/supplementals_content_screen.dart';
 import 'package:achievia/presentation/widgets/tabs/reusable/resusable_tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,7 +35,7 @@ class _TabBarReviewerState extends ConsumerState<TabBarReviewer> with SingleTick
             children: [
               MotherNotesContent(),
               QuestionsContentScreen(),
-              Text('Supplementals'),
+              SupplementalsContentScreen(),
             ]
           ),
         )
