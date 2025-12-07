@@ -21,15 +21,17 @@ import 'package:achievia/data/data_source/repository_data_source_impl/cache/cach
 import 'package:achievia/data/data_source/repository_data_source_impl/home/questions_remote_datasource.dart'
     as _i322;
 import 'package:achievia/data/models/quiz/questions_dto.dart' as _i74;
+import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart'
+    as _i581;
 import 'package:achievia/data/repositoryImpl/questions/questions_repository_impl.dart'
     as _i1000;
 import 'package:achievia/domain/entities/api/home/questions_entity.dart'
     as _i416;
+import 'package:achievia/domain/use_cases/auth/user_use_case.dart' as _i879;
 import 'package:achievia/domain/use_cases/questions/questions_use_case.dart'
     as _i803;
 import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:dio/dio.dart' as _i361;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:hive/hive.dart' as _i979;
 import 'package:injectable/injectable.dart' as _i526;
@@ -52,10 +54,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i344.DioClient>(() => _i344.DioClient());
     gh.lazySingleton<_i361.Dio>(() => registerModules.dio);
     gh.lazySingleton<_i895.Connectivity>(() => registerModules.connectivity);
-    gh.lazySingleton<_i558.FlutterSecureStorage>(
-      () => registerModules.tokenStorage,
-    );
-    gh.singleton<_i982.LocalStorageService>(
+    gh.lazySingleton<_i982.LocalStorageService>(
       () => _i982.LocalStorageService(gh<_i460.SharedPreferences>()),
     );
     gh.factory<_i979.Box<dynamic>>(
@@ -91,6 +90,14 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i692.CacheDataSourceImpl(
         gh<_i979.Box<_i74.QuestionsDto>>(instanceName: 'question_box'),
       ),
+    );
+    gh.factory<_i581.UserRepositoryImpl>(
+      () => _i581.UserRepositoryImpl(
+        datasource: gh<_i426.UserRemoteDatasource>(),
+      ),
+    );
+    gh.factory<_i879.UserUseCase>(
+      () => _i879.UserUseCase(impl: gh<_i581.UserRepositoryImpl>()),
     );
     gh.lazySingleton<_i1000.QuestionsRepositoryImpl>(
       () => _i1000.QuestionsRepositoryImpl(
