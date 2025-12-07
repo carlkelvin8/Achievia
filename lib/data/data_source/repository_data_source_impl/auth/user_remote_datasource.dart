@@ -42,6 +42,8 @@ Future<UserDto> login(UserDto dto) async {
     }
 
     await storageService.saveToken(response.data['data']['token']);
+    final token = storageService.token;
+    print(token);
     return UserDto.fromJson(response.data['data']);
   } catch (e, st) {
     print(e);

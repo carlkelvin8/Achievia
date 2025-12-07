@@ -5,6 +5,10 @@ import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:achievia/presentation/provider/theme/theme_provider.dart';
+import 'package:achievia/presentation/screens/auth/login_screen.dart';
+import 'package:achievia/presentation/screens/auth_checker.dart';
+import 'package:achievia/presentation/screens/main/home_screen.dart';
+import 'package:achievia/presentation/screens/main/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
@@ -29,12 +33,12 @@ class MyApp extends ConsumerWidget {
       title: 'Achievia',
       debugShowCheckedModeBanner: false,
       navigatorKey: NavigationService.navigatorKey,
-      initialRoute: RouteConstants.main,
       onGenerateRoute: AppRouter.generateRoute,
       onUnknownRoute: AppRouter.unknownRoute,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
+      home: AuthChecker(authenticated: MainScreen(), unauthenticated: LoginScreen()),
     );
   }
 }

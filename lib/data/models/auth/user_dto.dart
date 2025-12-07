@@ -21,6 +21,7 @@ class UserDto {
   final String? status;
   final String? profileImage;
   final int? courseId;
+  final String? token;
   UserDto({
     this.id,
     this.firstName,
@@ -38,13 +39,14 @@ class UserDto {
     this.status,
     this.profileImage,
     this.courseId,
+    this.token,
   });
 
   Map<String, dynamic> toJson() => _$UserDtoToJson(this);
 
   factory UserDto.fromJson(Map<String, dynamic> map) => _$UserDtoFromJson(map);
 
-  static UserDto fromEntity(UserEntity entity) => UserDto(id: entity.id, firstName: entity.firstName, middleName: entity.middleName, lastName: entity.lastName, bio: entity.bio, age: entity.age, username: entity.username, email: entity.email, password:entity. password, role: entity.role, status: entity.status, profileImage: entity.profileImage);
+  static UserDto fromEntity(UserEntity entity) => UserDto(id: entity.id, firstName: entity.firstName, middleName: entity.middleName, lastName: entity.lastName, bio: entity.bio, age: entity.age, username: entity.username, email: entity.email, password: entity.password, role: entity.role, status: entity.status, profileImage: entity.profileImage);
 
   UserEntity toEntity() => UserEntity(id: id, firstName: firstName, middleName: middleName, lastName: lastName, bio: bio, age: age, username: username, email: email, password: password, role: role, status: status, profileImage: profileImage);
 }

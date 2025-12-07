@@ -61,6 +61,8 @@ class LoginNotifier extends Notifier<LoginFormState> {
     );
 
     final user = await useCase.getLogin(entity);
+    usernameController.clear();
+    passwordController.clear();
     print('Logged in user: ${user.username}');
   }
 }
