@@ -7,25 +7,25 @@ part of 'user_dto.dart';
 // **************************************************************************
 
 UserDto _$UserDtoFromJson(Map<String, dynamic> json) => UserDto(
-  id: (json['id'] as num).toInt(),
-  firstName: json['firstName'] as String,
-  middleName: json['middleName'] as String,
-  lastName: json['lastName'] as String,
-  bio: json['bio'] as String,
-  age: (json['age'] as num).toInt(),
+  id: json['id'] as num?,
+  firstName: json['firstName'] as String?,
+  middleName: json['middleName'] as String?,
+  lastName: json['lastName'] as String?,
+  bio: json['bio'] as String?,
+  age: (json['age'] as num?)?.toInt(),
   trial: (json['trial'] as num?)?.toInt(),
-  username: json['username'] as String,
-  email: json['email'] as String,
-  password: json['password'] as String,
-  role: json['role'] as String,
+  username: json['username'] as String?,
+  email: json['email'] as String?,
+  password: json['password'] as String?,
+  role: json['role'] as String?,
   createdAt: json['createdAt'] == null
       ? null
       : DateTime.parse(json['createdAt'] as String),
   updatedAt: json['updatedAt'] == null
       ? null
       : DateTime.parse(json['updatedAt'] as String),
-  status: json['status'] as String,
-  profileImage: json['profileImage'] as String,
+  status: json['status'] as String?,
+  profileImage: json['profileImage'] as String?,
   courseId: (json['courseId'] as num?)?.toInt(),
 );
 

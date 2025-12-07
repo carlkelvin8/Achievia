@@ -1,3 +1,5 @@
+import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/core/di/local_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/core/constants/app_colors.dart';
@@ -299,10 +301,11 @@ class SettingsScreen extends ConsumerWidget {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Handle logout logic here
-                NavigationService.goToLogin();
+              onPressed: () async{
+                final singleton = sl<LocalStorageService>();
+                await singleton.clearToken();
+                Navigator.pop(context);
+                Navigator.pop(context);
               },
               child: const Text('Log Out', style: TextStyle(color: Colors.red)),
             ),

@@ -2,7 +2,6 @@ import 'package:achievia/const.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive/hive.dart';
 import 'package:injectable/injectable.dart';
 
@@ -17,8 +16,6 @@ abstract class RegisterModules {
   @lazySingleton
   Connectivity get connectivity => Connectivity();
 
-  @lazySingleton
-  FlutterSecureStorage get tokenStorage => FlutterSecureStorage();
 }
 
 
