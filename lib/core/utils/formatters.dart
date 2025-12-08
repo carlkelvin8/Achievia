@@ -1,4 +1,3 @@
-
 class Formatters {
     String formatDate(DateTime date) {
     const months = [
