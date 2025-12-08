@@ -1,13 +1,11 @@
 import 'package:achievia/core/constants/app_theme.dart';
 import 'package:achievia/core/constants/routers/app_router.dart';
 import 'package:achievia/core/constants/routers/navigation_service.dart';
-import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:achievia/presentation/provider/theme/theme_provider.dart';
 import 'package:achievia/presentation/screens/auth/login_screen.dart';
 import 'package:achievia/presentation/screens/auth_checker.dart';
-import 'package:achievia/presentation/screens/main/home_screen.dart';
 import 'package:achievia/presentation/screens/main/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

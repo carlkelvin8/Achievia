@@ -13,11 +13,11 @@ class QuestionsRepositoryImpl implements QuestionsRepository{
 
   QuestionsRepositoryImpl(this.local, this.remoteDatasource, this.network);
   @override
-  Future<List<QuestionsEntity>> getAllQuestions(String token, String id) async{
+  Future<List<QuestionsEntity>> getAllQuestions(String token) async{
     try {
       final connectivity = await network.isConnected;
       if (connectivity) {
-        final remoteQuestions = await remoteDatasource.getAllQuestions(token, id);
+        final remoteQuestions = await remoteDatasource.getAllQuestions(token);
         print('Repository - Remote questions received: $remoteQuestions');
         await local.cachePost(remoteQuestions);
         final mapped = remoteQuestions.map((e)=>e.toEntity()).toList();

@@ -23,7 +23,7 @@ Map<String, dynamic> _$QuestionsDtoToJson(QuestionsDto instance) =>
       'courseId': instance.courseId,
       'description': instance.description,
       'image': instance.image,
-      'day_subject': instance.day_subject,
+      'day_subject': instance.day_subject,  
       'createdAt': instance.createdAt,
     };
 

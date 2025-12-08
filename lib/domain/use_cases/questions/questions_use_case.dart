@@ -5,5 +5,5 @@ import 'package:injectable/injectable.dart';
 class QuestionsUseCase {
   final QuestionsRepositoryImpl impl;
   QuestionsUseCase(this.impl);
-  Future<List<QuestionsEntity>> getQuestions(String token,String id) async => await impl.getAllQuestions(token,  id);
+  Future<List<QuestionsEntity>> getQuestions(String token) async => await impl.getAllQuestions(token);
 }

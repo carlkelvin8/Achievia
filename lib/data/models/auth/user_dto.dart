@@ -1,9 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/domain/entities/api/auth/user_entity.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:injectable/injectable.dart';
 
 part 'user_dto.g.dart';
 @JsonSerializable()
+@injectable
+@lazySingleton
+
 class UserDto {
   final num? id;
   final String? firstName;
