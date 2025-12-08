@@ -29,6 +29,8 @@ import 'package:achievia/data/models/quiz/questions_dto.dart' as _i74;
 import 'package:achievia/data/models/reviewer/module_dto.dart' as _i862;
 import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart'
     as _i581;
+import 'package:achievia/data/repositoryImpl/questions/qot_repository_impl.dart'
+    as _i548;
 import 'package:achievia/data/repositoryImpl/questions/questions_repository_impl.dart'
     as _i1000;
 import 'package:achievia/data/repositoryImpl/reviewer/module_repository_impl.dart'
@@ -147,6 +149,13 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i879.UserUseCase>(
       () => _i879.UserUseCase(impl: gh<_i581.UserRepositoryImpl>()),
     );
+    gh.lazySingleton<_i548.QotRepositoryImpl>(
+      () => _i548.QotRepositoryImpl(
+        remoteDatasource: gh<_i322.QuestionsRemoteDatasource>(),
+        local: gh<_i692.CacheDataSourceImpl>(),
+        network: gh<_i790.NetworkInfo>(),
+      ),
+    );
     gh.lazySingleton<_i1000.QuestionsRepositoryImpl>(
       () => _i1000.QuestionsRepositoryImpl(
         gh<_i692.CacheDataSourceImpl>(),
@@ -162,7 +171,10 @@ extension GetItInjectableX on _i174.GetIt {
       ),
     );
     gh.factory<_i803.QuestionsUseCase>(
-      () => _i803.QuestionsUseCase(gh<_i1000.QuestionsRepositoryImpl>()),
+      () => _i803.QuestionsUseCase(
+        gh<_i1000.QuestionsRepositoryImpl>(),
+        gh<_i548.QotRepositoryImpl>(),
+      ),
     );
     gh.factory<_i533.ModuleUseCase>(
       () => _i533.ModuleUseCase(impl: gh<_i656.ModuleRepositoryImpl>()),

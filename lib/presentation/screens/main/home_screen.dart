@@ -1,3 +1,6 @@
+import 'package:achievia/core/utils/formatters.dart';
+import 'package:achievia/presentation/widgets/banners/build_banner.dart';
+import 'package:achievia/presentation/widgets/cards/question_of_the_day_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/presentation/widgets/cards/profile_status_card.dart';
@@ -21,12 +24,12 @@ class HomeScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 8),
-              _buildBanner(context),
+              BuildBanner(),
               const SizedBox(height: 12),
               const _SectionLabel(title: 'Question of the day'),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: _buildQuestionOfTheDay(context, ref, qotd.selectedIndex),
+                child: QuestionOfTheDayCard(selectedIndex: qotd.selectedIndex,),
               ),
               const SizedBox(height: 12),
               const _SectionLabel(title: "Today's Achievian Goal"),
@@ -64,84 +67,6 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  // Header removed: using global MainAppbar in MainScreen
-
-  // Dashboard banner
-  Widget _buildBanner(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.primary,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Center(
-          child: Text(
-            'Medical Technology Dashboard',
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: theme.colorScheme.onPrimary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Question of the day card
-  Widget _buildQuestionOfTheDay(
-    BuildContext context,
-    WidgetRef ref,
-    int? selectedIndex,
-  ) {
-    final theme = Theme.of(context);
-    final qotd = ref.watch(qotdProvider);
-    final options = qotd.options;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.2)),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            qotd.question,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ...List.generate(options.length, (index) {
-            return RadioListTile<int>(
-              value: index,
-              groupValue: selectedIndex,
-              dense: true,
-              visualDensity: VisualDensity.compact,
-              contentPadding: EdgeInsets.zero,
-              onChanged: (v) {
-                if (v != null) {
-                  ref.read(qotdProvider.notifier).selectOption(v);
-                }
-              },
-              title: Text(
-                options[index],
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
 
   // Today's goal card
   Widget _buildTodaysGoal(
@@ -166,7 +91,7 @@ class HomeScreen extends ConsumerWidget {
           Row(
             children: [
               Text(
-                _formatDate(date),
+                Formatters().formatDate(date),
                 style: theme.textTheme.titleSmall?.copyWith(
                   color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.w700,
@@ -201,24 +126,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    final m = months[date.month - 1];
-    return '$m ${date.day}, ${date.year}';
-  }
+
 
   Widget _buildTopListTitle(BuildContext context, String title) {
     final theme = Theme.of(context);
