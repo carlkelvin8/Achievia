@@ -124,7 +124,7 @@ class ExaminationToggleCard extends ConsumerWidget {
             Switch(
               value: value,
               onChanged: onChanged,
-              activeThumbColor: theme.colorScheme.primary,
+              activeColor: theme.colorScheme.primary,
             ),
           ],
         ),

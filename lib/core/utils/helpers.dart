@@ -69,30 +69,6 @@ final List<Map<String, dynamic>> messages = [
   },
 ];
 
-
-
-final List<PdfEntity> list = [
-  PdfEntity(text: 'Clinical Chemistry'),
-  PdfEntity(text: 'Hemathology'),
-  PdfEntity(text: 'Microbiology'),
-  PdfEntity(text: 'AUBF'),
-  PdfEntity(text: 'Immunology'),
-  PdfEntity(text: 'Serology'),
-  PdfEntity(text: 'Blood Banking'),
-  PdfEntity(text: 'Histopathology'),
-];
-
-final List<PdfEntity> list2 = [
-  PdfEntity(text: 'Clinical Chemistry'),
-  PdfEntity(text: 'Hemathology'),
-  PdfEntity(text: 'Microbiology'),
-];
-final List<PdfEntity> list3 = [
-  PdfEntity(text: 'Serology'),
-  PdfEntity(text: 'Blood Banking'),
-  PdfEntity(text: 'Histopathology'),
-];
-
 // Demo data for Reminder screen
 const List<ReminderEntity> demoReminderItems = [
   ReminderEntity(
