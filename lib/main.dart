@@ -3,6 +3,7 @@ import 'package:achievia/core/constants/routers/app_router.dart';
 import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
+import 'package:achievia/data/models/reviewer/module_dto.dart';
 import 'package:achievia/presentation/provider/theme/theme_provider.dart';
 import 'package:achievia/presentation/screens/auth/login_screen.dart';
 import 'package:achievia/presentation/screens/auth_checker.dart';
@@ -16,7 +17,9 @@ void main() async{
   final appDirectory = await path.getApplicationDocumentsDirectory();
   Hive.init(appDirectory.path);
   Hive.registerAdapter(QuestionsDtoAdapter());
+  Hive.registerAdapter(ModuleDtoAdapter());
   Hive.openBox('question_box');
+  Hive.openBox('module_box');
   await configureDependencies();
   runApp(const ProviderScope(child: MyApp()));
 }
