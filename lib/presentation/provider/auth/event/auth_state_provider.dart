@@ -3,7 +3,7 @@ import 'package:achievia/domain/entities/api/auth/user_entity.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/domain/use_cases/auth/user_use_case.dart';
-/// 🔹 Simple auth toggle provider
+
 class AuthNotifier extends Notifier<bool> {
   @override
   bool build() => false;
@@ -22,7 +22,6 @@ class LoginNotifier extends Notifier<LoginFormState> {
 
   @override
   LoginFormState build() {
-    // Read useCase from ref
     useCase = ref.read(userUseCaseProvider);
 
     usernameController = TextEditingController();
@@ -60,10 +59,10 @@ class LoginNotifier extends Notifier<LoginFormState> {
       profileImage: '',
     );
 
-    final user = await useCase.getLogin(entity);
+    await useCase.getLogin(entity);
     usernameController.clear();
     passwordController.clear();
-    print('Logged in user: ${user.username}');
+    
   }
 }
 

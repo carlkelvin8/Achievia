@@ -1,5 +1,6 @@
 import 'package:achievia/const.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
+import 'package:achievia/data/models/reviewer/module_dto.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
@@ -12,6 +13,9 @@ abstract class RegisterModules {
 
   @Named('questions_box')
   Box get questions => Hive.box('questions_box');
+
+  @Named('modules_box')
+  Box get modules => Hive.box('modules_box');
 
   @lazySingleton
   Connectivity get connectivity => Connectivity();
@@ -26,6 +30,12 @@ abstract class HiveModule {
   @preResolve
   Future<Box<QuestionsDto>> openQuestionBox() async {
     return await Hive.openBox<QuestionsDto>('questions_box');
+  }
+
+  @Named('module_box')
+  @preResolve
+  Future<Box<ModuleDto>> openModuleBox() async {
+    return await Hive.openBox<ModuleDto>('module_box');
   }
 }
 

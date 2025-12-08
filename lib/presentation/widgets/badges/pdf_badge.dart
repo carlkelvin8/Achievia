@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class PdfBadge extends StatefulWidget {
   final String text;
   final String tabType;
+  final String? imageUrl;
 
   const PdfBadge({
     super.key,
     required this.text,
     required this.tabType,
+    this.imageUrl,
   });
 
   @override
@@ -43,13 +45,27 @@ class _PdfBadgeState extends State<PdfBadge> {
               flex: 2,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Icon(
-                  widget.tabType == 'mother notes'
-                      ? Icons.picture_as_pdf
-                      : Icons.file_copy,
-                  size: 60,
-                  color: themeColor.primary,
-                ),
+                child: widget.imageUrl != null
+                    ? Image.network(
+                        widget.imageUrl!,
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          widget.tabType == 'mother notes'
+                              ? Icons.picture_as_pdf
+                              : Icons.file_copy,
+                          size: 60,
+                          color: themeColor.primary,
+                        ),
+                      )
+                    : Icon(
+                        widget.tabType == 'mother notes'
+                            ? Icons.picture_as_pdf
+                            : Icons.file_copy,
+                        size: 60,
+                        color: themeColor.primary,
+                      ),
               ),
             ),
             const SizedBox(height: 6),

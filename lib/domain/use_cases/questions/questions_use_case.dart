@@ -6,8 +6,6 @@ import 'package:injectable/injectable.dart';
 @injectable
 class QuestionsUseCase {
   final QuestionsRepositoryImpl impl;
-  final QotRepositoryImpl impqot;
-  QuestionsUseCase(this.impl, this.impqot);
-  Future<List<QuestionsEntity>> getQuestions(String token,String id) async => await impl.getAllQuestions(token,  id);
-  Future<QotyEntity> getQotQueston() async => await impqot.getQuestionOfTheDay();
+  QuestionsUseCase(this.impl);
+  Future<List<QuestionsEntity>> getQuestions(String token) async => await impl.getAllQuestions(token);
 }
