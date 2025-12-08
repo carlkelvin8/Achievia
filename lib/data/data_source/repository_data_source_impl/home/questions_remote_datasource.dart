@@ -5,7 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class QuestionRepoDataSource  {
-  Future<List<QuestionsDto>> getAllQuestions(String token);
+  Future<List<QuestionsDto>> getAllQuestions(String token, String id);
+  Future<QotdDto> getQotd();
+  
 }
 @lazySingleton
 @injectable
@@ -13,14 +15,15 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource{
   final Dio dio;
   QuestionsRemoteDatasource(this.dio);
  @override
-Future<List<QuestionsDto>> getAllQuestions(String token) async {
+Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
   try {
     final response = await dio.get(
-      '$BASE_URL/tasks/getQuiz',
+      '$BASE_URL/tasks/getQuiz?id=$id',
       options: Options(
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer $token',
+          'x-user-id':id
         },
       ),
     );

@@ -19,7 +19,7 @@ class GridBadges extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final questionsAsync = ref.watch(getQuestionsProviderState((token: token)));
+    final questionsAsync = ref.watch(getQuestionsProviderState((token: token, id:id)));
 
     return questionsAsync.when(
       data: (questions) {

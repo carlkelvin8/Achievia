@@ -18,8 +18,6 @@ void main() async{
   Hive.init(appDirectory.path);
   Hive.registerAdapter(QuestionsDtoAdapter());
   Hive.registerAdapter(ModuleDtoAdapter());
-  Hive.openBox('question_box');
-  Hive.openBox('module_box');
   await configureDependencies();
   runApp(const ProviderScope(child: MyApp()));
 }

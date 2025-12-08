@@ -10,10 +10,11 @@ final getQuestions = Provider<QuestionsUseCase>((ref){
   return sl.get<QuestionsUseCase>();
 });
 
-final getQuestionsProviderState = FutureProvider.family<List<QuestionsEntity>, ({String token})>((ref, params) async {
+
+final getQuestionsProviderState = FutureProvider.family<List<QuestionsEntity>, ({String token, String id})>((ref, params) async {
   final gtQuestions = ref.read(getQuestions);
   try {
-    final result = await gtQuestions.getQuestions(params.token);
+    final result = await gtQuestions.getQuestions(params.token, params.id);
     return result;
   } catch (e) {
     rethrow;
