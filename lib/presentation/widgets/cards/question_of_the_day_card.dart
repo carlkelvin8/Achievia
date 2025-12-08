@@ -17,10 +17,9 @@ class QuestionOfTheDayCard extends ConsumerWidget {
     WidgetRef ref,
   ) {
     final theme = Theme.of(context);
-    final qotd = ref.watch(qotdProvider);
     final questionsOfTheDay = ref.watch(getQoty);
-    final options = qotd.options;
     final opt = questionsOfTheDay.value?.choices;
+    
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
@@ -40,6 +39,18 @@ class QuestionOfTheDayCard extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           ...List.generate(opt?.length ?? 0, (index) {
+            final isSelected = selectedIndex == index;
+            final isCorrect = opt![index]['isCorrect'] as bool;
+
+            Color? textColor;
+            if (selectedIndex != null) {
+              if (isCorrect) {
+                textColor = Colors.lightGreen;
+              } else if (isSelected && !isCorrect) {
+                textColor = Colors.red;
+              }
+            }
+
             return RadioListTile<int>(
               value: index,
               groupValue: selectedIndex,
@@ -52,9 +63,9 @@ class QuestionOfTheDayCard extends ConsumerWidget {
                 }
               },
               title: Text(
-                opt![index]['choiceText'].toString(),
+                opt[index]['choiceText'].toString(),
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface,
+                  color: textColor,
                 ),
               ),
             );

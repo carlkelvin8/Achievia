@@ -7,6 +7,7 @@ import 'package:injectable/injectable.dart';
 abstract class QuestionRepoDataSource  {
   Future<List<QuestionsDto>> getAllQuestions(String token, String id);
   Future<QotdDto> getQotd();
+  
 }
 @lazySingleton
 @injectable
@@ -63,6 +64,4 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
       return QotdDto.fromJson({});
     }
   }
-
-  
 }
