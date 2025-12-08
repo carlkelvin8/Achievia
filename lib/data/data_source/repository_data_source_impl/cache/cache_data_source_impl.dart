@@ -10,7 +10,7 @@ abstract class CacheRemoteDataSource {
 class CacheDataSourceImpl implements CacheRemoteDataSource{
   final Box<QuestionsDto> box;
   CacheDataSourceImpl(@Named('question_box') this.box);
-
+  
   @override
   Future<List<QuestionsDto>> getCacheQuestions() async{
       return box.values.toList();

@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:achievia/presentation/provider/questions/questions_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,8 +18,9 @@ class QuestionOfTheDayCard extends ConsumerWidget {
   ) {
     final theme = Theme.of(context);
     final qotd = ref.watch(qotdProvider);
+    final questionsOfTheDay = ref.watch(getQoty);
     final options = qotd.options;
-
+    final opt = questionsOfTheDay.value?.choices;
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
@@ -30,14 +32,14 @@ class QuestionOfTheDayCard extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            qotd.question,
+            questionsOfTheDay.value?.questionText ?? "",
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 8),
-          ...List.generate(options.length, (index) {
+          ...List.generate(opt?.length ?? 0, (index) {
             return RadioListTile<int>(
               value: index,
               groupValue: selectedIndex,
@@ -50,7 +52,7 @@ class QuestionOfTheDayCard extends ConsumerWidget {
                 }
               },
               title: Text(
-                options[index],
+                opt![index]['choiceText'].toString(),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface,
                 ),

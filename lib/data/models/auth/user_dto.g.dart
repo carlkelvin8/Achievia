@@ -27,6 +27,7 @@ UserDto _$UserDtoFromJson(Map<String, dynamic> json) => UserDto(
   status: json['status'] as String?,
   profileImage: json['profileImage'] as String?,
   courseId: (json['courseId'] as num?)?.toInt(),
+  token: json['token'] as String?,
 );
 
 Map<String, dynamic> _$UserDtoToJson(UserDto instance) => <String, dynamic>{
@@ -46,4 +47,5 @@ Map<String, dynamic> _$UserDtoToJson(UserDto instance) => <String, dynamic>{
   'status': instance.status,
   'profileImage': instance.profileImage,
   'courseId': instance.courseId,
+  'token': instance.token,
 };
