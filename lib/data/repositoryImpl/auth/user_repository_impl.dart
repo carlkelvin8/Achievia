@@ -2,7 +2,7 @@
 import 'package:achievia/data/models/auth/user_dto.dart';
 import 'package:injectable/injectable.dart';
 
-import 'package:achievia/data/data_source/repository_data_source_impl/auth/user_remote_datasource.dart';
+import 'package:achievia/data/data_source/auth/user_remote_datasource.dart';
 import 'package:achievia/domain/entities/api/auth/user_entity.dart';
 import 'package:achievia/domain/repository/auth/user_repository.dart';
 @injectable

@@ -11,8 +11,7 @@ class ReminderScreenContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final items =
-        demoReminderItems; // Replace with provider-backed list when ready
+    final items = demoReminderItems; // Replace with provider-backed list when ready
 
     return Scaffold(
       appBar: AppBar(

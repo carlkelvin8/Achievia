@@ -14,15 +14,15 @@ import 'package:achievia/core/di/shared_pref.dart' as _i644;
 import 'package:achievia/core/network/conntectivity.dart' as _i790;
 import 'package:achievia/core/network/dio_client.dart' as _i344;
 import 'package:achievia/core/registration/register_modules.dart' as _i790;
-import 'package:achievia/data/data_source/repository_data_source_impl/auth/user_remote_datasource.dart'
+import 'package:achievia/data/data_source/auth/user_remote_datasource.dart'
     as _i426;
-import 'package:achievia/data/data_source/repository_data_source_impl/cache/cache_data_source_impl.dart'
+import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart'
     as _i692;
-import 'package:achievia/data/data_source/repository_data_source_impl/cache/module_cache_datasource.dart'
+import 'package:achievia/data/data_source/cache/module_cache_datasource.dart'
     as _i908;
-import 'package:achievia/data/data_source/repository_data_source_impl/home/questions_remote_datasource.dart'
+import 'package:achievia/data/data_source/home/questions_remote_datasource.dart'
     as _i322;
-import 'package:achievia/data/data_source/repository_data_source_impl/reviewer/module_remote_datasource.dart'
+import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart'
     as _i445;
 import 'package:achievia/data/models/auth/user_dto.dart' as _i235;
 import 'package:achievia/data/models/quiz/questions_dto.dart' as _i74;

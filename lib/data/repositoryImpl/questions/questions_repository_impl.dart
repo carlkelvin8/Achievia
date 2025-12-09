@@ -1,6 +1,6 @@
 import 'package:achievia/core/network/conntectivity.dart';
-import 'package:achievia/data/data_source/repository_data_source_impl/cache/cache_data_source_impl.dart';
-import 'package:achievia/data/data_source/repository_data_source_impl/home/questions_remote_datasource.dart';
+import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart';
+import 'package:achievia/data/data_source/home/questions_remote_datasource.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/repository/questions/questions_repository.dart';
 import 'package:injectable/injectable.dart';
