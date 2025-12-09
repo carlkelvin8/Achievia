@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/core/network/conntectivity.dart';
-import 'package:achievia/data/data_source/repository_data_source_impl/cache/module_cache_datasource.dart';
-import 'package:achievia/data/data_source/repository_data_source_impl/reviewer/module_remote_datasource.dart';
+import 'package:achievia/data/data_source/cache/module_cache_datasource.dart';
+import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart';
 import 'package:achievia/domain/entities/api/reviewer/module_entity.dart';
 import 'package:achievia/domain/repository/reviewer/module_repository.dart';
 import 'package:injectable/injectable.dart';
