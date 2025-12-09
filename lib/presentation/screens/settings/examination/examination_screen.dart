@@ -4,6 +4,7 @@ import 'package:achievia/presentation/widgets/examination/examination_info_card.
 import 'package:achievia/presentation/widgets/examination/examination_config_card.dart';
 import 'package:achievia/presentation/provider/examination/examination_provider.dart';
 import 'package:achievia/domain/entities/widgets/examination_config_entity.dart';
+import 'package:achievia/presentation/widgets/dialogs/radio_selection_dialog.dart';
 
 class ExaminationScreen extends ConsumerStatefulWidget {
   const ExaminationScreen({super.key});
@@ -106,80 +107,44 @@ class _ExaminationScreenState extends ConsumerState<ExaminationScreen> {
     BuildContext context,
     ExaminationConfig config,
     ExaminationConfigNotifier notifier,
-  ) {
-    showDialog(
+  ) async {
+    final selected = await RadioSelectionDialog.show<int>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Number of Items'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: ExaminationConfig.itemOptions.map((items) {
-            return RadioListTile<int>(
-              title: Text('$items items'),
-              value: items,
-              groupValue: config.numberOfItems,
-              onChanged: (value) {
-                if (value != null) {
-                  notifier.updateNumberOfItems(value);
-                  Navigator.of(context).pop();
-                }
-              },
-            );
-          }).toList(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-        ],
-      ),
+      title: 'Select Number of Items',
+      options: ExaminationConfig.itemOptions,
+      selectedValue: config.numberOfItems,
+      optionLabel: (items) => '$items items',
     );
+    
+    if (selected != null) {
+      notifier.updateNumberOfItems(selected);
+    }
   }
 
   void _showDurationDialog(
     BuildContext context,
     ExaminationConfig config,
     ExaminationConfigNotifier notifier,
-  ) {
-    showDialog(
+  ) async {
+    final selected = await RadioSelectionDialog.show<int>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Duration'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: ExaminationConfig.durationOptions.map((minutes) {
-            final hours = minutes ~/ 60;
-            final remainingMinutes = minutes % 60;
-            String durationText;
-            if (hours > 0) {
-              durationText = remainingMinutes > 0
-                  ? '${hours}h $remainingMinutes m'
-                  : '${hours}h';
-            } else {
-              durationText = '$minutes mins';
-            }
-
-            return RadioListTile<int>(
-              title: Text(durationText),
-              value: minutes,
-              groupValue: config.durationMinutes,
-              onChanged: (value) {
-                if (value != null) {
-                  notifier.updateDuration(value);
-                  Navigator.of(context).pop();
-                }
-              },
-            );
-          }).toList(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-        ],
-      ),
+      title: 'Select Duration',
+      options: ExaminationConfig.durationOptions,
+      selectedValue: config.durationMinutes,
+      optionLabel: (minutes) {
+        final hours = minutes ~/ 60;
+        final remainingMinutes = minutes % 60;
+        if (hours > 0) {
+          return remainingMinutes > 0
+              ? '${hours}h $remainingMinutes m'
+              : '${hours}h';
+        }
+        return '$minutes mins';
+      },
     );
+    
+    if (selected != null) {
+      notifier.updateDuration(selected);
+    }
   }
 }

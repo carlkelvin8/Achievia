@@ -176,6 +176,29 @@ class PomodoroNotifier extends Notifier<PomodoroStateEntity> {
         break;
     }
   }
+
+  /// Formats a Duration into a readable time string (HH:MM:SS or MM:SS)
+  String formatDuration(Duration duration) {
+    final mm = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final ss = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final hh = duration.inHours;
+    if (hh > 0) {
+      return '${hh.toString().padLeft(2, '0')}:$mm:$ss';
+    }
+    return '$mm:$ss';
+  }
+
+  /// Returns the display label for the current phase
+  String getPhaseLabel(PomodoroPhase phase) {
+    switch (phase) {
+      case PomodoroPhase.focus:
+        return 'Focus';
+      case PomodoroPhase.shortBreak:
+        return 'Short Break';
+      case PomodoroPhase.longBreak:
+        return 'Long Break';
+    }
+  }
 }
 
 final pomodoroProvider =

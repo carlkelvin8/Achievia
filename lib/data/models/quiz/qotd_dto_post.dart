@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'qotd_dto_post.g.dart';

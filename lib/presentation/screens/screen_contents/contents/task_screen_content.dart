@@ -1,8 +1,8 @@
 import 'package:achievia/core/constants/app_paddings.dart';
-import 'package:achievia/core/constants/widget_paddings.dart';
 import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/presentation/widgets/grids/grid_cards.dart';
+import 'package:achievia/presentation/widgets/list_items/list_item_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,7 +16,6 @@ class TaskScreenContent extends ConsumerStatefulWidget {
 class _TaskScreenContentState extends ConsumerState<TaskScreenContent> {
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -33,37 +32,13 @@ class _TaskScreenContentState extends ConsumerState<TaskScreenContent> {
                 ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
               SizedBox(height: 10),
-              GestureDetector(
+              ListItemCard(
+                icon: Icons.list_alt,
+                label: 'Reminders',
+                trailingText: '3',
                 onTap: () {
                   NavigationService.pushNamed(RouteConstants.reminder);
                 },
-                child: Container(
-                  padding: level2_widget,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSecondary,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  width: width,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.list_alt,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            'Reminders',
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                        ],
-                      ),
-                      Text('3', style: Theme.of(context).textTheme.labelMedium),
-                    ],
-                  ),
-                ),
               ),
             ],
           ),

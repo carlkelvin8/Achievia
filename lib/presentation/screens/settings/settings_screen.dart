@@ -7,6 +7,10 @@ import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:achievia/presentation/provider/settings/settings_provider.dart';
 import 'package:achievia/presentation/provider/theme/theme_provider.dart';
 import 'package:achievia/presentation/widgets/settings/settings_card.dart';
+import 'package:achievia/presentation/widgets/appbar/custom_app_bar.dart';
+import 'package:achievia/presentation/widgets/buttons/theme_toggle_button.dart';
+import 'package:achievia/presentation/widgets/inputs/text_size_slider.dart';
+import 'package:achievia/presentation/widgets/placeholder_gestures/dialog_builder.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -19,30 +23,8 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: Theme.of(context).colorScheme.primary,
-              size: 24,
-            ),
-            alignment: Alignment.center,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-            onPressed: () => NavigationService.pop(),
-          ),
-        ),
-        title: Text(
-          'Settings',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: 'Settings',
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
@@ -104,7 +86,10 @@ class SettingsScreen extends ConsumerWidget {
               child: SettingsItem(
                 icon: Icons.dark_mode_outlined,
                 title: 'Theme',
-                trailing: _buildThemeToggle(ref, themeMode),
+                trailing: ThemeToggleButton(
+                  isDarkMode: themeMode == ThemeMode.dark,
+                  onToggle: () => ref.read(themeModeProvider.notifier).toggleTheme(),
+                ),
               ),
             ),
 
@@ -115,15 +100,12 @@ class SettingsScreen extends ConsumerWidget {
                 children: [
                   SettingsItem(icon: Icons.text_fields, title: 'Text Size'),
                   const SizedBox(height: 16),
-                  _buildTextSizeSlider(ref, textSize),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Text Size lets you adjust the font size for a more comfortable reading experience. Customize it to suit your preference and reduce eye strain while studying.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      height: 1.4,
-                    ),
+                  TextSizeSlider(
+                    value: textSize,
+                    onChanged: (value) {
+                      ref.read(textSizeProvider.notifier).state = value;
+                    },
+                    description: 'Text Size lets you adjust the font size for a more comfortable reading experience. Customize it to suit your preference and reduce eye strain while studying.',
                   ),
                 ],
               ),
@@ -154,8 +136,22 @@ class SettingsScreen extends ConsumerWidget {
 
             // Log out
             SettingsCard(
-              onTap: () {
-                _showLogoutDialog(context);
+              onTap: () async {
+                final confirmed = await DialogBuilder.showConfirmation(
+                  context: context,
+                  title: 'Log Out',
+                  content: 'Are you sure you want to log out?',
+                  confirmText: 'Log Out',
+                  confirmColor: Colors.red,
+                );
+                if (confirmed == true) {
+                  final singleton = sl<LocalStorageService>();
+                  await singleton.clearToken();
+                  if (context.mounted) {
+                    NavigationService.pop();
+                    NavigationService.pop();
+                  }
+                }
               },
               child: SettingsItem(
                 icon: Icons.logout,
@@ -173,83 +169,6 @@ class SettingsScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildThemeToggle(WidgetRef ref, ThemeMode themeMode) {
-    final isDark = themeMode == ThemeMode.dark;
-
-    return GestureDetector(
-      onTap: () {
-        ref.read(themeModeProvider.notifier).toggleTheme();
-      },
-      child: Container(
-        width: 60,
-        height: 32,
-        decoration: BoxDecoration(
-          color: Theme.of(ref.context).colorScheme.primary,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Stack(
-          children: [
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 200),
-              left: isDark ? 30 : 2,
-              top: 2,
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  isDark ? Icons.dark_mode : Icons.light_mode,
-                  size: 16,
-                  color: Theme.of(ref.context).colorScheme.primary,
-                ),
-              ),
-            ),
-            Positioned(
-              left: isDark ? 8 : 36,
-              top: 8,
-              child: Text(
-                isDark ? 'NIGHT' : 'DAY',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextSizeSlider(WidgetRef ref, double textSize) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            const Text('A', style: TextStyle(fontSize: 12, color: Colors.grey)),
-            Expanded(
-              child: Slider(
-                value: textSize,
-                min: 0.0,
-                max: 1.0,
-                activeColor: headerColor2,
-                inactiveColor: Colors.grey[300],
-                onChanged: (value) {
-                  ref.read(textSizeProvider.notifier).state = value;
-                },
-              ),
-            ),
-            const Text('A', style: TextStyle(fontSize: 18, color: Colors.grey)),
-          ],
-        ),
-      ],
     );
   }
 
@@ -287,31 +206,5 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Log Out'),
-          content: const Text('Are you sure you want to log out?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async{
-                final singleton = sl<LocalStorageService>();
-                await singleton.clearToken();
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              child: const Text('Log Out', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
-    );
-  }
 }
+
