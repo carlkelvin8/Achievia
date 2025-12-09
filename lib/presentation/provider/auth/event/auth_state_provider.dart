@@ -35,14 +35,6 @@ class LoginNotifier extends Notifier<LoginFormState> {
     return const LoginFormState(email: '', password: '');
   }
 
-  void setUsername(String value) {
-    state = state.copyWith(email: value);
-  }
-
-  void setPassword(String value) {
-    state = state.copyWith(password: value);
-  }
-
   Future<void> submit() async {
     final entity = UserEntity(
       id: 0,

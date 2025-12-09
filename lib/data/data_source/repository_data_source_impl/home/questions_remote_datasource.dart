@@ -1,5 +1,6 @@
 import 'package:achievia/const.dart';
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
+import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -7,6 +8,7 @@ import 'package:injectable/injectable.dart';
 abstract class QuestionRepoDataSource  {
   Future<List<QuestionsDto>> getAllQuestions(String token, String id);
   Future<QotdDto> getQotd();
+  Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
   
 }
 @lazySingleton
@@ -62,6 +64,29 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
     } catch (e) {
       print(e);
       return QotdDto.fromJson({});
+    }
+  }
+  
+  @override
+  Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token) async{
+    try {
+      final response  =  await dio.post('$BASE_URL/tasks/ansQuestion', 
+      options: Options(
+        headers: {
+          'Content-Type':'application/json',
+          'Authorization': 'Bearer $token'
+        }
+      ),
+      data: dto.toJson()
+      );
+      print('datasource: ${response.data}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return dto;
+      }
+      return dto;
+    } catch (e) {
+      print(e);
+      return QotdDtoPost.fromJson({});
     }
   }
 }

@@ -18,6 +18,7 @@ class QuestionOfTheDayCard extends ConsumerWidget {
   ) {
     final theme = Theme.of(context);
     final questionsOfTheDay = ref.watch(getQoty);
+    final notifier = ref.read(answerQotProvider.notifier);
     final opt = questionsOfTheDay.value?.choices;
     
     return Container(
@@ -60,6 +61,7 @@ class QuestionOfTheDayCard extends ConsumerWidget {
               onChanged: (v) {
                 if (v != null) {
                   ref.read(qotdProvider.notifier).selectOption(v);
+                  notifier.answerQuestion(opt[v]['choiceText']);
                 }
               },
               title: Text(

@@ -12,6 +12,7 @@ class QotdDto {
   final int id;
   @HiveField(2)
   final String questionText;
+  @HiveField(3)
   final List<Map<String,dynamic>> choices;
   QotdDto({
     required this.quizId,
