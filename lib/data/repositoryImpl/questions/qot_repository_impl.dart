@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
+import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:injectable/injectable.dart';
 
@@ -32,6 +33,22 @@ class QotRepositoryImpl implements QotdRepository {
       print('repo: $e');
       rethrow;
     }
+  }
+  
+  @override
+  Future<QotyEntityPost> answerQuestion(QotyEntityPost entity) async{
+      final connectivity = await network.isConnected;
+      try {
+        if (connectivity) {
+          final dto =  QotdDtoPost.fromEntity(entity);
+          final remoteAnswer = await remoteDatasource.answerQuestion(dto, '');
+          return remoteAnswer.toEntity();
+        }
+        return QotyEntityPost(chosen_ans: '', quiz_id: 0, student_id: 0);
+      } catch (e) {
+        print('repos: $e');
+        return QotyEntityPost(chosen_ans: '', quiz_id: 0, student_id: 0);
+      }
   }
   
 }

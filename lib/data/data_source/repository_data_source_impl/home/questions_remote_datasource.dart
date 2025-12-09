@@ -1,11 +1,15 @@
 import 'package:achievia/const.dart';
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
+import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class QuestionRepoDataSource  {
-  Future<List<QuestionsDto>> getAllQuestions(String token);
+  Future<List<QuestionsDto>> getAllQuestions(String token, String id);
+  Future<QotdDto> getQotd();
+  Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
+  
 }
 @lazySingleton
 @injectable
@@ -13,14 +17,15 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource{
   final Dio dio;
   QuestionsRemoteDatasource(this.dio);
  @override
-Future<List<QuestionsDto>> getAllQuestions(String token) async {
+Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
   try {
     final response = await dio.get(
-      '$BASE_URL/tasks/getQuiz',
+      '$BASE_URL/tasks/getQuiz?id=$id',
       options: Options(
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer $token',
+          'x-user-id':id
         },
       ),
     );
@@ -59,6 +64,29 @@ Future<List<QuestionsDto>> getAllQuestions(String token) async {
     } catch (e) {
       print(e);
       return QotdDto.fromJson({});
+    }
+  }
+  
+  @override
+  Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token) async{
+    try {
+      final response  =  await dio.post('$BASE_URL/tasks/ansQuestion', 
+      options: Options(
+        headers: {
+          'Content-Type':'application/json',
+          'Authorization': 'Bearer $token'
+        }
+      ),
+      data: dto.toJson()
+      );
+      print('datasource: ${response.data}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return dto;
+      }
+      return dto;
+    } catch (e) {
+      print(e);
+      return QotdDtoPost.fromJson({});
     }
   }
 }

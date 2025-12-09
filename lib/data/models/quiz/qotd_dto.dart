@@ -1,6 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
-import 'package:achievia/domain/entities/widgets/qotd_entity.dart';
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'qotd_dto.g.dart';
@@ -13,6 +12,7 @@ class QotdDto {
   final int id;
   @HiveField(2)
   final String questionText;
+  @HiveField(3)
   final List<Map<String,dynamic>> choices;
   QotdDto({
     required this.quizId,
