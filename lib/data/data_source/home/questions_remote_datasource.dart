@@ -29,9 +29,9 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
         },
       ),
     );
-    final questionData = response.data['data']['response'] as Map<String, dynamic>;
+    final questionData = response.data['data']['response'] as List<dynamic>;
 
-    final questionsList = [QuestionsDto.fromJson(questionData)];
+    final questionsList = questionData.map((e)=>QuestionsDto.fromJson(e)).toList();
 
     return questionsList;
   } catch (e) {

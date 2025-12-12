@@ -1,7 +1,9 @@
+import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/entities/widgets/examination_results_entity.dart';
 import 'package:achievia/domain/entities/widgets/medical_abbreviation_entity.dart';
 import 'package:achievia/domain/entities/widgets/notes_entity.dart';
 import 'package:achievia/domain/entities/widgets/pdf_entity.dart';
+import 'package:achievia/domain/entities/widgets/questions_entity.dart';
 import 'package:achievia/domain/entities/widgets/reminders_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:achievia/domain/entities/widgets/reminder_entity.dart';
@@ -95,7 +97,7 @@ const List<ReminderEntity> demoReminderItems = [
 const List<AuthorEntity> demoAuthorItems = [
   AuthorEntity(
     image:
-        'https://imgs.search.brave.com/06y_UGpqC2WO7A0wUNodf1gbBVQFeVd4B6Wx2VLw8oQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvNTAwcC8y/Ni80MC9wcm9maWxl/LXBsYWNlaG9sZGVy/LWltYWdlLWdyYXkt/c2lsaG91ZXR0ZS12/ZWN0b3ItMjIxMjI2/NDAuanBn',
+        'https://christian18.sirv.com/employees/face_690f9182255ea.pdf',
     name: 'Rosell Marie H. Trinidad',
     university: 'Holy Angel University',
     achievement: 'Top 1, March 2025 MTLE',
@@ -105,7 +107,7 @@ const List<AuthorEntity> demoAuthorItems = [
   ),
   AuthorEntity(
     image:
-        'https://imgs.search.brave.com/06y_UGpqC2WO7A0wUNodf1gbBVQFeVd4B6Wx2VLw8oQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvNTAwcC8y/Ni80MC9wcm9maWxl/LXBsYWNlaG9sZGVy/LWltYWdlLWdyYXkt/c2lsaG91ZXR0ZS12/ZWN0b3ItMjIxMjI2/NDAuanBn',
+        'https://christian18.sirv.com/employees/face_690f9182255ea.pdf',
     name: 'Janette G. Madrigal',
     university: 'Saint Louis University',
     achievement: 'Top 1, August 2023 MTLE',
@@ -117,14 +119,14 @@ const List<AuthorEntity> demoAuthorItems = [
 
 
 final List<NotesEntity> notes = [
-  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'WBC anomalies'),
-  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'Transfusion Reactions'),
-  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: ' Protozoans'),
+  NotesEntity(image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf', title: 'WBC anomalies'),
+  NotesEntity(image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf', title: 'Transfusion Reactions'),
+  NotesEntity(image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf', title: ' Protozoans'),
 ];
 
 
 final List<NotesEntity> notes2 = [
-  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: ' Crystals in urine'),
+  NotesEntity(image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf', title: ' Crystals in urine'),
   ];
 // Demo data for Progress screen
 final ProgressEntity demoProgressData = ProgressEntity(
@@ -285,11 +287,11 @@ final List<MedicalAbbreviation> medicalAbbreviations = [
 ];
 
 final List<NotesEntity> mnemonics = [
-  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'NFPA Symbol'),
-  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'ISBT Blood Groups'),
-  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'Radial Immunodiffusion'),
-  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'DNA Viruses'),
-  NotesEntity(image: 'https://imgs.search.brave.com/vvOmHwq42yf8urfOjsQnnocDCOc_unxIiHgvw15HORw/rs:fit:500:0:1:0/g:ce/aHR0cDovL3d3dy53/cml0ZW9uLmNvb2wv/d3AtY29udGVudC91/cGxvYWRzLzIwMjEv/MDgvaVBhZFByb1dp/dGhOb3Rlc1BsdXNT/Y3JlZW5zaG90QW5k/UGVuY2lsOTAwLnBu/Zw', title: 'Gram Positive Bacilli'),
+  NotesEntity(image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf', title: 'NFPA Symbol'),
+  NotesEntity(image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf', title: 'ISBT Blood Groups'),
+  NotesEntity(image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf', title: 'Radial Immunodiffusion'),
+  NotesEntity(image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf', title: 'DNA Viruses'),
+  NotesEntity(image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf', title: 'Gram Positive Bacilli'),
 ];
 
 final List<PdfEntity> procedures = [
@@ -301,4 +303,10 @@ final List<PdfEntity> procedures = [
   PdfEntity(text: 'Manual Crossmatching'),
   PdfEntity(text: 'Manual CBC'),
   PdfEntity(text: 'Manual RBC Count'),
+];
+
+final List<QuestionsEntityWidget> questions = [
+  QuestionsEntityWidget(icon: Icons.question_answer_rounded, label: 'Question Bank', sub_label: 'A comprehensive collection of board exam–style questions designed to cover all major topics, helping you practice, assess your understanding, and prepare effectively for the actual exam.'),
+  QuestionsEntityWidget(icon: Icons.edit_document, label: 'Mock Boards', sub_label: 'Simulated board examinations designed to mirror the actual exam experience, helping you assess your readiness, build confidence, and identify areas that need improvement before the real test.'),
+  QuestionsEntityWidget(icon: Icons.emoji_events_sharp, label: 'Pre Boards', sub_label: 'A final one-take comprehensive exam that simulates the actual board, available only once and unlocked 2 weeks before the scheduled board exam to help you gauge your ultimate readiness.'),
 ];
