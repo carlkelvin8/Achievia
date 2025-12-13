@@ -14,16 +14,16 @@ import 'package:achievia/core/di/shared_pref.dart' as _i644;
 import 'package:achievia/core/network/conntectivity.dart' as _i790;
 import 'package:achievia/core/network/dio_client.dart' as _i344;
 import 'package:achievia/core/registration/register_modules.dart' as _i790;
-import 'package:achievia/data/data_source/repository_data_source_impl/auth/user_remote_datasource.dart'
-    as _i426;
-import 'package:achievia/data/data_source/repository_data_source_impl/cache/cache_data_source_impl.dart'
-    as _i692;
-import 'package:achievia/data/data_source/repository_data_source_impl/cache/module_cache_datasource.dart'
-    as _i908;
-import 'package:achievia/data/data_source/repository_data_source_impl/home/questions_remote_datasource.dart'
-    as _i322;
-import 'package:achievia/data/data_source/repository_data_source_impl/reviewer/module_remote_datasource.dart'
-    as _i445;
+import 'package:achievia/data/data_source/auth/user_remote_datasource.dart'
+    as _i528;
+import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart'
+    as _i761;
+import 'package:achievia/data/data_source/cache/module_cache_datasource.dart'
+    as _i214;
+import 'package:achievia/data/data_source/home/questions_remote_datasource.dart'
+    as _i557;
+import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart'
+    as _i536;
 import 'package:achievia/data/models/auth/user_dto.dart' as _i235;
 import 'package:achievia/data/models/quiz/questions_dto.dart' as _i74;
 import 'package:achievia/data/models/reviewer/module_dto.dart' as _i862;
@@ -85,8 +85,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i790.NetworkInfo>(
       () => _i790.NetworkInfoImpl(gh<_i895.Connectivity>()),
     );
-    gh.lazySingleton<_i322.QuestionsRemoteDatasource>(
-      () => _i322.QuestionsRemoteDatasource(gh<_i361.Dio>()),
+    gh.lazySingleton<_i557.QuestionsRemoteDatasource>(
+      () => _i557.QuestionsRemoteDatasource(gh<_i361.Dio>()),
     );
     gh.factory<_i416.QuestionsEntity>(
       () => _i416.QuestionsEntity(
@@ -104,11 +104,11 @@ extension GetItInjectableX on _i174.GetIt {
       instanceName: 'module_box',
       preResolve: true,
     );
-    gh.factory<_i426.UserRemoteDatasource>(
-      () => _i426.UserRemoteDatasource(dio: gh<_i361.Dio>()),
+    gh.factory<_i528.UserRemoteDatasource>(
+      () => _i528.UserRemoteDatasource(dio: gh<_i361.Dio>()),
     );
-    gh.factory<_i445.ModuleRemoteDatasource>(
-      () => _i445.ModuleRemoteDatasource(dio: gh<_i361.Dio>()),
+    gh.factory<_i536.ModuleRemoteDatasource>(
+      () => _i536.ModuleRemoteDatasource(dio: gh<_i361.Dio>()),
     );
     gh.factory<_i235.UserDto>(
       () => _i235.UserDto(
@@ -131,43 +131,43 @@ extension GetItInjectableX on _i174.GetIt {
         token: gh<String>(),
       ),
     );
-    gh.factory<_i908.ModuleCacheDataSourceImpl>(
-      () => _i908.ModuleCacheDataSourceImpl(
+    gh.factory<_i581.UserRepositoryImpl>(
+      () => _i581.UserRepositoryImpl(
+        datasource: gh<_i528.UserRemoteDatasource>(),
+      ),
+    );
+    gh.factory<_i214.ModuleCacheDataSourceImpl>(
+      () => _i214.ModuleCacheDataSourceImpl(
         gh<_i979.Box<_i862.ModuleDto>>(instanceName: 'module_box'),
       ),
     );
-    gh.factory<_i692.CacheDataSourceImpl>(
-      () => _i692.CacheDataSourceImpl(
+    gh.factory<_i761.CacheDataSourceImpl>(
+      () => _i761.CacheDataSourceImpl(
         gh<_i979.Box<_i74.QuestionsDto>>(instanceName: 'question_box'),
       ),
     );
-    gh.factory<_i581.UserRepositoryImpl>(
-      () => _i581.UserRepositoryImpl(
-        datasource: gh<_i426.UserRemoteDatasource>(),
+    gh.lazySingleton<_i548.QotRepositoryImpl>(
+      () => _i548.QotRepositoryImpl(
+        remoteDatasource: gh<_i557.QuestionsRemoteDatasource>(),
+        local: gh<_i761.CacheDataSourceImpl>(),
+        network: gh<_i790.NetworkInfo>(),
       ),
     );
     gh.factory<_i879.UserUseCase>(
       () => _i879.UserUseCase(impl: gh<_i581.UserRepositoryImpl>()),
     );
-    gh.lazySingleton<_i548.QotRepositoryImpl>(
-      () => _i548.QotRepositoryImpl(
-        remoteDatasource: gh<_i322.QuestionsRemoteDatasource>(),
-        local: gh<_i692.CacheDataSourceImpl>(),
+    gh.factory<_i656.ModuleRepositoryImpl>(
+      () => _i656.ModuleRepositoryImpl(
+        remoteDatasource: gh<_i536.ModuleRemoteDatasource>(),
+        cacheDataSource: gh<_i214.ModuleCacheDataSourceImpl>(),
         network: gh<_i790.NetworkInfo>(),
       ),
     );
     gh.lazySingleton<_i1000.QuestionsRepositoryImpl>(
       () => _i1000.QuestionsRepositoryImpl(
-        gh<_i692.CacheDataSourceImpl>(),
-        gh<_i322.QuestionsRemoteDatasource>(),
+        gh<_i761.CacheDataSourceImpl>(),
+        gh<_i557.QuestionsRemoteDatasource>(),
         gh<_i790.NetworkInfo>(),
-      ),
-    );
-    gh.factory<_i656.ModuleRepositoryImpl>(
-      () => _i656.ModuleRepositoryImpl(
-        remoteDatasource: gh<_i445.ModuleRemoteDatasource>(),
-        cacheDataSource: gh<_i908.ModuleCacheDataSourceImpl>(),
-        network: gh<_i790.NetworkInfo>(),
       ),
     );
     gh.factory<_i803.QuestionsUseCase>(

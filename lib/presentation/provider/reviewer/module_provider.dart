@@ -14,6 +14,7 @@ final getModulesProviderState = FutureProvider.family<List<ModuleEntity>, ({Stri
     final result = await moduleUseCase.getModules(params.token);
     return result;
   } catch (e) {
-    rethrow;
+    print(e);
+    return [];
   }
 });

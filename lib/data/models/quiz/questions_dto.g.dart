@@ -12,7 +12,7 @@ QuestionsDto _$QuestionsDtoFromJson(Map<String, dynamic> json) => QuestionsDto(
   courseId: (json['courseId'] as num).toInt(),
   description: json['description'] as String,
   image: json['image'] as String?,
-  day_subject: json['day_subject'] as String,
+  day_subject: json['day_subject'] as String?,
   createdAt: json['createdAt'] as String,
 );
 
@@ -23,7 +23,7 @@ Map<String, dynamic> _$QuestionsDtoToJson(QuestionsDto instance) =>
       'courseId': instance.courseId,
       'description': instance.description,
       'image': instance.image,
-      'day_subject': instance.day_subject,  
+      'day_subject': instance.day_subject,
       'createdAt': instance.createdAt,
     };
 
@@ -47,7 +47,7 @@ class QuestionsDtoAdapter extends TypeAdapter<QuestionsDto> {
       courseId: fields[2] as int,
       description: fields[3] as String,
       image: fields[4] as String?,
-      day_subject: fields[5] as String,
+      day_subject: fields[5] as String?,
       createdAt: fields[6] as String,
     );
   }

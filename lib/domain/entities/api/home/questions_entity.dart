@@ -7,7 +7,7 @@ class QuestionsEntity {
   final String courseId;
   final String description;
   final String image;
-  final String day_subject;
+  final String? day_subject;
   final String createdAt;
   QuestionsEntity({
     required this.id,

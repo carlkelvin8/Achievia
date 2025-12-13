@@ -26,7 +26,7 @@ class QuestionsDto {
   final String? image; // nullable
 
   @HiveField(5)
-  final String day_subject;
+  final String? day_subject;
 
   @HiveField(6)
   final String createdAt;
