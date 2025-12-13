@@ -1,9 +1,9 @@
 import 'package:achievia/core/constants/app_paddings.dart';
-import 'package:achievia/core/constants/widget_paddings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:achievia/domain/entities/widgets/reminder_entity.dart';
 import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/presentation/widgets/buttons/back_button_with_label.dart';
+import 'package:achievia/presentation/widgets/cards/reminder_card.dart';
 
 class ReminderScreenContent extends ConsumerWidget {
   const ReminderScreenContent({super.key});

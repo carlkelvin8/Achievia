@@ -1,8 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/core/utils/helpers.dart';
-import 'package:achievia/presentation/provider/questions/questions_provider.dart';
-import 'package:achievia/presentation/widgets/badges/pdf_badge.dart';
-import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/cards/questions_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
