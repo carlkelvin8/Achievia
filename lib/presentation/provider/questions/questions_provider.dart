@@ -41,7 +41,13 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier>{
     await useCase.answerQuestion(entity);
     print('chosen answer: $chosenAnswer');
   }
+
+  Future<void> randomizeQuestion()async{
+    await useCase.randomizeQuestions();
+  }
 }
+
+
 
 class AnswerQuestionNotifier {
   final String quiz_id;

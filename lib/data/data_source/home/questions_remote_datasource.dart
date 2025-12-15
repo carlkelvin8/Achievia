@@ -102,9 +102,9 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
       )
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = await response.data['response'] as List<dynamic>;
+        final data = await response.data['data']['response'] as List<dynamic>;
         final list =  data.map((e)=> QuestionsDto.fromJson(e)).toList();
-        
+        print(list);
         return list;
       }
       return [];

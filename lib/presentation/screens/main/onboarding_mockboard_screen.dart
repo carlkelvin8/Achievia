@@ -26,6 +26,7 @@ class _OnboardingMockboardScreenState extends ConsumerState<OnboardingMockboardS
       ),
       body: Padding(
         padding: level1_widget,
+        
       ),
     );
   }
