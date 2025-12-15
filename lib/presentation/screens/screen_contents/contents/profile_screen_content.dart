@@ -4,6 +4,7 @@ import 'package:achievia/core/utils/helpers.dart';
 import 'package:achievia/presentation/widgets/cards/examination_results_card.dart';
 import 'package:achievia/presentation/widgets/cards/mantra_card.dart';
 import 'package:achievia/presentation/widgets/cards/profile_status_card.dart';
+import 'package:achievia/presentation/widgets/badges/countdown_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,41 +31,11 @@ class _ProfileScreenContentState extends ConsumerState<ProfileScreenContent> {
             children: [
               const ProfileStatusCard(),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Days left before Board Exam:',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primary, // keep consistent with theme
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surface,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      '98 Days',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                ],
+              CountdownBadge(
+                label: 'Days left before Board Exam:',
+                value: '98 Days',
+                textColor: AppColors.primary,
+                valueColor: AppColors.primary,
               ),
               const SizedBox(height: 20),
               const MantraCard(),

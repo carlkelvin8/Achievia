@@ -4,12 +4,13 @@ class PdfBadge extends StatefulWidget {
   final String text;
   final String tabType;
   final String? imageUrl;
-
+  final VoidCallback? callback;
   const PdfBadge({
     super.key,
     required this.text,
     required this.tabType,
     this.imageUrl,
+    this.callback
   });
 
   @override
@@ -25,11 +26,7 @@ class _PdfBadgeState extends State<PdfBadge> {
     final textTheme = Theme.of(context).textTheme.labelSmall;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _isExpanded = !_isExpanded;
-        });
-      },
+      onTap: widget.callback,
       child: Container(
         padding: const EdgeInsets.all(8),
         width: double.infinity,
