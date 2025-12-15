@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:achievia/core/di/injection.dart';
@@ -9,6 +10,9 @@ final getQuestions = Provider<QuestionsUseCase>((ref){
   return sl.get<QuestionsUseCase>();
 });
 
+final getHive = Provider<CacheDataSourceImpl>((ref){
+  return sl.get<CacheDataSourceImpl>();
+});
 
 final getQuestionsProviderState = FutureProvider.family<List<QuestionsEntity>, ({String token, String id})>((ref, params) async {
   final gtQuestions = ref.read(getQuestions);
@@ -23,6 +27,16 @@ final getQuestionsProviderState = FutureProvider.family<List<QuestionsEntity>, (
 final getQoty = FutureProvider<QotyEntity>((ref) async {
   final gtQuestions = ref.read(getQuestions);
   return await gtQuestions.getQotQueston();
+});
+
+final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref)async{
+  final gtQuestions = ref.read(getHive);
+  try {
+    final result = await gtQuestions.getCacheQuestions();
+    return result.map((e)=>e.toEntity()).toList();
+  } catch (e) {
+    rethrow;
+  }
 });
 
 final answerQotProvider = NotifierProvider<QuestionsProvider, AnswerQuestionNotifier>(QuestionsProvider.new);
