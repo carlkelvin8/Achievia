@@ -52,8 +52,8 @@ class _OnboardingMockboardScreenState extends ConsumerState<OnboardingMockboardS
       ),
       persistentFooterAlignment: AlignmentDirectional.bottomCenter,
       persistentFooterDecoration: BoxDecoration(
-        boxShadow: [],
-        shape: BoxShape.rectangle,
+        
+        
       ),
       persistentFooterButtons: [ReusableButton(title: 'START EXAM', onPressed: (){}, width: 300, height: 50)],
     );
