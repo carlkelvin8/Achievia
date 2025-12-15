@@ -306,7 +306,22 @@ final List<PdfEntity> procedures = [
 ];
 
 final List<QuestionsEntityWidget> questions = [
-  QuestionsEntityWidget(icon: Icons.question_answer_rounded, label: 'Question Bank', sub_label: 'A comprehensive collection of board exam–style questions designed to cover all major topics, helping you practice, assess your understanding, and prepare effectively for the actual exam.'),
-  QuestionsEntityWidget(icon: Icons.edit_document, label: 'Mock Boards', sub_label: 'Simulated board examinations designed to mirror the actual exam experience, helping you assess your readiness, build confidence, and identify areas that need improvement before the real test.'),
-  QuestionsEntityWidget(icon: Icons.emoji_events_sharp, label: 'Pre Boards', sub_label: 'A final one-take comprehensive exam that simulates the actual board, available only once and unlocked 2 weeks before the scheduled board exam to help you gauge your ultimate readiness.'),
+  QuestionsEntityWidget(
+    icon: Icons.question_answer_rounded, 
+    label: 'Question Bank', 
+    sub_label: 'A comprehensive collection of board exam–style questions designed to cover all major topics, helping you practice, assess your understanding, and prepare effectively for the actual exam.',
+    callback: (context) => Navigator.pushNamed(context, '/onboarding-questions'),
+    ),
+  QuestionsEntityWidget(
+    icon: Icons.edit_document, 
+    label: 'Mock Boards', 
+    sub_label: 'Simulated board examinations designed to mirror the actual exam experience, helping you assess your readiness, build confidence, and identify areas that need improvement before the real test.',
+    callback: (context) => Navigator.pushNamed(context, '/onboarding-questions'),
+    ),
+  QuestionsEntityWidget(
+    icon: Icons.emoji_events_sharp, 
+    label: 'Pre Boards', 
+    sub_label: 'A final one-take comprehensive exam that simulates the actual board, available only once and unlocked 2 weeks before the scheduled board exam to help you gauge your ultimate readiness.', 
+    callback: (context) => Navigator.pushNamed(context, '/onboarding-questions'),
+    ),
 ];

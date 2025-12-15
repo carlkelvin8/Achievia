@@ -1,6 +1,7 @@
 import 'package:achievia/core/constants/app_theme.dart';
 import 'package:achievia/core/constants/routers/app_router.dart';
 import 'package:achievia/core/constants/routers/navigation_service.dart';
+import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:achievia/data/models/reviewer/module_dto.dart';
@@ -37,6 +38,7 @@ class MyApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
+      routes: appRoutes,
       home: AuthChecker(authenticated: MainScreen(), unauthenticated: LoginScreen()),
     );
   }

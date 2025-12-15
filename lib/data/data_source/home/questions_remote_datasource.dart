@@ -9,6 +9,7 @@ abstract class QuestionRepoDataSource  {
   Future<List<QuestionsDto>> getAllQuestions(String token, String id);
   Future<QotdDto> getQotd();
   Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
+  Future<List<QuestionsDto>> randomizeQuestion();
   
 }
 @lazySingleton
@@ -87,6 +88,29 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
     } catch (e) {
       print(e);
       return QotdDtoPost.fromJson({});
+    }
+  }
+  
+  @override
+  Future<List<QuestionsDto>> randomizeQuestion() async{
+    try {
+      final response = await dio.post('$BASE_URL/tasks/randomizeQuestions', 
+      options: Options(
+        headers: {
+          'Content-Type':'application/json'
+        }
+      )
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = await response.data['response'] as List<dynamic>;
+        final list =  data.map((e)=> QuestionsDto.fromJson(e)).toList();
+        
+        return list;
+      }
+      return [];
+    } catch (e) {
+      print(e);
+      return [];
     }
   }
 }

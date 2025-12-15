@@ -2,23 +2,24 @@
 import 'package:flutter/material.dart';
 
 import 'package:achievia/core/constants/widget_paddings.dart';
-import 'package:achievia/domain/entities/widgets/questions_entity.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class QuestionsCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String sub_label;
+  final VoidCallback? callback;
   const QuestionsCard({
     super.key,
     required this.icon,
     required this.label,
     required this.sub_label,
+    this.callback
   });
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){},
+      onTap: callback,
       child: Container(
       width: MediaQuery.of(context).size.width,
       padding: level1_widget,
