@@ -43,7 +43,8 @@ class MockboardCard extends StatelessWidget {
                         Text('• ${labels[index]}',
                         style: GoogleFonts.poppins(
                             fontSize: 12,
-                            fontWeight: FontWeight.w400
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black
                           ),
                         ),
                     separatorBuilder: (_, __) =>
@@ -53,7 +54,8 @@ class MockboardCard extends StatelessWidget {
                 : Text(labels.first,
                 style: GoogleFonts.poppins(
                             fontSize: 12,
-                            fontWeight: FontWeight.w400
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black
                           ),
                 ),
           ),

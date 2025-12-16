@@ -2,6 +2,7 @@
 import 'package:achievia/presentation/screens/auth/login_screen.dart';
 import 'package:achievia/presentation/screens/auth/onboarding_screen.dart';
 import 'package:achievia/presentation/screens/main/about_screen.dart';
+import 'package:achievia/presentation/screens/main/exam_screen.dart';
 import 'package:achievia/presentation/screens/main/home_screen.dart';
 import 'package:achievia/presentation/screens/main/main_screen.dart';
 import 'package:achievia/presentation/screens/main/messages_screen.dart';
@@ -37,6 +38,7 @@ class RouteConstants {
   static const String pomodoroTimer = '/pomodoro-timer';
   static const String reminder = '/reminder';
   static const String onboardingQuestions = '/onboarding-questions';
+  static const String examScreen = '/exam-screen';
 }
 
 
@@ -65,6 +67,7 @@ final Map<String, WidgetBuilder> appRoutes = {
   // Other features
   RouteConstants.reminder: (_) => const ReminderScreenContent(),
   RouteConstants.onboardingQuestions: (_) => const OnboardingMockboardScreen(title: '',),
+  RouteConstants.examScreen:(_) => const ExamScreen()
 };
 
 

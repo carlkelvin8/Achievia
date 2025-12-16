@@ -1,5 +1,6 @@
 import 'package:achievia/core/constants/widget_paddings.dart';
 import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/presentation/provider/pomodoro/pomodoro_providers.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/cards/mockboard_card.dart';
 import 'package:achievia/presentation/widgets/cards/mockboard_dynamic_card.dart';
@@ -18,6 +19,7 @@ class OnboardingMockboardScreen extends ConsumerStatefulWidget {
 class _OnboardingMockboardScreenState extends ConsumerState<OnboardingMockboardScreen> {
   @override
   Widget build(BuildContext context) {
+    final notifier = ref.read(pomodoroProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         title: Text('Mock Boards',
@@ -55,7 +57,10 @@ class _OnboardingMockboardScreenState extends ConsumerState<OnboardingMockboardS
         
         
       ),
-      persistentFooterButtons: [ReusableButton(title: 'START EXAM', onPressed: (){}, width: 300, height: 50)],
+      persistentFooterButtons: [ReusableButton(title: 'START EXAM', onPressed: (){
+        notifier.start();
+        Navigator.pushNamed(context, '/exam-screen');
+      }, width: 300, height: 50)],
     );
   }
 }

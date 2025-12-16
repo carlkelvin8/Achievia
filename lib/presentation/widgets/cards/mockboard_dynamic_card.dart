@@ -38,7 +38,8 @@ class MockboardDynamicCard extends ConsumerWidget {
                                     Text('${index + 1}. ${question[index].title}',
                                     style: GoogleFonts.poppins(
                                         fontSize: 12,
-                                        fontWeight: FontWeight.w400
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black
                                       ),
                                     ),
                                 separatorBuilder: (_, __) =>
