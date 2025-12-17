@@ -324,3 +324,13 @@ final List<QuestionsEntityWidget> questions = [
     callback: (context) => Navigator.pushNamed(context, '/onboarding-questions'),
     ),
 ];
+
+final List<String> assets = [
+              'Review each question carefully.', 
+              'Skip questions that are hard and come back to them if there’s still time.',
+              'Manage your time wisely — don’t get stuck on one question.',
+              'Focus throughout the exam and avoid distractions.'
+              ];
+final List<String> assets2 = ['General Passing Average: Minimum of 75% overall.',
+'Minimum Subject Score: You must not score below 50% in any major subject. One subject below 50% results in automatic failure.'
+];

@@ -50,7 +50,7 @@ class QuestionsCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 11,
-                  color: Theme.of(context).primaryColor
+                  color: Theme.of(context).colorScheme.primary
                 ),
                 )
               ],

@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:achievia/core/di/injection.dart';
@@ -9,6 +11,9 @@ final getQuestions = Provider<QuestionsUseCase>((ref){
   return sl.get<QuestionsUseCase>();
 });
 
+final getHive = Provider<CacheDataSourceImpl>((ref){
+  return sl.get<CacheDataSourceImpl>();
+});
 
 final getQuestionsProviderState = FutureProvider.family<List<QuestionsEntity>, ({String token, String id})>((ref, params) async {
   final gtQuestions = ref.read(getQuestions);
@@ -25,8 +30,46 @@ final getQoty = FutureProvider<QotyEntity>((ref) async {
   return await gtQuestions.getQotQueston();
 });
 
-final answerQotProvider = NotifierProvider<QuestionsProvider, AnswerQuestionNotifier>(QuestionsProvider.new);
+final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref)async{
+  final gtQuestions = ref.read(getHive);
+  try {
+    final result = await gtQuestions.getCacheQuestions();
+    return result.map((e)=>e.toEntity()).toList();
+  } catch (e) {
+    rethrow;
+  }
+});
 
+final getGeneratedQuestions = FutureProvider<List<QotyEntity>>((ref)async{
+  final gtQuestions = ref.read(getQuestions);
+  try {
+    final results = await gtQuestions.getGeneratedQuestions();
+    return results;
+  } catch (e) {
+    rethrow;
+  }
+});
+
+final answerQotProvider = NotifierProvider<QuestionsProvider, AnswerQuestionNotifier>(QuestionsProvider.new);
+final pageController = NotifierProvider.autoDispose<PageControllerProvider, PageController>(PageControllerProvider.new);
+
+class PageControllerProvider extends Notifier<PageController> {
+  @override
+  PageController build() {
+      return PageController();
+  }
+
+  Future<void> next()async{
+    state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+  }
+
+  Future<void> prev()async{
+    state.previousPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+  }
+
+
+  
+}
 
 class QuestionsProvider extends Notifier<AnswerQuestionNotifier>{
   late final QuestionsUseCase useCase;

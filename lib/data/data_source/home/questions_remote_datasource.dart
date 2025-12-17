@@ -1,4 +1,5 @@
 import 'package:achievia/const.dart';
+import 'package:achievia/data/data_source/cache/mock_boards_questions_data_source.dart';
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
 import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
@@ -9,6 +10,7 @@ abstract class QuestionRepoDataSource  {
   Future<List<QuestionsDto>> getAllQuestions(String token, String id);
   Future<QotdDto> getQotd();
   Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
+  Future<List<QotdDto>> getTheGeneratedQuiz();
   Future<List<QuestionsDto>> randomizeQuestion();
   
 }
@@ -16,7 +18,8 @@ abstract class QuestionRepoDataSource  {
 @injectable
 class QuestionsRemoteDatasource implements QuestionRepoDataSource{
   final Dio dio;
-  QuestionsRemoteDatasource(this.dio);
+  final MockBoardsQuestionsDataSourceImpl local;
+  QuestionsRemoteDatasource(this.dio, this.local);
  @override
 Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
   try {
@@ -102,9 +105,11 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
       )
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = await response.data['data']['response'] as List<dynamic>;
+        final data = await response.data['data']['response']['subjects'] as List<dynamic>;
+        final questions = await response.data['data']['response']['questions'] as List<dynamic>;
         final list =  data.map((e)=> QuestionsDto.fromJson(e)).toList();
-        print(list);
+        final questionsList = questions.map((e)=>QotdDto.fromJson(e)).toList();
+        await local.cachePost(questionsList);
         return list;
       }
       return [];
@@ -112,5 +117,16 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
       print(e);
       return [];
     }
+  }
+  
+  @override
+  Future<List<QotdDto>> getTheGeneratedQuiz() async{
+      try {
+        final cache = await local.getCacheQuestions();
+        return cache.map((e)=>e).toList();
+      } catch (e) {
+        print(e);
+        return [];
+      }
   }
 }
