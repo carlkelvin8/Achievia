@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:achievia/core/di/injection.dart';
@@ -39,8 +40,36 @@ final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref)async{
   }
 });
 
-final answerQotProvider = NotifierProvider<QuestionsProvider, AnswerQuestionNotifier>(QuestionsProvider.new);
+final getGeneratedQuestions = FutureProvider<List<QotyEntity>>((ref)async{
+  final gtQuestions = ref.read(getQuestions);
+  try {
+    final results = await gtQuestions.getGeneratedQuestions();
+    return results;
+  } catch (e) {
+    rethrow;
+  }
+});
 
+final answerQotProvider = NotifierProvider<QuestionsProvider, AnswerQuestionNotifier>(QuestionsProvider.new);
+final pageController = NotifierProvider.autoDispose<PageControllerProvider, PageController>(PageControllerProvider.new);
+
+class PageControllerProvider extends Notifier<PageController> {
+  @override
+  PageController build() {
+      return PageController();
+  }
+
+  Future<void> next()async{
+    state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+  }
+
+  Future<void> prev()async{
+    state.previousPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+  }
+
+
+  
+}
 
 class QuestionsProvider extends Notifier<AnswerQuestionNotifier>{
   late final QuestionsUseCase useCase;

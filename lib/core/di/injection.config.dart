@@ -18,6 +18,8 @@ import 'package:achievia/data/data_source/auth/user_remote_datasource.dart'
     as _i528;
 import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart'
     as _i761;
+import 'package:achievia/data/data_source/cache/mock_boards_questions_data_source.dart'
+    as _i396;
 import 'package:achievia/data/data_source/cache/module_cache_datasource.dart'
     as _i214;
 import 'package:achievia/data/data_source/home/questions_remote_datasource.dart'
@@ -25,6 +27,7 @@ import 'package:achievia/data/data_source/home/questions_remote_datasource.dart'
 import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart'
     as _i536;
 import 'package:achievia/data/models/auth/user_dto.dart' as _i235;
+import 'package:achievia/data/models/quiz/qotd_dto.dart' as _i900;
 import 'package:achievia/data/models/quiz/questions_dto.dart' as _i74;
 import 'package:achievia/data/models/reviewer/module_dto.dart' as _i862;
 import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart'
@@ -70,6 +73,15 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i982.LocalStorageService(gh<_i460.SharedPreferences>()),
     );
     gh.factory<_i979.Box<dynamic>>(
+      () => registerModules.exam,
+      instanceName: 'exam_box',
+    );
+    await gh.factoryAsync<_i979.Box<_i900.QotdDto>>(
+      () => hiveModule.openExamBox(),
+      instanceName: 'exam_box',
+      preResolve: true,
+    );
+    gh.factory<_i979.Box<dynamic>>(
       () => registerModules.questions,
       instanceName: 'questions_box',
     );
@@ -84,20 +96,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i790.NetworkInfo>(
       () => _i790.NetworkInfoImpl(gh<_i895.Connectivity>()),
-    );
-    gh.lazySingleton<_i557.QuestionsRemoteDatasource>(
-      () => _i557.QuestionsRemoteDatasource(gh<_i361.Dio>()),
-    );
-    gh.factory<_i416.QuestionsEntity>(
-      () => _i416.QuestionsEntity(
-        id: gh<String>(),
-        title: gh<String>(),
-        courseId: gh<String>(),
-        description: gh<String>(),
-        image: gh<String>(),
-        day_subject: gh<String>(),
-        createdAt: gh<String>(),
-      ),
     );
     await gh.factoryAsync<_i979.Box<_i862.ModuleDto>>(
       () => hiveModule.openModuleBox(),
@@ -131,6 +129,17 @@ extension GetItInjectableX on _i174.GetIt {
         token: gh<String>(),
       ),
     );
+    gh.factory<_i416.QuestionsEntity>(
+      () => _i416.QuestionsEntity(
+        id: gh<String>(),
+        title: gh<String>(),
+        courseId: gh<String>(),
+        description: gh<String>(),
+        image: gh<String>(),
+        day_subject: gh<String>(),
+        createdAt: gh<String>(),
+      ),
+    );
     gh.factory<_i581.UserRepositoryImpl>(
       () => _i581.UserRepositoryImpl(
         datasource: gh<_i528.UserRemoteDatasource>(),
@@ -141,20 +150,24 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i979.Box<_i862.ModuleDto>>(instanceName: 'module_box'),
       ),
     );
+    gh.factory<_i396.MockBoardsQuestionsDataSourceImpl>(
+      () => _i396.MockBoardsQuestionsDataSourceImpl(
+        gh<_i979.Box<_i900.QotdDto>>(instanceName: 'exam_box'),
+      ),
+    );
     gh.factory<_i761.CacheDataSourceImpl>(
       () => _i761.CacheDataSourceImpl(
         gh<_i979.Box<_i74.QuestionsDto>>(instanceName: 'question_box'),
       ),
     );
-    gh.lazySingleton<_i548.QotRepositoryImpl>(
-      () => _i548.QotRepositoryImpl(
-        remoteDatasource: gh<_i557.QuestionsRemoteDatasource>(),
-        local: gh<_i761.CacheDataSourceImpl>(),
-        network: gh<_i790.NetworkInfo>(),
-      ),
-    );
     gh.factory<_i879.UserUseCase>(
       () => _i879.UserUseCase(impl: gh<_i581.UserRepositoryImpl>()),
+    );
+    gh.lazySingleton<_i557.QuestionsRemoteDatasource>(
+      () => _i557.QuestionsRemoteDatasource(
+        gh<_i361.Dio>(),
+        gh<_i396.MockBoardsQuestionsDataSourceImpl>(),
+      ),
     );
     gh.factory<_i656.ModuleRepositoryImpl>(
       () => _i656.ModuleRepositoryImpl(
@@ -170,14 +183,21 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i790.NetworkInfo>(),
       ),
     );
+    gh.lazySingleton<_i548.QotRepositoryImpl>(
+      () => _i548.QotRepositoryImpl(
+        remoteDatasource: gh<_i557.QuestionsRemoteDatasource>(),
+        local: gh<_i761.CacheDataSourceImpl>(),
+        network: gh<_i790.NetworkInfo>(),
+      ),
+    );
+    gh.factory<_i533.ModuleUseCase>(
+      () => _i533.ModuleUseCase(impl: gh<_i656.ModuleRepositoryImpl>()),
+    );
     gh.factory<_i803.QuestionsUseCase>(
       () => _i803.QuestionsUseCase(
         gh<_i1000.QuestionsRepositoryImpl>(),
         gh<_i548.QotRepositoryImpl>(),
       ),
-    );
-    gh.factory<_i533.ModuleUseCase>(
-      () => _i533.ModuleUseCase(impl: gh<_i656.ModuleRepositoryImpl>()),
     );
     return this;
   }

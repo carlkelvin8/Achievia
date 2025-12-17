@@ -1,6 +1,7 @@
 import 'package:achievia/core/network/conntectivity.dart';
 import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart';
 import 'package:achievia/data/data_source/home/questions_remote_datasource.dart';
+import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/repository/questions/questions_repository.dart';
 import 'package:injectable/injectable.dart';
@@ -48,6 +49,22 @@ class QuestionsRepositoryImpl implements QuestionsRepository{
     return [];
     } catch (e) {
       print('repo q: $e');
+      return [];
+    }
+  }
+
+  @override
+  Future<List<QotyEntity>> getRandomizedQuestions() async{
+    final isConnected = await network.isConnected;
+    try {
+      if (isConnected) {
+        final responseCached = await remoteDatasource.getTheGeneratedQuiz();
+        final mapData = responseCached.map((e)=>e.toEntity()).toList();
+        return mapData;
+      }
+      return [];
+    } catch (e) {
+      print(e);
       return [];
     }
   }

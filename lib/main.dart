@@ -3,6 +3,7 @@ import 'package:achievia/core/constants/routers/app_router.dart';
 import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/data/models/quiz/qotd_dto.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:achievia/data/models/reviewer/module_dto.dart';
 import 'package:achievia/presentation/provider/theme/theme_provider.dart';
@@ -19,6 +20,7 @@ void main() async{
   Hive.init(appDirectory.path);
   Hive.registerAdapter(QuestionsDtoAdapter());
   Hive.registerAdapter(ModuleDtoAdapter());
+  Hive.registerAdapter(QotdDtoAdapter());
   await configureDependencies();
   runApp(const ProviderScope(child: MyApp()));
 }
