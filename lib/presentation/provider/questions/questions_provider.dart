@@ -52,7 +52,7 @@ final getGeneratedQuestions = FutureProvider<List<QotyEntity>>((ref)async{
 
 final answerQotProvider = NotifierProvider<QuestionsProvider, AnswerQuestionNotifier>(QuestionsProvider.new);
 final pageController = NotifierProvider.autoDispose<PageControllerProvider, PageController>(PageControllerProvider.new);
-
+final changeIndexProvider = NotifierProvider.autoDispose<IndexProvider, int>(IndexProvider.new);
 class PageControllerProvider extends Notifier<PageController> {
   @override
   PageController build() {
@@ -66,8 +66,15 @@ class PageControllerProvider extends Notifier<PageController> {
   Future<void> prev()async{
     state.previousPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
   }
+}
 
+class IndexProvider extends Notifier<int> {
+  @override
+  int build() => 0;
 
+  void changeIndex(int index){
+    state = index;
+  }
   
 }
 

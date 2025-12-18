@@ -13,6 +13,7 @@ QotdDto _$QotdDtoFromJson(Map<String, dynamic> json) => QotdDto(
   choices: (json['choices'] as List<dynamic>)
       .map((e) => e as Map<String, dynamic>)
       .toList(),
+  quiz: json['quiz'] as Map<String, dynamic>?,
 );
 
 Map<String, dynamic> _$QotdDtoToJson(QotdDto instance) => <String, dynamic>{
@@ -20,7 +21,9 @@ Map<String, dynamic> _$QotdDtoToJson(QotdDto instance) => <String, dynamic>{
   'id': instance.id,
   'questionText': instance.questionText,
   'choices': instance.choices,
+  'quiz': instance.quiz,
 };
+	
 
 // **************************************************************************
 // TypeAdapterGenerator
@@ -41,13 +44,14 @@ class QotdDtoAdapter extends TypeAdapter<QotdDto> {
       id: fields[1] as int,
       questionText: fields[2] as String,
       choices: (fields[3] as List<dynamic>).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
+      quiz: fields[4] != null ? Map<String, dynamic>.from(fields[4] as Map) : null,
     );
   }
 
   @override
   void write(BinaryWriter writer, QotdDto obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.quizId)
       ..writeByte(1)
@@ -55,7 +59,9 @@ class QotdDtoAdapter extends TypeAdapter<QotdDto> {
       ..writeByte(2)
       ..write(obj.questionText)
       ..writeByte(3)
-      ..write(obj.choices);
+      ..write(obj.choices)
+      ..writeByte(4)
+      ..write(obj.quiz);
   }
 
   @override

@@ -4,11 +4,14 @@ class QotyEntity {
   final int id;
   final String questionText;
   final List<Map<String,dynamic>> choices;
+  final Map<String,dynamic>? quiz;
+
   QotyEntity({
     required this.quizId,
     required this.id,
     required this.questionText,
     required this.choices,
+    this.quiz
   });
 }
 

@@ -37,11 +37,14 @@ class QuestionsContent extends StatelessWidget {
             final isSelected = selectedIndex == index;
 
             Color? textColor;
+            FontWeight? font;
             if (selectedIndex != null) {
               if (choice['isCorrect'] == true) {
                 textColor = Colors.green;
+                font = FontWeight.bold;
               } else if (isSelected) {
                 textColor = Colors.red;
+                font = FontWeight.bold;
               }
             }
 
@@ -53,6 +56,7 @@ class QuestionsContent extends StatelessWidget {
                 choice['choiceText'],
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: textColor,
+                  fontWeight: font
                 ),
               ),
             );

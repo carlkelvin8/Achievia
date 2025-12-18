@@ -7,10 +7,12 @@ import 'package:google_fonts/google_fonts.dart';
 class ExamAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double toolbarheight;
   final String title;
+  final String? page;
   const ExamAppBar({
     super.key,
     required this.toolbarheight,
     required this.title,
+    this.page
   });
 
   @override
@@ -44,6 +46,12 @@ class ExamAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             const SizedBox(height: 2,),
             Text('Mockboards',
+            style: GoogleFonts.poppins(
+              fontSize: 12
+
+            ),
+            ),
+            Text('$page',
             style: GoogleFonts.poppins(
               fontSize: 12
 
