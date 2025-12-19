@@ -50,6 +50,9 @@ final getGeneratedQuestions = FutureProvider<List<QotyEntity>>((ref)async{
   }
 });
 
+
+final answeredQuestionsProvider = NotifierProvider<ShowUnansweredQuestionsProvider, List<int>>(ShowUnansweredQuestionsProvider.new);
+final showModalNotifier = NotifierProvider<ShowModalProvider, bool>(ShowModalProvider.new);
 final answerQotProvider = NotifierProvider<QuestionsProvider, AnswerQuestionNotifier>(QuestionsProvider.new);
 final pageController = NotifierProvider.autoDispose<PageControllerProvider, PageController>(PageControllerProvider.new);
 final changeIndexProvider = NotifierProvider.autoDispose<IndexProvider, int>(IndexProvider.new);
@@ -66,6 +69,27 @@ class PageControllerProvider extends Notifier<PageController> {
   Future<void> prev()async{
     state.previousPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
   }
+}
+
+class ShowUnansweredQuestionsProvider extends Notifier<List<int>> {
+  late final bool isShown;
+  @override
+  List<int> build() => [];
+
+  Future<void> isAnswered(int index)async{
+    state.add(index);
+    print(state);
+  }
+}
+
+class ShowModalProvider extends Notifier<bool>{
+  @override
+  bool build() => false;
+
+  void showModal(){
+    state = !state;
+  }
+  
 }
 
 class IndexProvider extends Notifier<int> {
@@ -89,7 +113,6 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier>{
   Future<void> answerQuestion(String chosenAnswer)async{
     final entity =  QotyEntityPost(chosen_ans: chosenAnswer, quiz_id: 1, student_id: 1);
     await useCase.answerQuestion(entity);
-    print('chosen answer: $chosenAnswer');
   }
 
   Future<void> randomizeQuestion()async{

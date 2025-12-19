@@ -1,8 +1,9 @@
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
-import 'package:achievia/presentation/provider/tabs/event/tab_event.dart';
 import 'package:achievia/presentation/widgets/appbar/exam_app_bar.dart';
+import 'package:achievia/presentation/widgets/badges/unanswered_questions_badge.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/cards/questions_content.dart';
+import 'package:achievia/presentation/widgets/cards/unanswered_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,7 +16,6 @@ class ExamScreen extends ConsumerStatefulWidget {
 
 class _ExamScreenState extends ConsumerState<ExamScreen> {
 
-  /// questionIndex -> selectedChoiceIndex
   final Map<int, int> selectedAnswers = {};
 
   @override
@@ -25,9 +25,13 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
     final pageControllers = ref.watch(pageController);
     final indexs = ref.watch(changeIndexProvider);
     final indexNotider = ref.read(changeIndexProvider.notifier);
-
+    final showModal = ref.read(showModalNotifier.notifier);
+    final visible = ref.watch(showModalNotifier);
+    final isAnswered = ref.read(answeredQuestionsProvider.notifier);
+    final isAnsweredWatch = ref.watch(answeredQuestionsProvider);
     return Scaffold(
       appBar: ExamAppBar(
+      callback: ()=>pageControllerNotifier.next(),
       title: asyncQuestions.when(data: (q){
         return q[indexs].quiz?['title'];
       }, 
@@ -54,18 +58,26 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
             itemBuilder: (context, index) {
               final question = questions[index];
 
-              return QuestionsContent(
+              return  !visible ? QuestionsContent(
                 questionText: question.questionText,
                 choices: question.choices,
                 selectedIndex: selectedAnswers[index],
                 onSelect: (v) {
                   if (v != null) {
+                    isAnswered.isAnswered(question.id);
                     setState(() {
                       selectedAnswers[index] = v;
                     });
                   }
                 },
-              );
+              ) : UnansweredCard(
+                  itemCount: questions.length,
+                  itemBuilder: (context, indx) => UnansweredQuestionsBadge(
+                    content: '${indx + 1}',
+                    answered: isAnsweredWatch.contains(questions[indx].id),
+                    index: indx,
+                  ),
+                );
             },
           );
         },
@@ -74,9 +86,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
       ),
       persistentFooterButtons: [
         IconButton(
-          onPressed: () {
-            pageControllerNotifier.prev();
-          },
+          onPressed: () =>pageControllerNotifier.prev(),
           icon: Icon(
             Icons.arrow_back_ios,
             color: Theme.of(context).primaryColor,
@@ -84,13 +94,14 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
         ),
         ReusableButton(
           title: selectedAnswers[indexs] == null ? 'UNANSWERED' : 'ANSWERED',
-          onPressed: () {},
+          onPressed: () =>showModal.showModal(),
           width: 240,
           height: 50,
         ),
         IconButton(
-          onPressed:selectedAnswers[indexs] == null ? null : () {
+          onPressed:selectedAnswers[indexs] == null ? null : (){
             pageControllerNotifier.next();
+            
           },
           icon: Icon(
             Icons.arrow_forward_ios,
