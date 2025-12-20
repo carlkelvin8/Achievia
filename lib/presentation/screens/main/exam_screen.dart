@@ -69,6 +69,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                   }
                 },
               ) : UnansweredCard(
+                  isShown: () => showModal.showModal(),
                   itemCount: questions.length,
                   itemBuilder: (context, indx) => UnansweredQuestionsBadge(
                     callback: (){
@@ -78,7 +79,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                     content: '${indx + 1}',
                     answered: isAnsweredWatch.contains(questions[indx].id),
                     index: indx,
-                  ),
+                  ), totalItems: isAnsweredWatch.length, currentItems: questions.length,
                 );
             },
           );
@@ -86,7 +87,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
-      persistentFooterButtons: [
+      persistentFooterButtons:visible  ? null : [
         IconButton(
           onPressed: () => pageControllerNotifier.prev(),
           icon: Icon(

@@ -24,8 +24,9 @@ class UnansweredQuestionsBadge extends StatelessWidget {
         color: answered ? Colors.black : Theme.of(context).primaryColor,
         borderRadius: BorderRadius.circular(8)
       ),
-      padding: EdgeInsets.all(8.0),
-      child: Text(content,
+      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
+      child: Center(
+        child: Text(content,
       textAlign: TextAlign.center,
       style: GoogleFonts.poppins(
         fontSize: 10,
@@ -33,6 +34,7 @@ class UnansweredQuestionsBadge extends StatelessWidget {
         fontWeight: FontWeight.w700
       ),
       ),
+      )
     ),
     );
   }
