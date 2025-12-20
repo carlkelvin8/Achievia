@@ -6,25 +6,34 @@ class UnansweredQuestionsBadge extends StatelessWidget {
   final String content;
   final bool answered;
   final int index;
+  final VoidCallback callback;
   const UnansweredQuestionsBadge({
     super.key,
     required this.content,
     required this.answered,
-    required this.index
+    required this.index,
+    required this.callback
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: answered ? Colors.black : Theme.of(context).primaryColor,
-      padding: EdgeInsets.all(5.0),
+    return GestureDetector(
+      onTap: callback,
+      child: Container(
+      decoration: BoxDecoration(
+        color: answered ? Colors.black : Theme.of(context).primaryColor,
+        borderRadius: BorderRadius.circular(8)
+      ),
+      padding: EdgeInsets.all(8.0),
       child: Text(content,
+      textAlign: TextAlign.center,
       style: GoogleFonts.poppins(
-        fontSize: 9,
+        fontSize: 10,
         color:answered   ? Colors.white : Colors.black ,
         fontWeight: FontWeight.w700
       ),
       ),
+    ),
     );
   }
 }

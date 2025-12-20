@@ -4,6 +4,7 @@ import 'package:achievia/domain/entities/widgets/notes_entity.dart';
 import 'package:achievia/domain/entities/widgets/pdf_entity.dart';
 import 'package:achievia/domain/entities/widgets/questions_entity.dart';
 import 'package:achievia/domain/entities/widgets/reminders_entity.dart';
+import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:flutter/material.dart';
 import 'package:achievia/domain/entities/widgets/reminder_entity.dart';
 import 'package:achievia/domain/entities/widgets/author_entity.dart';
@@ -334,3 +335,36 @@ final List<String> assets = [
 final List<String> assets2 = ['General Passing Average: Minimum of 75% overall.',
 'Minimum Subject Score: You must not score below 50% in any major subject. One subject below 50% results in automatic failure.'
 ];
+
+List<Widget> buildExamFooter({
+  required VoidCallback onPrev,
+  required VoidCallback onToggleModal,
+  required VoidCallback? onNext,
+  required bool isAnswered,
+  required Color iconColor,
+  double buttonWidth = 240,
+  double buttonHeight = 50,
+}) {
+  return [
+    IconButton(
+      onPressed: onPrev,
+      icon: Icon(
+        Icons.arrow_back_ios,
+        color: iconColor,
+      ),
+    ),
+    ReusableButton(
+      title: isAnswered ? 'ANSWERED' : 'UNANSWERED',
+      onPressed: onToggleModal,
+      width: buttonWidth,
+      height: buttonHeight,
+    ),
+    IconButton(
+      onPressed: onNext,
+      icon: Icon(
+        Icons.arrow_forward_ios,
+        color: iconColor,
+      ),
+    ),
+  ];
+}
