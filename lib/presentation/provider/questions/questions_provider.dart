@@ -69,6 +69,10 @@ class PageControllerProvider extends Notifier<PageController> {
   Future<void> prev()async{
     state.previousPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
   }
+
+  Future<void> navigateToPage(int index)async{
+    state.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.ease);
+  }
 }
 
 class ShowUnansweredQuestionsProvider extends Notifier<List<int>> {

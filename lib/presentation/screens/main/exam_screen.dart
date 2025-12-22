@@ -1,6 +1,7 @@
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
 import 'package:achievia/presentation/widgets/appbar/exam_app_bar.dart';
 import 'package:achievia/presentation/widgets/badges/unanswered_questions_badge.dart';
+import 'package:achievia/presentation/widgets/builders/exam_pageview_builder.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/cards/questions_content.dart';
 import 'package:achievia/presentation/widgets/cards/unanswered_card.dart';
@@ -15,9 +16,7 @@ class ExamScreen extends ConsumerStatefulWidget {
 }
 
 class _ExamScreenState extends ConsumerState<ExamScreen> {
-
   final Map<int, int> selectedAnswers = {};
-
   @override
   Widget build(BuildContext context) {
     final asyncQuestions = ref.watch(getGeneratedQuestions);
@@ -44,12 +43,11 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
         error: (_, __) => '0 / 0',
       ),
     ),
-
       persistentFooterAlignment: AlignmentDirectional.center,
       body: asyncQuestions.when(
         data: (questions) {
-          return PageView.builder(
-            physics: const NeverScrollableScrollPhysics(),
+          return ExamPageviewBuilder(
+            visible: visible,
             controller: pageControllers,
             itemCount: questions.length,
             onPageChanged: (index) {
@@ -71,12 +69,17 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                   }
                 },
               ) : UnansweredCard(
+                  isShown: () => showModal.showModal(),
                   itemCount: questions.length,
                   itemBuilder: (context, indx) => UnansweredQuestionsBadge(
+                    callback: (){
+                      pageControllerNotifier.navigateToPage(indx);
+                      showModal.showModal();
+                    },
                     content: '${indx + 1}',
                     answered: isAnsweredWatch.contains(questions[indx].id),
                     index: indx,
-                  ),
+                  ), totalItems: isAnsweredWatch.length, currentItems: questions.length,
                 );
             },
           );
@@ -84,9 +87,9 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
-      persistentFooterButtons: [
+      persistentFooterButtons:visible  ? null : [
         IconButton(
-          onPressed: () =>pageControllerNotifier.prev(),
+          onPressed: () => pageControllerNotifier.prev(),
           icon: Icon(
             Icons.arrow_back_ios,
             color: Theme.of(context).primaryColor,
