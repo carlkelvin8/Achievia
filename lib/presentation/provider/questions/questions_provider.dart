@@ -62,7 +62,10 @@ class PageControllerProvider extends Notifier<PageController> {
       return PageController();
   }
 
-  Future<void> next()async{
+  Future<void> next(BuildContext context)async{
+    if (state.page == 99) {
+      Navigator.pop(context);
+    }
     state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
   }
 

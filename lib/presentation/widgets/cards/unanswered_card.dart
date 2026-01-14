@@ -70,7 +70,7 @@ class UnansweredCard extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: itemCount,
                   gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 10,
+                    crossAxisCount: MediaQuery.of(context).size.width == 360 ? 12 : 10,
                     mainAxisSpacing: 2.0,
                     crossAxisSpacing: 3.0,
                     mainAxisExtent: 46.2,

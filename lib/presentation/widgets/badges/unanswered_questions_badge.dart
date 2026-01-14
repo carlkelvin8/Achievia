@@ -24,16 +24,18 @@ class UnansweredQuestionsBadge extends StatelessWidget {
         color: answered ? Colors.black : Theme.of(context).primaryColor,
         borderRadius: BorderRadius.circular(8)
       ),
-      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
+      padding: EdgeInsets.symmetric(horizontal:8.0, vertical: 8.0),
       child: Center(
-        child: Text(content,
+        child: FittedBox(
+          child: Text(content,
       textAlign: TextAlign.center,
       style: GoogleFonts.poppins(
-        fontSize: 10,
+        fontSize: 12,
         color:answered   ? Colors.white : Colors.black ,
         fontWeight: FontWeight.w700
       ),
       ),
+        )
       )
     ),
     );

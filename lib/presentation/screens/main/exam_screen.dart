@@ -30,7 +30,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
     final isAnsweredWatch = ref.watch(answeredQuestionsProvider);
     return Scaffold(
       appBar: ExamAppBar(
-      callback: ()=>pageControllerNotifier.next(),
+      callback: ()=>pageControllerNotifier.next(context),
       title: asyncQuestions.when(data: (q){
         return q[indexs].quiz?['title'];
       }, 
@@ -98,12 +98,12 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
         ReusableButton(
           title: selectedAnswers[indexs] == null ? 'UNANSWERED' : 'ANSWERED',
           onPressed: () =>showModal.showModal(),
-          width: 240,
+          width: MediaQuery.of(context).size.width == 360 ? 200 : 240,
           height: 50,
         ),
         IconButton(
           onPressed:selectedAnswers[indexs] == null ? null : (){
-            pageControllerNotifier.next();
+            pageControllerNotifier.next(context);
             
           },
           icon: Icon(
