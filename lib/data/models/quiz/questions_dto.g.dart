@@ -27,8 +27,9 @@ Map<String, dynamic> _$QuestionsDtoToJson(QuestionsDto instance) =>
       'createdAt': instance.createdAt,
     };
 
+
 // **************************************************************************
-// TypeAdapterGenerator
+// HiveTypeAdapterGenerator
 // **************************************************************************
 
 class QuestionsDtoAdapter extends TypeAdapter<QuestionsDto> {

@@ -30,13 +30,14 @@ Map<String, dynamic> _$ModuleDtoToJson(ModuleDto instance) => <String, dynamic>{
   'subjectId': instance.subjectId,
 };
 
+
 // **************************************************************************
-// TypeAdapterGenerator
+// HiveTypeAdapterGenerator
 // **************************************************************************
 
 class ModuleDtoAdapter extends TypeAdapter<ModuleDto> {
   @override
-  final int typeId = 2;
+  final int typeId = 3;
 
   @override
   ModuleDto read(BinaryReader reader) {

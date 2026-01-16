@@ -1,33 +1,48 @@
 import 'package:achievia/core/constants/app_colors.dart';
 import 'package:achievia/core/constants/widget_paddings.dart';
+import 'package:achievia/presentation/provider/profile/profile_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
-class ProfileStatusCard extends ConsumerWidget {
+class ProfileStatusCard extends ConsumerStatefulWidget {
   const ProfileStatusCard({super.key});
+
+  @override
+  ConsumerState<ProfileStatusCard> createState() => _ProfileStatusCardState();
+}
+
+class _ProfileStatusCardState extends ConsumerState<ProfileStatusCard> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(profileProvider.notifier).fetchProfile();
+    });
+  }
 
   Widget _buildDetailRow(BuildContext context, String label, String value) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 3),
+      padding: const EdgeInsets.only(bottom: 2),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 100,
+            width: 85,
             child: Text(
               label,
-              style: textTheme.bodySmall?.copyWith(
+              style: const TextStyle(
+                fontSize: 10,
                 fontWeight: FontWeight.w500,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              ).copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ),
           Text(
             '► ',
-            style: textTheme.bodySmall?.copyWith(
+            style: TextStyle(
+              fontSize: 10,
               fontWeight: FontWeight.bold,
               color: colorScheme.onSurfaceVariant,
             ),
@@ -35,7 +50,8 @@ class ProfileStatusCard extends ConsumerWidget {
           Expanded(
             child: Text(
               value,
-              style: textTheme.bodySmall?.copyWith(
+              style: TextStyle(
+                fontSize: 10,
                 fontWeight: FontWeight.w600,
                 color: colorScheme.onSurface,
               ),
@@ -47,7 +63,9 @@ class ProfileStatusCard extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final profileState = ref.watch(profileProvider);
+    final profile = profileState.profile;
     final width = MediaQuery.of(context).size.width;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -55,6 +73,28 @@ class ProfileStatusCard extends ConsumerWidget {
       3,
       (index) => Icon(Icons.star, color: Colors.amber.shade700, size: 13),
     );
+
+    // Format date of examination
+    String formattedExamDate = 'N/A';
+    if (profile?.dateOfExamination != null) {
+      formattedExamDate = DateFormat('MMMM yyyy').format(profile!.dateOfExamination!).toUpperCase();
+    }
+
+    // Profile image URL
+    final profileImageUrl = profile?.profileImage ??
+        'https://imgs.search.brave.com/06y_UGpqC2WO7A0wUNodf1gbBVQFeVd4B6Wx2VLw8oQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvNTAwcC8y/Ni80MC9wcm9maWxl/LXBsYWNlaG9sZGVy/LWltYWdlLWdyYXkt/c2lsaG91ZXR0ZS12/ZWN0b3ItMjIxMjI2/NDAuanBn';
+
+    if (profileState.isLoading) {
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colorScheme.outline),
+        ),
+        width: width,
+        height: 300,
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -119,8 +159,19 @@ class ProfileStatusCard extends ConsumerWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
-                      'https://imgs.search.brave.com/06y_UGpqC2WO7A0wUNodf1gbBVQFeVd4B6Wx2VLw8oQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvNTAwcC8y/Ni80MC9wcm9maWxl/LXBsYWNlaG9sZGVy/LWltYWdlLWdyYXkt/c2lsaG91ZXR0ZS12/ZWN0b3ItMjIxMjI2/NDAuanBn',
+                      profileImageUrl,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 120,
+                          color: colorScheme.surfaceContainerHighest,
+                          child: Icon(
+                            Icons.person,
+                            size: 60,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -129,12 +180,12 @@ class ProfileStatusCard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildDetailRow(context, 'LAST NAME', 'SINDAO'),
-                      _buildDetailRow(context, 'FIRST NAME', 'CHARLES'),
-                      _buildDetailRow(context, 'MIDDLE NAME', 'MARTINEZ'),
-                      _buildDetailRow(context, 'UNIVERSITY', 'LPU'),
-                      _buildDetailRow(context, 'PURPOSE', 'MTLE'),
-                      _buildDetailRow(context, 'DATE OF EXAM', 'AUGUST 2025'),
+                      _buildDetailRow(context, 'LAST NAME', profile?.lastName?.toUpperCase() ?? 'N/A'),
+                      _buildDetailRow(context, 'FIRST NAME', profile?.firstName?.toUpperCase() ?? 'N/A'),
+                      _buildDetailRow(context, 'MIDDLE NAME', profile?.middleName?.toUpperCase() ?? 'N/A'),
+                      _buildDetailRow(context, 'UNIVERSITY', profile?.university?.toUpperCase() ?? 'N/A'),
+                      _buildDetailRow(context, 'PURPOSE', profile?.purpose?.toUpperCase() ?? 'N/A'),
+                      _buildDetailRow(context, 'DATE OF EXAM', formattedExamDate),
                     ],
                   ),
                 ),
@@ -160,10 +211,13 @@ class ProfileStatusCard extends ConsumerWidget {
           // Barcode
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Image.network(
-              'https://imgs.search.brave.com/YqFfU8CSBKMHpPVf6q72dWwX86OHj1IghUb5g9fYBPU/rs:fit:0:180:1:0/g:ce/aHR0cHM6Ly93d3cu/YmFyY29kZXJlc291/cmNlLmNvbS9pbWFn/ZXMvQ29kZTM5QmFy/Y29kZS5qcGc',
-              height: 50,
-              fit: BoxFit.fitWidth,
+            child: SizedBox(
+              width: double.infinity,
+              child: Image.network(
+                'https://imgs.search.brave.com/YqFfU8CSBKMHpPVf6q72dWwX86OHj1IghUb5g9fYBPU/rs:fit:0:180:1:0/g:ce/aHR0cHM6Ly93d3cu/YmFyY29kZXJlc291/cmNlLmNvbS9pbWFn/ZXMvQ29kZTM5QmFy/Y29kZS5qcGc',
+                height: 50,
+                fit: BoxFit.fill,
+              ),
             ),
           ),
         ],
