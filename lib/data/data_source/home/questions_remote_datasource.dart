@@ -3,6 +3,7 @@ import 'package:achievia/data/data_source/cache/mock_boards_questions_data_sourc
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
 import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
+import 'package:achievia/data/models/quiz/results_dto.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
@@ -12,7 +13,7 @@ abstract class QuestionRepoDataSource  {
   Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
   Future<List<QotdDto>> getTheGeneratedQuiz();
   Future<List<QuestionsDto>> randomizeQuestion();
-  
+  Future<List<ResultsDto>> getResults();
 }
 @lazySingleton
 @injectable
@@ -128,5 +129,11 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
         print(e);
         return [];
       }
+  }
+  
+  @override
+  Future<List<ResultsDto>> getResults() {
+    // TODO: implement getResults
+    throw UnimplementedError();
   }
 }

@@ -41,6 +41,7 @@ class QotRepositoryImpl implements QotdRepository {
         if (connectivity) {
           final dto =  QotdDtoPost.fromEntity(entity);
           final remoteAnswer = await remoteDatasource.answerQuestion(dto, '');
+          print(remoteAnswer.chosen_answer);
           return remoteAnswer.toEntity();
         }
         return QotyEntityPost(chosen_ans: '', quiz_id: 0, student_id: 0);
