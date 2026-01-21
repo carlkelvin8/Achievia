@@ -134,6 +134,9 @@ extension GetItInjectableX on _i174.GetIt {
         profileImage: gh<String>(),
         courseId: gh<int>(),
         token: gh<String>(),
+        university: gh<String>(),
+        purpose: gh<String>(),
+        dateOfExamination: gh<DateTime>(),
       ),
     );
     gh.factory<_i662.ProfileRepositoryImpl>(

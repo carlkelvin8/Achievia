@@ -18,7 +18,7 @@ class PdfBadge extends StatefulWidget {
 }
 
 class _PdfBadgeState extends State<PdfBadge> {
-  bool _isExpanded = false;
+  final bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {

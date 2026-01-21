@@ -17,13 +17,12 @@ QotdDto _$QotdDtoFromJson(Map<String, dynamic> json) => QotdDto(
 );
 
 Map<String, dynamic> _$QotdDtoToJson(QotdDto instance) => <String, dynamic>{
-  'quizId': instance.quizId,
-  'id': instance.id,
-  'questionText': instance.questionText,
-  'choices': instance.choices,
-  'quiz': instance.quiz,
-};
-
+      'quizId': instance.quizId,
+      'id': instance.id,
+      'questionText': instance.questionText,
+      'choices': instance.choices,
+      'quiz': instance.quiz,
+    };
 
 // **************************************************************************
 // HiveTypeAdapterGenerator

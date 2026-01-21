@@ -1,58 +1,34 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/core/di/injection.dart';
-import 'package:achievia/data/repositoryImpl/profile/profile_repository_impl.dart';
-import 'package:achievia/domain/entities/api/profile/profile_entity.dart';
+import 'package:achievia/core/di/local_storage_service.dart';
+import 'package:achievia/domain/entities/api/auth/user_entity.dart';
+import 'package:achievia/domain/use_cases/auth/user_use_case.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfileState {
-  final ProfileEntity? profile;
-  final bool isLoading;
-  final String? error;
+// Provider for UserUseCase
+final profileUseCaseProvider = Provider<UserUseCase>((ref) {
+  return sl<UserUseCase>();
+});
 
-  const ProfileState({
-    this.profile,
-    this.isLoading = false,
-    this.error,
-  });
+// Provider for LocalStorageService
+final localStorageServiceProvider = Provider<LocalStorageService>((ref) {
+  return sl<LocalStorageService>();
+});
 
-  ProfileState copyWith({
-    ProfileEntity? profile,
-    bool? isLoading,
-    String? error,
-  }) {
-    return ProfileState(
-      profile: profile ?? this.profile,
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
-    );
-  }
-}
+// FutureProvider for profile data
+final profileProvider = FutureProvider<UserEntity>((ref) async {
+  final useCase = ref.read(profileUseCaseProvider);
+  final storageService = ref.read(localStorageServiceProvider);
 
-class ProfileNotifier extends Notifier<ProfileState> {
-  @override
-  ProfileState build() {
-    return const ProfileState();
+  final token = storageService.token;
+  if (token == null || token.isEmpty) {
+    throw Exception('No authentication token found');
   }
 
-  Future<void> fetchProfile() async {
-    state = state.copyWith(isLoading: true, error: null);
-
-    try {
-      final repository = sl<ProfileRepositoryImpl>();
-      final profile = await repository.getProfile();
-      state = state.copyWith(profile: profile, isLoading: false);
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
+  try {
+    final profile = await useCase.getProfile(token);
+    return profile;
+  } catch (e) {
+    throw Exception('Failed to fetch profile: $e');
   }
-
-  void clearProfile() {
-    state = const ProfileState();
-  }
-}
-
-final profileProvider = NotifierProvider<ProfileNotifier, ProfileState>(
-  () => ProfileNotifier(),
-);
+});

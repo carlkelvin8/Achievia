@@ -19,16 +19,16 @@ ModuleDto _$ModuleDtoFromJson(Map<String, dynamic> json) => ModuleDto(
 );
 
 Map<String, dynamic> _$ModuleDtoToJson(ModuleDto instance) => <String, dynamic>{
-  'id': instance.id,
-  'title': instance.title,
-  'description': instance.description,
-  'userId': instance.userId,
-  'createdAt': instance.createdAt,
-  'file': instance.file,
-  'image': instance.image,
-  'status': instance.status,
-  'subjectId': instance.subjectId,
-};
+      'id': instance.id,
+      'title': instance.title,
+      'description': instance.description,
+      'userId': instance.userId,
+      'createdAt': instance.createdAt,
+      'file': instance.file,
+      'image': instance.image,
+      'status': instance.status,
+      'subjectId': instance.subjectId,
+    };
 
 
 // **************************************************************************

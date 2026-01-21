@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:achievia/domain/entities/api/auth/user_entity.dart';
 import 'package:achievia/presentation/widgets/cards/profile_status_card.dart';
+import 'package:achievia/presentation/widgets/cards/profile_status_card_mock.dart';
+import 'package:flutter/material.dart';
 
 /// A wrapper widget that displays a ProfileStatusCard with a rank badge
 /// Useful for leaderboards and ranked lists
@@ -8,6 +10,7 @@ class RankedProfileCard extends StatelessWidget {
   final Widget? customCard;
   final double? width;
   final double? height;
+  final UserEntity? mockProfile;
 
   const RankedProfileCard({
     super.key,
@@ -15,12 +18,13 @@ class RankedProfileCard extends StatelessWidget {
     this.customCard,
     this.width,
     this.height = 190,
+    this.mockProfile,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return SizedBox(
       width: width ?? 260,
       height: height,
@@ -37,13 +41,16 @@ class RankedProfileCard extends StatelessWidget {
                     color: theme.dividerColor.withValues(alpha: 0.2),
                   ),
                 ),
-                child: customCard ??
+                child:
+                    customCard ??
                     FittedBox(
                       fit: BoxFit.cover,
                       alignment: Alignment.topLeft,
                       child: SizedBox(
                         width: 360,
-                        child: const ProfileStatusCard(),
+                        child: mockProfile != null
+                            ? ProfileStatusCardMock(profile: mockProfile!)
+                            : const ProfileStatusCard(),
                       ),
                     ),
               ),
@@ -53,10 +60,7 @@ class RankedProfileCard extends StatelessWidget {
             right: 8,
             top: 8,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 6,
-                vertical: 2,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary,
                 borderRadius: BorderRadius.circular(6),

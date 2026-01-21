@@ -28,6 +28,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
     final visible = ref.watch(showModalNotifier);
     final isAnswered = ref.read(answeredQuestionsProvider.notifier);
     final isAnsweredWatch = ref.watch(answeredQuestionsProvider);
+    final answerQuestion = ref.read(answerQotProvider.notifier);
     return Scaffold(
       appBar: ExamAppBar(
       callback: ()=>pageControllerNotifier.next(context),
@@ -60,9 +61,11 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                 questionText: question.questionText,
                 choices: question.choices,
                 selectedIndex: selectedAnswers[index],
-                onSelect: (v) {
+                onSelect: (v) async{
                   if (v != null) {
                     isAnswered.isAnswered(question.id);
+                    await answerQuestion.answerQuestion(question.choices[v]['choiceText']);
+                    print(selectedAnswers);
                     setState(() {
                       selectedAnswers[index] = v;
                     });
