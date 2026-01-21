@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart';
+import 'package:achievia/domain/entities/api/home/results_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,6 +12,7 @@ final getQuestions = Provider<QuestionsUseCase>((ref){
   return sl.get<QuestionsUseCase>();
 });
 
+
 final getHive = Provider<CacheDataSourceImpl>((ref){
   return sl.get<CacheDataSourceImpl>();
 });
@@ -19,6 +21,16 @@ final getQuestionsProviderState = FutureProvider.family<List<QuestionsEntity>, (
   final gtQuestions = ref.read(getQuestions);
   try {
     final result = await gtQuestions.getQuestions(params.token, params.id);
+    return result;
+  } catch (e) {
+    rethrow;
+  }
+});
+
+final getResultsProviderState = FutureProvider<QuizScoreEntity?>((ref) async {
+  final gtQuestions = ref.read(getQuestions);
+  try {
+    final result = await gtQuestions.getGWA();
     return result;
   } catch (e) {
     rethrow;

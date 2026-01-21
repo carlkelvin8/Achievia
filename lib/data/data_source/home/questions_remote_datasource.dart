@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:achievia/const.dart';
 import 'package:achievia/data/data_source/cache/mock_boards_questions_data_source.dart';
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
@@ -13,7 +15,7 @@ abstract class QuestionRepoDataSource  {
   Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
   Future<List<QotdDto>> getTheGeneratedQuiz();
   Future<List<QuestionsDto>> randomizeQuestion();
-  Future<List<ResultsDto>> getResults();
+  Future<QuizScoreResponse> getResults();
 }
 @lazySingleton
 @injectable
@@ -89,7 +91,12 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
         return dto;
       }
       return dto;
-    } catch (e) {
+    } on DioException catch(e){
+      print(e.response?.data);
+      return QotdDtoPost.fromJson({});
+    }
+    
+    catch (e) {
       print(e);
       return QotdDtoPost.fromJson({});
     }
@@ -132,8 +139,28 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
   }
   
   @override
-  Future<List<ResultsDto>> getResults() {
-    // TODO: implement getResults
-    throw UnimplementedError();
+  Future<QuizScoreResponse> getResults() async{
+    try {
+      final response = await dio.get('$BASE_URL/tasks/getGWA/1', 
+      options: Options(
+        contentType: 'application/json',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      )
+    );
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return QuizScoreResponse.fromJson(response.data);
+    }
+    return QuizScoreResponse.fromJson({});
+    } on DioException catch(e){
+      print(e.response?.data);
+      return QuizScoreResponse.fromJson({});
+    }
+    catch (e) {
+      print(e);
+      return QuizScoreResponse.fromJson({});
+    }
   }
 }
