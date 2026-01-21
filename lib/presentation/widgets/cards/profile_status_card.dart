@@ -5,13 +5,26 @@ import 'package:achievia/presentation/widgets/placeholder_gestures/loading_indic
 import 'package:achievia/presentation/widgets/placeholder_gestures/network_image_with_fallback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
-class ProfileStatusCard extends ConsumerWidget {
+class ProfileStatusCard extends ConsumerStatefulWidget {
   const ProfileStatusCard({super.key});
+
+  @override
+  ConsumerState<ProfileStatusCard> createState() => _ProfileStatusCardState();
+}
+
+class _ProfileStatusCardState extends ConsumerState<ProfileStatusCard> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(profileProvider.notifier).fetchProfile();
+    });
+  }
 
   Widget _buildDetailRow(BuildContext context, String label, String value) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 2),
@@ -25,8 +38,7 @@ class ProfileStatusCard extends ConsumerWidget {
               style: textTheme.bodySmall?.copyWith(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              ).copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ),
           Text(
@@ -79,7 +91,9 @@ class ProfileStatusCard extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final profileState = ref.watch(profileProvider);
+    final profile = profileState.profile;
     final width = MediaQuery.of(context).size.width;
     final colorScheme = Theme.of(context).colorScheme;
     final profileAsync = ref.watch(profileProvider);

@@ -30,6 +30,7 @@ Map<String, dynamic> _$ModuleDtoToJson(ModuleDto instance) => <String, dynamic>{
       'subjectId': instance.subjectId,
     };
 
+
 // **************************************************************************
 // HiveTypeAdapterGenerator
 // **************************************************************************
