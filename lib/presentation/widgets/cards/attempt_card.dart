@@ -1,18 +1,21 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:achievia/presentation/provider/questions/questions_provider.dart';
 import 'package:achievia/presentation/widgets/cards/data_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:achievia/core/constants/app_assets.dart';
 import 'package:achievia/core/constants/app_colors.dart';
 
-class AttemptCard extends StatelessWidget {
+class AttemptCard extends ConsumerWidget {
   const AttemptCard({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final watch = ref.watch(getResultsProviderState);
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
       height: MediaQuery.of(context).size.height * 0.9,
@@ -52,23 +55,24 @@ class AttemptCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12,),
-          Container(
+          watch.when(
+            data: (q){ 
+              return Container(
             padding: EdgeInsets.all(15.0),
             color: Colors.white,
-            child: Expanded(
-            child: ListView(
+            child: Expanded(child: ListView.separated(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              children: [
-                DataCard(dataNum: '77.00', subject: 'Clinical Chemistry'),
-                DataCard(dataNum: '77.00', subject: 'Clinical Chemistry'),
-                DataCard(dataNum: '77.00', subject: 'Clinical Chemistry'),
-                DataCard(dataNum: '77.00', subject: 'Clinical Chemistry'),
-                DataCard(dataNum: '77.00', subject: 'Clinical Chemistry'),
-              ],
-            ),
-          ),
-          )
+              physics: NeverScrollableScrollPhysics( ),
+              itemBuilder: (context, index){
+                final data = q.score.answers;
+                return DataCard(dataNum: data[index].score.toString(), subject: data[index].name);
+              }, 
+              separatorBuilder: (context, index)=> const SizedBox(height: 10,), 
+              itemCount: q!.score.answers.length)),
+          );
+            }, 
+            error: (_, _) => Text('Error'), 
+            loading: ()=>Center(child: CircularProgressIndicator(),))
         ],
       ),
     );
