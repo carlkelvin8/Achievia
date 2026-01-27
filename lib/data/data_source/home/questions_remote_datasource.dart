@@ -140,7 +140,7 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
   @override
   Future<QuizScoreResponse> getResults() async{
     try {
-      final response = await dio.get('$BASE_URL/tasks/getGWA/1', 
+      final response = await dio.get('$BASE_URL/tasks/getGWA/100', 
       options: Options(
         contentType: 'application/json',
         headers: {

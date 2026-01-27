@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
+import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/cards/data_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -97,6 +98,13 @@ class AttemptCard extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
             ),
           ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: ReusableButton(title: 'Summary', onPressed: (){
+              Navigator.pushNamed(context, '/summary-screen');
+            }, width: 150, height: 40, backgroundColor: Colors.white, textColor: Colors.blue,),
+          )
         ],
       ),
     );
