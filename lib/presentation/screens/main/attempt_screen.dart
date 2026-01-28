@@ -11,8 +11,11 @@ class AttemptScreen extends StatefulWidget {
 class _AttemptScreenState extends State<AttemptScreen> {
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text('Attempt Results'),
+      ),
       body: Padding(
         padding: EdgeInsetsGeometry.symmetric(vertical: 12, horizontal: 12),
         child: AttemptCard(),

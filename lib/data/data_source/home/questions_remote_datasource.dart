@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:achievia/const.dart';
 import 'package:achievia/data/data_source/cache/mock_boards_questions_data_source.dart';
@@ -141,7 +140,7 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
   @override
   Future<QuizScoreResponse> getResults() async{
     try {
-      final response = await dio.get('$BASE_URL/tasks/getGWA/1', 
+      final response = await dio.get('$BASE_URL/tasks/getGWA/100', 
       options: Options(
         contentType: 'application/json',
         headers: {

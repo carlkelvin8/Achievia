@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
+import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/cards/data_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,70 +10,101 @@ import 'package:achievia/core/constants/app_assets.dart';
 import 'package:achievia/core/constants/app_colors.dart';
 
 class AttemptCard extends ConsumerWidget {
-  const AttemptCard({
-    super.key,
-  });
+  const AttemptCard({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final watch = ref.watch(getResultsProviderState);
+
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 17, 44, 131),
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        borderRadius: BorderRadius.circular(10),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-      child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.start,
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Image.asset(logo, height: 40,),
-                  Text('RESULTS',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  ),
-                ],
+              Image.asset(logo, height: 40),
+              const SizedBox(width: 8),
+              Text(
+                'RESULTS',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
+
+          const SizedBox(height: 12),
+
           Center(
-            child: Text("Nice one, Achievian! You're getting better and better",
-            style: GoogleFonts.poppins(
-              color: LightColors.secondary,
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.center,
+            child: Text(
+              "Nice one, Achievian! You're getting better and better",
+              style: GoogleFonts.poppins(
+                color: LightColors.secondary,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 12,),
-          watch.when(
-            data: (q){ 
-              return Container(
-            padding: EdgeInsets.all(15.0),
-            color: Colors.white,
-            child: Expanded(child: ListView.separated(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics( ),
-              itemBuilder: (context, index){
-                final data = q.score.answers;
-                return DataCard(dataNum: data[index].score.toString(), subject: data[index].name);
-              }, 
-              separatorBuilder: (context, index)=> const SizedBox(height: 10,), 
-              itemCount: q!.score.answers.length)),
-          );
-            }, 
-            error: (_, _) => Text('Error'), 
-            loading: ()=>Center(child: CircularProgressIndicator(),))
+
+          const SizedBox(height: 16),
+
+          Expanded(
+            child: watch.when(
+              data: (q) {
+                final data = q!.score.answers;
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                    Expanded(child: ListView.separated(
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      int value = double.parse(data[index].score.toStringAsFixed(1)).round();
+                      return DataCard(
+                          dataNum: value.toString(),
+                          subject: data[index].name, 
+                          scores: q.score.score,
+                            );
+                          },
+                        )
+                      ),
+                    DataCard(dataNum: q.score.score, subject: 'Average', scores: q.score.score),
+                    const SizedBox(height: 8),
+                    DataCard(dataNum: double.parse(q.score.score) >= 75 ? 'Pass' : 'Failed', 
+                    subject: 'Remarks', 
+                    scores: q.score.score,
+                    textColor: double.parse(q.score.score) >= 75 ? Colors.black : Colors.white,
+                    color: double.parse(q.score.score) >= 75 ? Colors.green : Colors.red,
+                    )
+                    ],
+                  ),
+                );
+              },
+              error: (_, __) => const Center(child: Text('Error')),
+              loading: () => const Center(child: CircularProgressIndicator()),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: ReusableButton(title: 'Summary', onPressed: (){
+              Navigator.pushNamed(context, '/summary-screen');
+            }, width: 150, height: 40, backgroundColor: Colors.white, textColor: Colors.blue,),
+          )
         ],
       ),
     );

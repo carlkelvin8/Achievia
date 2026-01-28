@@ -10,6 +10,7 @@ import 'package:achievia/presentation/screens/main/messages_screen.dart';
 import 'package:achievia/presentation/screens/main/onboarding_mockboard_screen.dart';
 import 'package:achievia/presentation/screens/main/profile_screen.dart';
 import 'package:achievia/presentation/screens/main/reviewers_screen.dart';
+import 'package:achievia/presentation/screens/main/summary_screen.dart';
 import 'package:achievia/presentation/screens/notifications/notifications_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/reminder_screen_content.dart';
 import 'package:achievia/presentation/screens/settings/examination/examination_screen.dart';
@@ -41,6 +42,7 @@ class RouteConstants {
   static const String reminder = '/reminder';
   static const String onboardingQuestions = '/onboarding-questions';
   static const String examScreen = '/exam-screen';
+  static const String summaryScreen = '/summary-screen';
 }
 
 
@@ -71,6 +73,7 @@ final Map<String, WidgetBuilder> appRoutes = {
   RouteConstants.onboardingQuestions: (_) => const OnboardingMockboardScreen(title: '',),
   RouteConstants.examScreen:(_) => const ExamScreen(),
   RouteConstants.attemptScreen:(_) => const AttemptScreen(),
+  RouteConstants.summaryScreen:(_) => const SummaryScreen(),
 };
 
 
