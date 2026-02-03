@@ -16,20 +16,11 @@ import 'package:achievia/core/network/dio_client.dart' as _i344;
 import 'package:achievia/core/registration/register_modules.dart' as _i790;
 import 'package:achievia/data/data_source/auth/user_remote_datasource.dart'
     as _i528;
-import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart'
-    as _i761;
-import 'package:achievia/data/data_source/cache/mock_boards_questions_data_source.dart'
-    as _i396;
-import 'package:achievia/data/data_source/cache/module_cache_datasource.dart'
-    as _i214;
 import 'package:achievia/data/data_source/home/questions_remote_datasource.dart'
     as _i557;
 import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart'
     as _i536;
 import 'package:achievia/data/models/auth/user_dto.dart' as _i235;
-import 'package:achievia/data/models/quiz/qotd_dto.dart' as _i900;
-import 'package:achievia/data/models/quiz/questions_dto.dart' as _i74;
-import 'package:achievia/data/models/reviewer/module_dto.dart' as _i862;
 import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart'
     as _i581;
 import 'package:achievia/data/repositoryImpl/questions/qot_repository_impl.dart'
@@ -48,7 +39,6 @@ import 'package:achievia/domain/use_cases/reviewer/module_use_case.dart'
 import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:dio/dio.dart' as _i361;
 import 'package:get_it/get_it.dart' as _i174;
-import 'package:hive/hive.dart' as _i979;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 
@@ -61,7 +51,6 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
     final registerModules = _$RegisterModules();
-    final hiveModule = _$HiveModule();
     await gh.factoryAsync<_i460.SharedPreferences>(
       () => registerModule.prefs,
       preResolve: true,
@@ -72,35 +61,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i982.LocalStorageService>(
       () => _i982.LocalStorageService(gh<_i460.SharedPreferences>()),
     );
-    gh.factory<_i979.Box<dynamic>>(
-      () => registerModules.exam,
-      instanceName: 'exam_box',
-    );
-    await gh.factoryAsync<_i979.Box<_i900.QotdDto>>(
-      () => hiveModule.openExamBox(),
-      instanceName: 'exam_box',
-      preResolve: true,
-    );
-    gh.factory<_i979.Box<dynamic>>(
-      () => registerModules.questions,
-      instanceName: 'questions_box',
-    );
-    gh.factory<_i979.Box<dynamic>>(
-      () => registerModules.modules,
-      instanceName: 'modules_box',
-    );
-    await gh.factoryAsync<_i979.Box<_i74.QuestionsDto>>(
-      () => hiveModule.openQuestionBox(),
-      instanceName: 'question_box',
-      preResolve: true,
-    );
     gh.lazySingleton<_i790.NetworkInfo>(
       () => _i790.NetworkInfoImpl(gh<_i895.Connectivity>()),
     );
-    await gh.factoryAsync<_i979.Box<_i862.ModuleDto>>(
-      () => hiveModule.openModuleBox(),
-      instanceName: 'module_box',
-      preResolve: true,
+    gh.lazySingleton<_i557.QuestionsRemoteDatasource>(
+      () => _i557.QuestionsRemoteDatasource(gh<_i361.Dio>()),
     );
     gh.factory<_i528.UserRemoteDatasource>(
       () => _i528.UserRemoteDatasource(dio: gh<_i361.Dio>()),
@@ -140,64 +105,40 @@ extension GetItInjectableX on _i174.GetIt {
         createdAt: gh<String>(),
       ),
     );
+    gh.lazySingleton<_i548.QotRepositoryImpl>(
+      () => _i548.QotRepositoryImpl(
+        remoteDatasource: gh<_i557.QuestionsRemoteDatasource>(),
+        network: gh<_i790.NetworkInfo>(),
+      ),
+    );
     gh.factory<_i581.UserRepositoryImpl>(
       () => _i581.UserRepositoryImpl(
         datasource: gh<_i528.UserRemoteDatasource>(),
       ),
     );
-    gh.factory<_i214.ModuleCacheDataSourceImpl>(
-      () => _i214.ModuleCacheDataSourceImpl(
-        gh<_i979.Box<_i862.ModuleDto>>(instanceName: 'module_box'),
-      ),
-    );
-    gh.factory<_i396.MockBoardsQuestionsDataSourceImpl>(
-      () => _i396.MockBoardsQuestionsDataSourceImpl(
-        gh<_i979.Box<_i900.QotdDto>>(instanceName: 'exam_box'),
-      ),
-    );
-    gh.factory<_i761.CacheDataSourceImpl>(
-      () => _i761.CacheDataSourceImpl(
-        gh<_i979.Box<_i74.QuestionsDto>>(instanceName: 'question_box'),
-      ),
-    );
-    gh.factory<_i879.UserUseCase>(
-      () => _i879.UserUseCase(impl: gh<_i581.UserRepositoryImpl>()),
-    );
-    gh.lazySingleton<_i557.QuestionsRemoteDatasource>(
-      () => _i557.QuestionsRemoteDatasource(
-        gh<_i361.Dio>(),
-        gh<_i396.MockBoardsQuestionsDataSourceImpl>(),
-      ),
-    );
-    gh.factory<_i656.ModuleRepositoryImpl>(
-      () => _i656.ModuleRepositoryImpl(
-        remoteDatasource: gh<_i536.ModuleRemoteDatasource>(),
-        cacheDataSource: gh<_i214.ModuleCacheDataSourceImpl>(),
-        network: gh<_i790.NetworkInfo>(),
-      ),
-    );
     gh.lazySingleton<_i1000.QuestionsRepositoryImpl>(
       () => _i1000.QuestionsRepositoryImpl(
-        gh<_i761.CacheDataSourceImpl>(),
         gh<_i557.QuestionsRemoteDatasource>(),
         gh<_i790.NetworkInfo>(),
       ),
-    );
-    gh.lazySingleton<_i548.QotRepositoryImpl>(
-      () => _i548.QotRepositoryImpl(
-        remoteDatasource: gh<_i557.QuestionsRemoteDatasource>(),
-        local: gh<_i761.CacheDataSourceImpl>(),
-        network: gh<_i790.NetworkInfo>(),
-      ),
-    );
-    gh.factory<_i533.ModuleUseCase>(
-      () => _i533.ModuleUseCase(impl: gh<_i656.ModuleRepositoryImpl>()),
     );
     gh.factory<_i803.QuestionsUseCase>(
       () => _i803.QuestionsUseCase(
         gh<_i1000.QuestionsRepositoryImpl>(),
         gh<_i548.QotRepositoryImpl>(),
       ),
+    );
+    gh.factory<_i879.UserUseCase>(
+      () => _i879.UserUseCase(impl: gh<_i581.UserRepositoryImpl>()),
+    );
+    gh.factory<_i656.ModuleRepositoryImpl>(
+      () => _i656.ModuleRepositoryImpl(
+        remoteDatasource: gh<_i536.ModuleRemoteDatasource>(),
+        network: gh<_i790.NetworkInfo>(),
+      ),
+    );
+    gh.factory<_i533.ModuleUseCase>(
+      () => _i533.ModuleUseCase(impl: gh<_i656.ModuleRepositoryImpl>()),
     );
     return this;
   }
@@ -206,5 +147,3 @@ extension GetItInjectableX on _i174.GetIt {
 class _$RegisterModule extends _i644.RegisterModule {}
 
 class _$RegisterModules extends _i790.RegisterModules {}
-
-class _$HiveModule extends _i790.HiveModule {}

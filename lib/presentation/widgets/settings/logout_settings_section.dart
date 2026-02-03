@@ -35,12 +35,11 @@ class LogoutSettingsSection extends ConsumerWidget {
       confirmText: 'Log Out',
       confirmColor: Colors.red,
     );
-    
+
     if (confirmed == true) {
       final singleton = sl<LocalStorageService>();
       await singleton.clearToken();
       if (context.mounted) {
-        NavigationService.pop();
         NavigationService.pop();
       }
     }

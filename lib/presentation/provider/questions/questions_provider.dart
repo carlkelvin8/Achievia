@@ -1,5 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart';
+
 import 'package:achievia/domain/entities/api/home/results_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,24 +8,24 @@ import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/use_cases/questions/questions_use_case.dart';
-final getQuestions = Provider<QuestionsUseCase>((ref){
+
+final getQuestions = Provider<QuestionsUseCase>((ref) {
   return sl.get<QuestionsUseCase>();
 });
 
-
-final getHive = Provider<CacheDataSourceImpl>((ref){
-  return sl.get<CacheDataSourceImpl>();
-});
-
-final getQuestionsProviderState = FutureProvider.family<List<QuestionsEntity>, ({String token, String id})>((ref, params) async {
-  final gtQuestions = ref.read(getQuestions);
-  try {
-    final result = await gtQuestions.getQuestions(params.token, params.id);
-    return result;
-  } catch (e) {
-    rethrow;
-  }
-});
+final getQuestionsProviderState =
+    FutureProvider.family<List<QuestionsEntity>, ({String token, String id})>((
+      ref,
+      params,
+    ) async {
+      final gtQuestions = ref.read(getQuestions);
+      try {
+        final result = await gtQuestions.getQuestions(params.token, params.id);
+        return result;
+      } catch (e) {
+        rethrow;
+      }
+    });
 
 final getResultsProviderState = FutureProvider<QuizScoreEntity?>((ref) async {
   final gtQuestions = ref.read(getQuestions);
@@ -42,17 +42,11 @@ final getQoty = FutureProvider<QotyEntity>((ref) async {
   return await gtQuestions.getQotQueston();
 });
 
-final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref)async{
-  final gtQuestions = ref.read(getHive);
-  try {
-    final result = await gtQuestions.getCacheQuestions();
-    return result.map((e)=>e.toEntity()).toList();
-  } catch (e) {
-    rethrow;
-  }
+final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref) async {
+  return [];
 });
 
-final getGeneratedQuestions = FutureProvider<List<QotyEntity>>((ref)async{
+final getGeneratedQuestions = FutureProvider<List<QotyEntity>>((ref) async {
   final gtQuestions = ref.read(getQuestions);
   try {
     final results = await gtQuestions.getGeneratedQuestions();
@@ -62,31 +56,51 @@ final getGeneratedQuestions = FutureProvider<List<QotyEntity>>((ref)async{
   }
 });
 
+final answeredQuestionsProvider =
+    NotifierProvider<ShowUnansweredQuestionsProvider, List<int>>(
+      ShowUnansweredQuestionsProvider.new,
+    );
+final showModalNotifier = NotifierProvider<ShowModalProvider, bool>(
+  ShowModalProvider.new,
+);
+final answerQotProvider =
+    NotifierProvider<QuestionsProvider, AnswerQuestionNotifier>(
+      QuestionsProvider.new,
+    );
+final pageController =
+    NotifierProvider.autoDispose<PageControllerProvider, PageController>(
+      PageControllerProvider.new,
+    );
+final changeIndexProvider = NotifierProvider.autoDispose<IndexProvider, int>(
+  IndexProvider.new,
+);
 
-final answeredQuestionsProvider = NotifierProvider<ShowUnansweredQuestionsProvider, List<int>>(ShowUnansweredQuestionsProvider.new);
-final showModalNotifier = NotifierProvider<ShowModalProvider, bool>(ShowModalProvider.new);
-final answerQotProvider = NotifierProvider<QuestionsProvider, AnswerQuestionNotifier>(QuestionsProvider.new);
-final pageController = NotifierProvider.autoDispose<PageControllerProvider, PageController>(PageControllerProvider.new);
-final changeIndexProvider = NotifierProvider.autoDispose<IndexProvider, int>(IndexProvider.new);
 class PageControllerProvider extends Notifier<PageController> {
   @override
   PageController build() {
-      return PageController();
+    return PageController();
   }
 
-  Future<void> next(BuildContext context)async{
+  Future<void> next(BuildContext context) async {
     if (state.page == 99) {
       Navigator.pushNamed(context, '/attempt-screen');
     }
     state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
   }
 
-  Future<void> prev()async{
-    state.previousPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+  Future<void> prev() async {
+    state.previousPage(
+      duration: Duration(milliseconds: 500),
+      curve: Curves.ease,
+    );
   }
 
-  Future<void> navigateToPage(int index)async{
-    state.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.ease);
+  Future<void> navigateToPage(int index) async {
+    state.animateToPage(
+      index,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.ease,
+    );
   }
 }
 
@@ -95,51 +109,55 @@ class ShowUnansweredQuestionsProvider extends Notifier<List<int>> {
   @override
   List<int> build() => [];
 
-  Future<void> isAnswered(int index)async{
+  Future<void> isAnswered(int index) async {
     state.add(index);
     print(state);
   }
 }
 
-class ShowModalProvider extends Notifier<bool>{
+class ShowModalProvider extends Notifier<bool> {
   @override
   bool build() => false;
 
-  void showModal(){
+  void showModal() {
     state = !state;
   }
-  
 }
 
 class IndexProvider extends Notifier<int> {
   @override
   int build() => 0;
 
-  void changeIndex(int index){
+  void changeIndex(int index) {
     state = index;
   }
-  
 }
 
-class QuestionsProvider extends Notifier<AnswerQuestionNotifier>{
+class QuestionsProvider extends Notifier<AnswerQuestionNotifier> {
   late final QuestionsUseCase useCase;
   @override
   AnswerQuestionNotifier build() {
     useCase = ref.read(getQuestions);
-    return AnswerQuestionNotifier(quiz_id: '', student_id: '', chosen_answer: '');
+    return AnswerQuestionNotifier(
+      quiz_id: '',
+      student_id: '',
+      chosen_answer: '',
+    );
   }
-  
-  Future<void> answerQuestion(String chosenAnswer)async{
-    final entity =  QotyEntityPost(chosen_ans: chosenAnswer, quiz_id: 1, student_id: 1);
+
+  Future<void> answerQuestion(String chosenAnswer) async {
+    final entity = QotyEntityPost(
+      chosen_ans: chosenAnswer,
+      quiz_id: 1,
+      student_id: 1,
+    );
     await useCase.answerQuestion(entity);
   }
 
-  Future<void> randomizeQuestion()async{
+  Future<void> randomizeQuestion() async {
     await useCase.randomizeQuestions();
   }
 }
-
-
 
 class AnswerQuestionNotifier {
   final String quiz_id;
@@ -150,7 +168,6 @@ class AnswerQuestionNotifier {
     required this.student_id,
     required this.chosen_answer,
   });
-  
 
   AnswerQuestionNotifier copyWith({
     String? quiz_id,
