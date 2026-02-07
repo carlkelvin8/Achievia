@@ -1,7 +1,4 @@
 import 'package:achievia/const.dart';
-import 'package:achievia/data/models/quiz/qotd_dto.dart';
-import 'package:achievia/data/models/quiz/questions_dto.dart';
-import 'package:achievia/data/models/reviewer/module_dto.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
