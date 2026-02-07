@@ -1,6 +1,6 @@
 
 import 'package:achievia/const.dart';
-import 'package:achievia/data/data_source/cache/mock_boards_questions_data_source.dart';
+import 'package:achievia/core/network/offline_caching.dart';
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
 import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
@@ -21,7 +21,7 @@ abstract class QuestionRepoDataSource  {
 @injectable
 class QuestionsRemoteDatasource implements QuestionRepoDataSource{
   final Dio dio;
-  final MockBoardsQuestionsDataSourceImpl local;
+  final OfflineCaching local;
   QuestionsRemoteDatasource(this.dio, this.local);
  @override
 Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
@@ -117,7 +117,8 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
         final questions = await response.data['data']['response']['questions'] as List<dynamic>;
         final list =  data.map((e)=> QuestionsDto.fromJson(e)).toList();
         final questionsList = questions.map((e)=>QotdDto.fromJson(e)).toList();
-        await local.cachePost(questionsList);
+        await local.insertQuestionsToCache(list);
+        await local.insertQotdToCache(questionsList);
         return list;
       }
       return [];
@@ -130,8 +131,8 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
   @override
   Future<List<QotdDto>> getTheGeneratedQuiz() async{
       try {
-        final cache = await local.getCacheQuestions();
-        return cache.map((e)=>e).toList();
+        final cache = await local.getQotdFromCache();
+        return cache;
       } catch (e) {
         print(e);
         return [];
@@ -141,7 +142,7 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
   @override
   Future<QuizScoreResponse> getResults() async{
     try {
-      final response = await dio.get('$BASE_URL/tasks/getGWA/1', 
+      final response = await dio.get('$BASE_URL/tasks/getGWA/1',
       options: Options(
         contentType: 'application/json',
         headers: {
@@ -167,12 +168,13 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
   @override
   Future<String> putToAttempt() async{
     try {
-      final response = await dio.post('$BASE_URL/putToQuizAttempt');
+      final response = await dio.post('$BASE_URL/tasks/putToQuizAttempt');
       if (response.statusCode == 200 || response.statusCode == 201) {
         return response.data['message'];
       }
       return response.data['message'];
     } on DioException catch(e){
+      print(e.response?.data);
       return e.response?.data['message'];
     }
     

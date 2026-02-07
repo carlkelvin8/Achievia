@@ -4,18 +4,15 @@ import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:achievia/core/network/conntectivity.dart';
-import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart' show CacheDataSourceImpl;
 import 'package:achievia/data/data_source/home/questions_remote_datasource.dart';
 import 'package:achievia/domain/repository/questions/qotd_repository.dart';
 @lazySingleton
 @injectable
 class QotRepositoryImpl implements QotdRepository {
   final QuestionsRemoteDatasource remoteDatasource;
-  final CacheDataSourceImpl local;
   final NetworkInfo network; 
   QotRepositoryImpl({
     required this.remoteDatasource,
-    required this.local,
     required this.network,
   });
   @override

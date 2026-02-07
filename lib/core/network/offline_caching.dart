@@ -1,12 +1,14 @@
+import 'dart:convert';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
+import 'package:achievia/data/models/quiz/qotd_dto.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:injectable/injectable.dart';
+
 @lazySingleton
 @injectable
 class OfflineCaching {
   static Database? _database;
-
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -14,13 +16,17 @@ class OfflineCaching {
     return _database!;
   }
 
-  Future<Database> _initDB() async {
+Future<Database> _initDB() async {
   final path = join(await getDatabasesPath(), 'cache.db');
+
+  // DELETE old DB (dev only)
+  await deleteDatabase(path); // <- ensures fresh DB is created
 
   return await openDatabase(
     path,
-    version: 1,
+    version: 2,
     onCreate: (db, version) async {
+      // Create Questions table
       await db.execute('''
         CREATE TABLE questions (
           id INTEGER PRIMARY KEY,
@@ -32,27 +38,79 @@ class OfflineCaching {
           createdAt TEXT
         )
       ''');
+      // Create QOTD table
+      await db.execute('''
+        CREATE TABLE qotd (
+          id INTEGER PRIMARY KEY,
+          quizId INTEGER,
+          questionText TEXT,
+          choices TEXT,
+          quiz TEXT
+        )
+      ''');
+    },
+    onUpgrade: (db, oldVersion, newVersion) async {
+      if (oldVersion < 2) {
+        await db.execute('''
+          CREATE TABLE qotd (
+            id INTEGER PRIMARY KEY,
+            quizId INTEGER,
+            questionText TEXT,
+            choices TEXT,
+            quiz TEXT
+          )
+        ''');
+      }
     },
   );
 }
 
-Future<void> insertDataToCache(List<QuestionsDto> dto)async{
-  final db = await database;
-  Batch batch = db.batch();
-  for (var index in dto) {
-    batch.insert('questions' , index.toJson(),conflictAlgorithm: ConflictAlgorithm.replace);
+
+  // ---------------- QuestionsDto caching ----------------
+  Future<void> insertQuestionsToCache(List<QuestionsDto> dto) async {
+    final db = await database;
+    Batch batch = db.batch();
+    for (var item in dto) {
+      batch.insert(
+        'questions',
+        item.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
   }
 
-  await batch.commit();
-}
+  Future<List<QuestionsDto>> getQuestionsFromCache() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('questions');
+    return maps.map((map) => QuestionsDto.fromJson(map)).toList();
+  }
 
-Future<List<QuestionsDto>> getDataFromCache()async{
-  final db = await database;
-  final List<Map<String,dynamic>> maps = await db.query('questions');
-  return List.generate(maps.length, (i){
-    return QuestionsDto.fromJson(maps[i]);
-  });
-}
+  // ---------------- QotdDto caching ----------------
+  Future<void> insertQotdToCache(List<QotdDto> dto) async {
+    final db = await database;
+    Batch batch = db.batch();
+    for (var item in dto) {
+      batch.insert(
+        'qotd',
+        item.toSqliteMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
+  }
 
+  Future<List<QotdDto>> getQotdFromCache() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('qotd');
+    return maps.map((map) {
+      return QotdDto(
+        id: map['id'],
+        quizId: map['quizId'],
+        questionText: map['questionText'],
+        choices: List<Map<String, dynamic>>.from(jsonDecode(map['choices'])),
+        quiz: map['quiz'] != null ? Map<String, dynamic>.from(jsonDecode(map['quiz'])) : null,
+      );
+    }).toList();
+  }
 }
-

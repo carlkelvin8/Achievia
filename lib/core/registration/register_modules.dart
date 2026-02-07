@@ -27,25 +27,5 @@ abstract class RegisterModules {
 
 
 
-@module
-abstract class HiveModule {
-  @Named('question_box')
-  @preResolve
-  Future<Box<QuestionsDto>> openQuestionBox() async {
-    return await Hive.openBox<QuestionsDto>('questions_box');
-  }
-
-  @Named('module_box')
-  @preResolve
-  Future<Box<ModuleDto>> openModuleBox() async {
-    return await Hive.openBox<ModuleDto>('module_box');
-  }
-
-  @Named('exam_box')
-  @preResolve
-  Future<Box<QotdDto>> openExamBox() async {
-    return await Hive.openBox<QotdDto>('exam_box');
-  }
-}
 
 

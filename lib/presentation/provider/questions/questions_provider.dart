@@ -45,7 +45,7 @@ final getQoty = FutureProvider<QotyEntity>((ref) async {
 final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref)async{
   final gtQuestions = ref.read(getHive);
   try {
-    final result = await gtQuestions.getDataFromCache();
+    final result = await gtQuestions.getQuestionsFromCache();
     return result.map((e)=>e.toEntity()).toList();
   } catch (e) {
     rethrow;
@@ -69,17 +69,22 @@ final answerQotProvider = NotifierProvider<QuestionsProvider, AnswerQuestionNoti
 final pageController = NotifierProvider.autoDispose<PageControllerProvider, PageController>(PageControllerProvider.new);
 final changeIndexProvider = NotifierProvider.autoDispose<IndexProvider, int>(IndexProvider.new);
 class PageControllerProvider extends Notifier<PageController> {
+  late final QuestionsUseCase useCases;
   @override
   PageController build() {
+      useCases = ref.read(getQuestions);
       return PageController();
   }
 
   Future<void> next(BuildContext context)async{
     if (state.page == 99) {
+      await useCases.submitQuiz();
       Navigator.pushNamed(context, '/attempt-screen');
     }
     state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
   }
+
+
 
   Future<void> prev()async{
     state.previousPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
@@ -133,6 +138,7 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier>{
     final entity =  QotyEntityPost(chosen_ans: chosenAnswer, quiz_id: 1, student_id: 1);
     await useCase.answerQuestion(entity);
   }
+
 
   Future<void> randomizeQuestion()async{
     await useCase.randomizeQuestions();
