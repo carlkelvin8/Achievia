@@ -13,6 +13,7 @@ import 'package:achievia/core/di/local_storage_service.dart' as _i982;
 import 'package:achievia/core/di/shared_pref.dart' as _i644;
 import 'package:achievia/core/network/conntectivity.dart' as _i790;
 import 'package:achievia/core/network/dio_client.dart' as _i344;
+import 'package:achievia/core/network/offline_caching.dart' as _i64;
 import 'package:achievia/core/registration/register_modules.dart' as _i790;
 import 'package:achievia/data/data_source/auth/user_remote_datasource.dart'
     as _i528;
@@ -73,6 +74,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i344.DioClient>(() => _i344.DioClient());
     gh.lazySingleton<_i361.Dio>(() => registerModules.dio);
     gh.lazySingleton<_i895.Connectivity>(() => registerModules.connectivity);
+    gh.lazySingleton<_i64.OfflineCaching>(() => _i64.OfflineCaching());
     gh.lazySingleton<_i982.LocalStorageService>(
       () => _i982.LocalStorageService(gh<_i460.SharedPreferences>()),
     );
@@ -193,7 +195,7 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i1000.QuestionsRepositoryImpl>(
       () => _i1000.QuestionsRepositoryImpl(
-        gh<_i761.CacheDataSourceImpl>(),
+        gh<_i64.OfflineCaching>(),
         gh<_i557.QuestionsRemoteDatasource>(),
         gh<_i790.NetworkInfo>(),
       ),
