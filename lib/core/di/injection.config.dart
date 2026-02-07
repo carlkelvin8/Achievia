@@ -18,11 +18,15 @@ import 'package:achievia/data/data_source/auth/user_remote_datasource.dart'
     as _i528;
 import 'package:achievia/data/data_source/home/questions_remote_datasource.dart'
     as _i557;
+import 'package:achievia/data/data_source/profile/profile_remote_datasource.dart'
+    as _i655;
 import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart'
     as _i536;
 import 'package:achievia/data/models/auth/user_dto.dart' as _i235;
 import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart'
     as _i581;
+import 'package:achievia/data/repositoryImpl/profile/profile_repository_impl.dart'
+    as _i662;
 import 'package:achievia/data/repositoryImpl/questions/qot_repository_impl.dart'
     as _i548;
 import 'package:achievia/data/repositoryImpl/questions/questions_repository_impl.dart'
@@ -73,6 +77,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i536.ModuleRemoteDatasource>(
       () => _i536.ModuleRemoteDatasource(dio: gh<_i361.Dio>()),
     );
+    gh.factory<_i655.ProfileRemoteDatasource>(
+      () => _i655.ProfileRemoteDatasource(dio: gh<_i361.Dio>()),
+    );
     gh.factory<_i235.UserDto>(
       () => _i235.UserDto(
         id: gh<num>(),
@@ -92,6 +99,14 @@ extension GetItInjectableX on _i174.GetIt {
         profileImage: gh<String>(),
         courseId: gh<int>(),
         token: gh<String>(),
+        university: gh<String>(),
+        purpose: gh<String>(),
+        dateOfExamination: gh<DateTime>(),
+      ),
+    );
+    gh.factory<_i662.ProfileRepositoryImpl>(
+      () => _i662.ProfileRepositoryImpl(
+        datasource: gh<_i655.ProfileRemoteDatasource>(),
       ),
     );
     gh.factory<_i416.QuestionsEntity>(
