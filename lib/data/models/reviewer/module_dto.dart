@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'module_dto.g.dart';
 
-@HiveType(typeId: 3)
+@HiveType(typeId: 2)
 @JsonSerializable()
 class ModuleDto {
   @HiveField(0)

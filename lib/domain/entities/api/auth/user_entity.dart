@@ -16,9 +16,6 @@ class UserEntity {
   final String? status;
   final String? profileImage;
   final int? courseId;
-  final String? university;
-  final String? purpose;
-  final DateTime? dateOfExamination;
   UserEntity({
     this.id,
     this.firstName,
@@ -36,8 +33,5 @@ class UserEntity {
     this.status,
     this.profileImage,
     this.courseId,
-    this.university,
-    this.purpose,
-    this.dateOfExamination,
   });
 }

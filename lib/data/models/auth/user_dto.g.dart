@@ -8,9 +8,9 @@ part of 'user_dto.dart';
 
 UserDto _$UserDtoFromJson(Map<String, dynamic> json) => UserDto(
   id: json['id'] as num?,
-  firstName: json['first_name'] as String?,
-  middleName: json['middle_name'] as String?,
-  lastName: json['last_name'] as String?,
+  firstName: json['firstName'] as String?,
+  middleName: json['middleName'] as String?,
+  lastName: json['lastName'] as String?,
   bio: json['bio'] as String?,
   age: (json['age'] as num?)?.toInt(),
   trial: (json['trial'] as num?)?.toInt(),
@@ -25,21 +25,16 @@ UserDto _$UserDtoFromJson(Map<String, dynamic> json) => UserDto(
       ? null
       : DateTime.parse(json['updatedAt'] as String),
   status: json['status'] as String?,
-  profileImage: json['profile_image'] as String?,
+  profileImage: json['profileImage'] as String?,
   courseId: (json['courseId'] as num?)?.toInt(),
   token: json['token'] as String?,
-  university: json['university'] as String?,
-  purpose: json['purpose'] as String?,
-  dateOfExamination: json['date_of_examination'] == null
-      ? null
-      : DateTime.parse(json['date_of_examination'] as String),
 );
 
 Map<String, dynamic> _$UserDtoToJson(UserDto instance) => <String, dynamic>{
   'id': instance.id,
-  'first_name': instance.firstName,
-  'middle_name': instance.middleName,
-  'last_name': instance.lastName,
+  'firstName': instance.firstName,
+  'middleName': instance.middleName,
+  'lastName': instance.lastName,
   'bio': instance.bio,
   'age': instance.age,
   'trial': instance.trial,
@@ -50,10 +45,7 @@ Map<String, dynamic> _$UserDtoToJson(UserDto instance) => <String, dynamic>{
   'createdAt': instance.createdAt?.toIso8601String(),
   'updatedAt': instance.updatedAt?.toIso8601String(),
   'status': instance.status,
-  'profile_image': instance.profileImage,
+  'profileImage': instance.profileImage,
   'courseId': instance.courseId,
   'token': instance.token,
-  'university': instance.university,
-  'purpose': instance.purpose,
-  'date_of_examination': instance.dateOfExamination?.toIso8601String(),
 };

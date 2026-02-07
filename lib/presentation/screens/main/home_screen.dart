@@ -1,5 +1,4 @@
 import 'package:achievia/core/utils/formatters.dart';
-import 'package:achievia/core/utils/helpers.dart';
 import 'package:achievia/presentation/widgets/banners/build_banner.dart';
 import 'package:achievia/presentation/widgets/cards/question_of_the_day_card.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +32,7 @@ class HomeScreen extends ConsumerWidget {
               const SectionLabel(title: 'Question of the day'),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: QuestionOfTheDayCard(selectedIndex: qotd.selectedIndex),
+                child: QuestionOfTheDayCard(selectedIndex: qotd.selectedIndex,),
               ),
               const SizedBox(height: 12),
               const SectionLabel(title: "Today's Achievian Goal"),
@@ -44,8 +43,7 @@ class HomeScreen extends ConsumerWidget {
                   title: goal.title,
                   details: goal.details,
                   isChecked: goal.isChecked,
-                  onToggle: () =>
-                      ref.read(goalProvider.notifier).toggleChecked(),
+                  onToggle: () => ref.read(goalProvider.notifier).toggleChecked(),
                 ),
               ),
               const SizedBox(height: 12),
@@ -61,20 +59,14 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 8),
               const SectionLabel(title: 'Top 10 Achievans on Mock Boards'),
               HorizontalCardList(
-                itemCount: mockTopAchievians.length,
-                itemBuilder: (context, index) => RankedProfileCard(
-                  rank: index + 1,
-                  mockProfile: mockTopAchievians[index],
-                ),
+                itemCount: 6,
+                itemBuilder: (context, index) => RankedProfileCard(rank: index + 1),
               ),
               const SizedBox(height: 8),
               const SectionLabel(title: "July's Top 10 Streak Achievans"),
               HorizontalCardList(
-                itemCount: mockTopStreakAchievians.length,
-                itemBuilder: (context, index) => RankedProfileCard(
-                  rank: index + 1,
-                  mockProfile: mockTopStreakAchievians[index],
-                ),
+                itemCount: 6,
+                itemBuilder: (context, index) => RankedProfileCard(rank: index + 1),
               ),
             ],
           ),

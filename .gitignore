@@ -37,9 +37,6 @@ migrate_working_dir/
 *.g.dart
 *.config.dart
 
-# Environment/Config
-lib/const.dart
-
 # Symbolication related
 app.*.symbols
 

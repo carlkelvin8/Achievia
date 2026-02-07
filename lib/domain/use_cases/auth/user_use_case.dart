@@ -7,11 +7,10 @@ import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart';
 @injectable
 class UserUseCase {
   final UserRepositoryImpl impl;
-  UserUseCase({required this.impl});
+  UserUseCase({
+    required this.impl,
+  });
 
-  Future<UserEntity> getLogin(UserEntity entity) async =>
-      await impl.loginRepository(entity);
-
-  Future<UserEntity> getProfile(String token) async =>
-      await impl.getProfile(token);
+  Future<UserEntity> getLogin(UserEntity entity) async => await impl.loginRepository(entity);
+  
 }
