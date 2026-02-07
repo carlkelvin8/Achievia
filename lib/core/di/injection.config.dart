@@ -68,9 +68,9 @@ extension GetItInjectableX on _i174.GetIt {
       preResolve: true,
     );
     gh.lazySingleton<_i344.DioClient>(() => _i344.DioClient());
+    gh.lazySingleton<_i64.OfflineCaching>(() => _i64.OfflineCaching());
     gh.lazySingleton<_i361.Dio>(() => registerModules.dio);
     gh.lazySingleton<_i895.Connectivity>(() => registerModules.connectivity);
-    gh.lazySingleton<_i64.OfflineCaching>(() => _i64.OfflineCaching());
     gh.lazySingleton<_i982.LocalStorageService>(
       () => _i982.LocalStorageService(gh<_i460.SharedPreferences>()),
     );

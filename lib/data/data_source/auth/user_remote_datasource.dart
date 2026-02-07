@@ -45,7 +45,12 @@ Future<UserDto> login(UserDto dto) async {
     final token = storageService.token;
     print(token);
     return UserDto.fromJson(response.data['data']);
-  } catch (e, st) {
+  }on DioException catch(e){
+    print(e.response?.data);
+    return UserDto.fromJson({});
+  }
+  
+  catch (e, st) {
     print(e);
     print('stack trace: $st');
     return UserDto.fromJson({});

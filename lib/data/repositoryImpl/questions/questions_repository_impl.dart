@@ -86,4 +86,19 @@ class QuestionsRepositoryImpl implements QuestionsRepository{
     }
   }
   
+  @override
+  Future<String> submitQuiz() async{
+    final isConnected = await network.isConnected;
+    try {
+      if (isConnected) {
+        final responseCached = await remoteDatasource.putToAttempt();
+        return responseCached;
+      }
+      return "";
+    } catch (e) {
+      print(e);
+      return "";
+    }
+  }
+  
 }
