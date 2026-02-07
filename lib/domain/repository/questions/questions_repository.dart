@@ -6,5 +6,4 @@ abstract class QuestionsRepository {
   Future<List<QuestionsEntity>> generateQuestions();
   Future<List<QotyEntity>> getRandomizedQuestions();
   Future<QuizScoreEntity?> getQuizScores();
-  Future<String> submitQuiz();
 }

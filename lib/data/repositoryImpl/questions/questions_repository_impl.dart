@@ -1,6 +1,5 @@
 import 'package:achievia/core/network/conntectivity.dart';
-import 'package:achievia/core/network/offline_caching.dart';
-import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart';
+
 import 'package:achievia/data/data_source/home/questions_remote_datasource.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
@@ -12,10 +11,9 @@ import 'package:injectable/injectable.dart';
 @injectable
 class QuestionsRepositoryImpl implements QuestionsRepository {
   final QuestionsRemoteDatasource remoteDatasource;
-  final OfflineCaching local;
   final NetworkInfo network;
 
-  QuestionsRepositoryImpl(this.local, this.remoteDatasource, this.network);
+  QuestionsRepositoryImpl(this.remoteDatasource, this.network);
   @override
   Future<List<QuestionsEntity>> getAllQuestions(String token, String id) async {
     try {
@@ -26,13 +24,11 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
           id,
         );
         print('Repository - Remote questions received: $remoteQuestions');
-        await local.insertDataToCache(remoteQuestions);
         final mapped = remoteQuestions.map((e) => e.toEntity()).toList();
         print('Repository - Mapped to entities: $mapped');
         return mapped;
       } else {
-        final cached = await local.getDataFromCache();
-        return cached.map((e) => e.toEntity()).toList();
+        return [];
       }
     } catch (e, st) {
       print('Repository error: $e');
@@ -47,7 +43,6 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
     try {
       if (isConnected) {
         final response = await remoteDatasource.randomizeQuestion();
-        await local.insertDataToCache(response);
         final mapped = response.map((e) => e.toEntity()).toList();
         return mapped;
       }
@@ -86,21 +81,6 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
     } catch (e) {
       print(e);
       return null;
-    }
-  }
-
-  @override
-  Future<String> submitQuiz() async {
-    final isConnected = await network.isConnected;
-    try {
-      if (isConnected) {
-        final responseCached = await remoteDatasource.putToAttempt();
-        return responseCached;
-      }
-      return "";
-    } catch (e) {
-      print(e);
-      return "";
     }
   }
 }

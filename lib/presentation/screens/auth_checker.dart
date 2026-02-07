@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class AuthChecker extends ConsumerWidget {
   final Widget authenticated;
   final Widget unauthenticated;
-
   const AuthChecker({
     super.key,
     required this.authenticated,
@@ -14,14 +13,12 @@ class AuthChecker extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(tokenStreamProvider);
-
-    return authState.when(
-      data: (token) =>
-          token != null ? authenticated : unauthenticated,
-      loading: () =>
-          const Center(child: CircularProgressIndicator()),
-      error: (_, __) => unauthenticated,
+    final watchRef = ref.watch(tokenStream);
+    return watchRef.when(data: (token){
+      return token != null ? authenticated : unauthenticated;
+    }, 
+    loading: () => CircularProgressIndicator(),
+    error: (_, __) => unauthenticated,
     );
   }
 }
