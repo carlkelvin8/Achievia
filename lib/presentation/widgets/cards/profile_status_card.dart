@@ -159,11 +159,14 @@ class ProfileStatusCard extends ConsumerWidget {
 
           // Barcode
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: Image.network(
-              'https://imgs.search.brave.com/YqFfU8CSBKMHpPVf6q72dWwX86OHj1IghUb5g9fYBPU/rs:fit:0:180:1:0/g:ce/aHR0cHM6Ly93d3cu/YmFyY29kZXJlc291/cmNlLmNvbS9pbWFn/ZXMvQ29kZTM5QmFy/Y29kZS5qcGc',
-              height: 50,
-              fit: BoxFit.fitWidth,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            child: SizedBox(
+              width: double.infinity,
+              child: Image.network(
+                'https://imgs.search.brave.com/YqFfU8CSBKMHpPVf6q72dWwX86OHj1IghUb5g9fYBPU/rs:fit:0:180:1:0/g:ce/aHR0cHM6Ly93d3cu/YmFyY29kZXJlc291/cmNlLmNvbS9pbWFn/ZXMvQ29kZTM5QmFy/Y29kZS5qcGc',
+                height: 40,
+                fit: BoxFit.fill,
+              ),
             ),
           ),
         ],

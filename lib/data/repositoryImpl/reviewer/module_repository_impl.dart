@@ -20,7 +20,7 @@ class ModuleRepositoryImpl implements ModuleRepository {
   Future<List<ModuleEntity>> getModules(String token) async {
     try {
       final connectivity = await network.isConnected;
-      
+
       if (connectivity) {
         // Fetch from API and cache
         final remoteModules = await remoteDatasource.getModules(token);

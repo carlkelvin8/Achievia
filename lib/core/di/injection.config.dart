@@ -19,11 +19,15 @@ import 'package:achievia/data/data_source/auth/user_remote_datasource.dart'
     as _i528;
 import 'package:achievia/data/data_source/home/questions_remote_datasource.dart'
     as _i557;
+import 'package:achievia/data/data_source/profile/profile_remote_datasource.dart'
+    as _i655;
 import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart'
     as _i536;
 import 'package:achievia/data/models/auth/user_dto.dart' as _i235;
 import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart'
     as _i581;
+import 'package:achievia/data/repositoryImpl/profile/profile_repository_impl.dart'
+    as _i662;
 import 'package:achievia/data/repositoryImpl/questions/qot_repository_impl.dart'
     as _i548;
 import 'package:achievia/data/repositoryImpl/questions/questions_repository_impl.dart'
@@ -40,7 +44,6 @@ import 'package:achievia/domain/use_cases/reviewer/module_use_case.dart'
 import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:dio/dio.dart' as _i361;
 import 'package:get_it/get_it.dart' as _i174;
-import 'package:hive/hive.dart' as _i979;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 
@@ -64,18 +67,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i982.LocalStorageService>(
       () => _i982.LocalStorageService(gh<_i460.SharedPreferences>()),
     );
-    gh.factory<_i979.Box<dynamic>>(
-      () => registerModules.exam,
-      instanceName: 'exam_box',
-    );
-    gh.factory<_i979.Box<dynamic>>(
-      () => registerModules.questions,
-      instanceName: 'questions_box',
-    );
-    gh.factory<_i979.Box<dynamic>>(
-      () => registerModules.modules,
-      instanceName: 'modules_box',
-    );
     gh.lazySingleton<_i790.NetworkInfo>(
       () => _i790.NetworkInfoImpl(gh<_i895.Connectivity>()),
     );
@@ -87,9 +78,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i1000.QuestionsRepositoryImpl>(
       () => _i1000.QuestionsRepositoryImpl(
-        gh<_i64.OfflineCaching>(),
         gh<_i557.QuestionsRemoteDatasource>(),
         gh<_i790.NetworkInfo>(),
+        gh<_i64.OfflineCaching>(),
       ),
     );
     gh.factory<_i528.UserRemoteDatasource>(
@@ -97,6 +88,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i536.ModuleRemoteDatasource>(
       () => _i536.ModuleRemoteDatasource(dio: gh<_i361.Dio>()),
+    );
+    gh.factory<_i655.ProfileRemoteDatasource>(
+      () => _i655.ProfileRemoteDatasource(dio: gh<_i361.Dio>()),
     );
     gh.factory<_i235.UserDto>(
       () => _i235.UserDto(
@@ -117,6 +111,14 @@ extension GetItInjectableX on _i174.GetIt {
         profileImage: gh<String>(),
         courseId: gh<int>(),
         token: gh<String>(),
+        university: gh<String>(),
+        purpose: gh<String>(),
+        dateOfExamination: gh<DateTime>(),
+      ),
+    );
+    gh.factory<_i662.ProfileRepositoryImpl>(
+      () => _i662.ProfileRepositoryImpl(
+        datasource: gh<_i655.ProfileRemoteDatasource>(),
       ),
     );
     gh.factory<_i416.QuestionsEntity>(
