@@ -13,6 +13,7 @@ abstract class QuestionRepoDataSource {
   Future<List<QotdDto>> getTheGeneratedQuiz();
   Future<List<QuestionsDto>> randomizeQuestion();
   Future<QuizScoreResponse> getResults();
+  Future<String> putToAttempt();
 }
 
 @lazySingleton
@@ -129,7 +130,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
   Future<QuizScoreResponse> getResults() async {
     try {
       final response = await dio.get(
-        '$BASE_URL/tasks/getGWA/100',
+        '$BASE_URL/tasks/getGWA/1',
         options: Options(
           contentType: 'application/json',
           headers: {
@@ -148,6 +149,22 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
     } catch (e) {
       print(e);
       return QuizScoreResponse.fromJson({});
+    }
+  }
+
+  @override
+  Future<String> putToAttempt() async {
+    try {
+      final response = await dio.post('$BASE_URL/putToQuizAttempt');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data['message'];
+      }
+      return response.data['message'];
+    } on DioException catch (e) {
+      return e.response?.data['message'];
+    } catch (e) {
+      print(e);
+      return "";
     }
   }
 }
