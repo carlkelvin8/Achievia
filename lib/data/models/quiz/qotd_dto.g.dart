@@ -23,6 +23,8 @@ Map<String, dynamic> _$QotdDtoToJson(QotdDto instance) => <String, dynamic>{
   'choices': instance.choices,
   'quiz': instance.quiz,
 };
+
+
 	
 
 // **************************************************************************

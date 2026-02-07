@@ -1,4 +1,5 @@
 import 'package:achievia/core/network/conntectivity.dart';
+import 'package:achievia/core/network/offline_caching.dart';
 import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart';
 import 'package:achievia/data/data_source/home/questions_remote_datasource.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
@@ -10,7 +11,7 @@ import 'package:injectable/injectable.dart';
 @injectable
 class QuestionsRepositoryImpl implements QuestionsRepository{
   final QuestionsRemoteDatasource remoteDatasource;
-  final CacheDataSourceImpl local;
+  final OfflineCaching local;
   final NetworkInfo network;
 
   QuestionsRepositoryImpl(this.local, this.remoteDatasource, this.network);
@@ -21,13 +22,13 @@ class QuestionsRepositoryImpl implements QuestionsRepository{
       if (connectivity) {
         final remoteQuestions = await remoteDatasource.getAllQuestions(token, id);
         print('Repository - Remote questions received: $remoteQuestions');
-        await local.cachePost(remoteQuestions);
+        await local.insertDataToCache(remoteQuestions);
         final mapped = remoteQuestions.map((e)=>e.toEntity()).toList();
         print('Repository - Mapped to entities: $mapped');
         return mapped;
 
       }else{
-        final cached = await local.getCacheQuestions();
+        final cached = await local.getDataFromCache();
         return cached.map((e)=>e.toEntity()).toList();
       }
     } catch (e, st) {
@@ -43,7 +44,7 @@ class QuestionsRepositoryImpl implements QuestionsRepository{
     try {
       if (isConnected) {
       final response = await remoteDatasource.randomizeQuestion();
-      await local.cachePost(response);
+      await local.insertDataToCache(response);
       final mapped =  response.map((e)=>e.toEntity()).toList();
       return mapped;
     }

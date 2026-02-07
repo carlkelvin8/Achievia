@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:achievia/core/network/offline_caching.dart';
 import 'package:achievia/data/data_source/cache/cache_data_source_impl.dart';
 import 'package:achievia/domain/entities/api/home/results_entity.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +14,8 @@ final getQuestions = Provider<QuestionsUseCase>((ref){
 });
 
 
-final getHive = Provider<CacheDataSourceImpl>((ref){
-  return sl.get<CacheDataSourceImpl>();
+final getHive = Provider<OfflineCaching>((ref){
+  return sl.get<OfflineCaching>();
 });
 
 final getQuestionsProviderState = FutureProvider.family<List<QuestionsEntity>, ({String token, String id})>((ref, params) async {
@@ -45,7 +46,7 @@ final getQoty = FutureProvider<QotyEntity>((ref) async {
 final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref)async{
   final gtQuestions = ref.read(getHive);
   try {
-    final result = await gtQuestions.getCacheQuestions();
+    final result = await gtQuestions.getDataFromCache();
     return result.map((e)=>e.toEntity()).toList();
   } catch (e) {
     rethrow;
