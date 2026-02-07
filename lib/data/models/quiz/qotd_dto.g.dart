@@ -17,23 +17,20 @@ QotdDto _$QotdDtoFromJson(Map<String, dynamic> json) => QotdDto(
 );
 
 Map<String, dynamic> _$QotdDtoToJson(QotdDto instance) => <String, dynamic>{
-  'quizId': instance.quizId,
-  'id': instance.id,
-  'questionText': instance.questionText,
-  'choices': instance.choices,
-  'quiz': instance.quiz,
-};
-
-
-	
+      'quizId': instance.quizId,
+      'id': instance.id,
+      'questionText': instance.questionText,
+      'choices': instance.choices,
+      'quiz': instance.quiz,
+    };
 
 // **************************************************************************
-// TypeAdapterGenerator
+// HiveTypeAdapterGenerator
 // **************************************************************************
 
 class QotdDtoAdapter extends TypeAdapter<QotdDto> {
   @override
-  final int typeId = 3;
+  final int typeId = 4;
 
   @override
   QotdDto read(BinaryReader reader) {
@@ -45,8 +42,8 @@ class QotdDtoAdapter extends TypeAdapter<QotdDto> {
       quizId: fields[0] as int,
       id: fields[1] as int,
       questionText: fields[2] as String,
-      choices: (fields[3] as List<dynamic>).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
-      quiz: fields[4] != null ? Map<String, dynamic>.from(fields[4] as Map) : null,
+      choices: (fields[3] as List).cast<Map<String, dynamic>>(),
+      quiz: fields[4] as Map<String, dynamic>?,
     );
   }
 

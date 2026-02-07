@@ -6,7 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'qotd_dto.g.dart';
-@HiveType(typeId: 2)
+@HiveType(typeId: 4)
 @JsonSerializable()
 class QotdDto {
   @HiveField(0)
