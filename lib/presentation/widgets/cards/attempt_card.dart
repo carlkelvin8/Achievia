@@ -10,11 +10,12 @@ import 'package:achievia/core/constants/app_assets.dart';
 import 'package:achievia/core/constants/app_colors.dart';
 
 class AttemptCard extends ConsumerWidget {
-  const AttemptCard({super.key});
+  final num attemptId;
+  const AttemptCard({super.key, required this.attemptId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final watch = ref.watch(getResultsProviderState);
+    final watch = ref.watch(getResultsProviderState(attemptId));
 
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,

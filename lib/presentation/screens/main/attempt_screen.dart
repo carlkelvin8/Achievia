@@ -18,7 +18,7 @@ class _AttemptScreenState extends State<AttemptScreen> {
       ),
       body: Padding(
         padding: EdgeInsetsGeometry.symmetric(vertical: 12, horizontal: 12),
-        child: AttemptCard(),
+        child: AttemptCard(attemptId: 1,),
       ),
     );
   }

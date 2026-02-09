@@ -24,8 +24,8 @@ class GridBadges extends ConsumerWidget {
       icon: questions[index].icon, 
       label: questions[index].label, 
       sub_label: questions[index].sub_label,
-      callback:(){
-        provider.randomizeQuestion();
+      callback:()async{
+        await provider.randomizeQuestion();
         Navigator.pushNamed(context, '/onboarding-questions');
       },
       ), 

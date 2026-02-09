@@ -14,7 +14,7 @@ abstract class QuestionRepoDataSource  {
   Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
   Future<List<QotdDto>> getTheGeneratedQuiz();
   Future<List<QuestionsDto>> randomizeQuestion();
-  Future<QuizScoreResponse> getResults();
+  Future<QuizScoreResponse> getResults(num noOfAttempt);
   Future<String> putToAttempt();
 }
 @lazySingleton
@@ -122,7 +122,11 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
         return list;
       }
       return [];
-    } catch (e) {
+    }on DioException catch(e){
+      print('DIO ERROR: $e');
+      return [];
+    } 
+    catch (e) {
       print(e);
       return [];
     }
@@ -140,9 +144,9 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
   }
   
   @override
-  Future<QuizScoreResponse> getResults() async{
+  Future<QuizScoreResponse> getResults(num noOfAttempt) async{
     try {
-      final response = await dio.get('$BASE_URL/tasks/getGWA/1',
+      final response = await dio.get('$BASE_URL/tasks/getGWA/$noOfAttempt',
       options: Options(
         contentType: 'application/json',
         headers: {

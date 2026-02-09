@@ -5,6 +5,7 @@ import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/entities/api/home/results_entity.dart';
 import 'package:achievia/domain/repository/questions/questions_repository.dart';
+import 'package:achievia/presentation/provider/examination/examination_provider.dart';
 import 'package:injectable/injectable.dart';
 
 @lazySingleton
@@ -48,6 +49,7 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
       if (isConnected) {
       final response = await remoteDatasource.randomizeQuestion();
       await local.insertQuestionsToCache(response);
+      print('REPO${response.map((e)=>e.toEntity()).toList()}');
       final mapped =  response.map((e)=>e.toEntity()).toList();
       return mapped;
     }
@@ -75,11 +77,11 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
   }
 
   @override
-  Future<QuizScoreEntity?> getQuizScores() async {
+  Future<QuizScoreEntity?> getQuizScores(num noOfAttempt) async {
     final isConnected = await network.isConnected;
     try {
       if (isConnected) {
-        final responseCached = await remoteDatasource.getResults();
+        final responseCached = await remoteDatasource.getResults(noOfAttempt);
         return responseCached.toEntity();
       }
       return null;

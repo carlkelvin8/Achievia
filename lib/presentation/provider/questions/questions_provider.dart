@@ -27,10 +27,10 @@ final getQuestionsProviderState = FutureProvider.family<List<QuestionsEntity>, (
   }
 });
 
-final getResultsProviderState = FutureProvider<QuizScoreEntity?>((ref) async {
+final getResultsProviderState = FutureProvider.family<QuizScoreEntity?, num>((ref, attemptNo) async {
   final gtQuestions = ref.read(getQuestions);
   try {
-    final result = await gtQuestions.getGWA();
+    final result = await gtQuestions.getGWA(attemptNo);
     return result;
   } catch (e) {
     rethrow;
@@ -46,8 +46,10 @@ final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref)async{
   final gtQuestions = ref.read(getHive);
   try {
     final result = await gtQuestions.getQuestionsFromCache();
+    print(result);
     return result.map((e)=>e.toEntity()).toList();
   } catch (e) {
+    print(e);
     rethrow;
   }
 });
@@ -56,8 +58,10 @@ final getGeneratedQuestions = FutureProvider<List<QotyEntity>>((ref)async{
   final gtQuestions = ref.read(getQuestions);
   try {
     final results = await gtQuestions.getGeneratedQuestions();
+    print(results);
     return results;
   } catch (e) {
+    print(e);
     rethrow;
   }
 });
