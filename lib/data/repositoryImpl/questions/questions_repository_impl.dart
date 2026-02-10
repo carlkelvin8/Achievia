@@ -48,6 +48,7 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
       if (isConnected) {
       final response = await remoteDatasource.randomizeQuestion();
       await local.insertQuestionsToCache(response);
+      print('REPO${response.map((e)=>e.toEntity()).toList()}');
       final mapped =  response.map((e)=>e.toEntity()).toList();
       return mapped;
     }
@@ -75,17 +76,20 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
   }
 
   @override
-  Future<QuizScoreEntity?> getQuizScores() async {
-    final isConnected = await network.isConnected;
+  Future<QuizScoreEntity?> getQuizScores(int noOfAttempt) async {
+    final responseCached = await remoteDatasource.getResults(noOfAttempt);
+    print('from impl repo: $noOfAttempt');
+    return responseCached.toEntity();
+  }
+  @override
+  Future<int> submitQuiz() async{
     try {
-      if (isConnected) {
-        final responseCached = await remoteDatasource.getResults();
-        return responseCached.toEntity();
-      }
-      return null;
+      final responseCached = await remoteDatasource.putToAttempt();
+      print('from impl:$responseCached');
+      return responseCached;
     } catch (e) {
       print(e);
-      return null;
+      return 0;
     }
   }
 }

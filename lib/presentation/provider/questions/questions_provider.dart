@@ -8,6 +8,7 @@ import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/use_cases/questions/questions_use_case.dart';
+import 'package:flutter_riverpod/legacy.dart';
 final getQuestions = Provider<QuestionsUseCase>((ref){
   return sl.get<QuestionsUseCase>();
 });
@@ -27,10 +28,11 @@ final getQuestionsProviderState = FutureProvider.family<List<QuestionsEntity>, (
   }
 });
 
-final getResultsProviderState = FutureProvider<QuizScoreEntity?>((ref) async {
+final getResultsProviderState = FutureProvider.family<QuizScoreEntity?, int>((ref, attemptNo) async {
   final gtQuestions = ref.read(getQuestions);
+  print('from $attemptNo');
   try {
-    final result = await gtQuestions.getGWA();
+    final result = await gtQuestions.getGWA(attemptNo);
     return result;
   } catch (e) {
     rethrow;
@@ -46,8 +48,10 @@ final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref)async{
   final gtQuestions = ref.read(getHive);
   try {
     final result = await gtQuestions.getQuestionsFromCache();
+    print(result);
     return result.map((e)=>e.toEntity()).toList();
   } catch (e) {
+    print(e);
     rethrow;
   }
 });
@@ -56,11 +60,14 @@ final getGeneratedQuestions = FutureProvider<List<QotyEntity>>((ref)async{
   final gtQuestions = ref.read(getQuestions);
   try {
     final results = await gtQuestions.getGeneratedQuestions();
+    print(results);
     return results;
   } catch (e) {
+    print(e);
     rethrow;
   }
 });
+final attemptIdProvider = StateProvider<int?>((ref) => null);
 
 
 final answeredQuestionsProvider = NotifierProvider<ShowUnansweredQuestionsProvider, List<int>>(ShowUnansweredQuestionsProvider.new);
@@ -69,14 +76,21 @@ final answerQotProvider = NotifierProvider<QuestionsProvider, AnswerQuestionNoti
 final pageController = NotifierProvider.autoDispose<PageControllerProvider, PageController>(PageControllerProvider.new);
 final changeIndexProvider = NotifierProvider.autoDispose<IndexProvider, int>(IndexProvider.new);
 class PageControllerProvider extends Notifier<PageController> {
+  late final QuestionsUseCase useCases;
   @override
   PageController build() {
+      useCases = ref.read(getQuestions);
       return PageController();
   }
-
+  
   Future<void> next(BuildContext context)async{
     if (state.page == 99) {
-      Navigator.pushNamed(context, '/attempt-screen');
+      final attemptId = await useCases.submitQuiz();
+      await useCases.getGWA(attemptId);
+      print('sa next ito: $attemptId');
+      ref.read(attemptIdProvider.notifier).state = attemptId;
+
+      Navigator.pushNamed(context, '/attempt-screen', arguments: attemptId);
     }
     state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
   }
@@ -97,6 +111,11 @@ class ShowUnansweredQuestionsProvider extends Notifier<List<int>> {
 
   Future<void> isAnswered(int index)async{
     state.add(index);
+    print(state);
+  }
+
+  Future<void> resetState()async{
+    state.clear();
     print(state);
   }
 }

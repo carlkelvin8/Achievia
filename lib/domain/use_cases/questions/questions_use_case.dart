@@ -14,5 +14,6 @@ class QuestionsUseCase {
   Future<QotyEntity> getQotQueston() async => await impqot.getQuestionOfTheDay();
   Future<QotyEntityPost> answerQuestion(QotyEntityPost dto) async => await impqot.answerQuestion(dto);
   Future<List<QotyEntity>> getGeneratedQuestions() async => await impl.getRandomizedQuestions();
-  Future<QuizScoreEntity?> getGWA() async => await impl.getQuizScores();
+  Future<QuizScoreEntity?> getGWA(int noOfAttempt) async => await impl.getQuizScores(noOfAttempt);
+  Future<int> submitQuiz() async => await impl.submitQuiz();
 }

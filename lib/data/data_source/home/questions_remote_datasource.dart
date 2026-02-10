@@ -1,5 +1,7 @@
 
 import 'package:achievia/const.dart';
+import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/core/di/local_storage_service.dart';
 import 'package:achievia/core/network/offline_caching.dart';
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
 import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
@@ -14,8 +16,8 @@ abstract class QuestionRepoDataSource  {
   Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
   Future<List<QotdDto>> getTheGeneratedQuiz();
   Future<List<QuestionsDto>> randomizeQuestion();
-  Future<QuizScoreResponse> getResults();
-  Future<String> putToAttempt();
+  Future<QuizScoreResponse> getResults(int noOfAttempt);
+  Future<int> putToAttempt();
 }
 @lazySingleton
 @injectable
@@ -122,7 +124,11 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
         return list;
       }
       return [];
-    } catch (e) {
+    }on DioException catch(e){
+      print('DIO ERROR: $e');
+      return [];
+    } 
+    catch (e) {
       print(e);
       return [];
     }
@@ -140,9 +146,10 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
   }
   
   @override
-  Future<QuizScoreResponse> getResults() async{
+  Future<QuizScoreResponse> getResults(int noOfAttempt) async{
+    print('from quiz: $noOfAttempt');
     try {
-      final response = await dio.get('$BASE_URL/tasks/getGWA/1',
+      final response = await dio.get('$BASE_URL/tasks/getGWA/$noOfAttempt',
       options: Options(
         contentType: 'application/json',
         headers: {
@@ -159,28 +166,28 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
       print(e.response?.data);
       return QuizScoreResponse.fromJson({});
     }
-    catch (e) {
-      print(e);
-      return QuizScoreResponse.fromJson({});
-    }
   }
   
   @override
-  Future<String> putToAttempt() async{
+  Future<int> putToAttempt() async{
+    final LocalStorageService storageService = sl<LocalStorageService>();
     try {
-      final response = await dio.post('$BASE_URL/tasks/putToQuizAttempt');
+      final getId =   storageService.creds;
+      final response = await dio.post('$BASE_URL/tasks/putToQuizAttempt/$getId');
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return response.data['message'];
+        print('from datasource: ${response.data['data']['attempt']}');
+        return response.data['data']['attempt'];
       }
-      return response.data['message'];
+      print('from datasource: ${response.data['data']['attempt']}');
+      return response.data['data']['attempt'];
     } on DioException catch(e){
       print(e.response?.data);
       return e.response?.data['message'];
     }
     
     catch (e) {
-      print(e);
-      return "";
+      print('catch from datasource:$e');
+      return 0;
     }
   }
 

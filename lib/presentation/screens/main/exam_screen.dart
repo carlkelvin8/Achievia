@@ -28,6 +28,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
     final visible = ref.watch(showModalNotifier);
     final isAnswered = ref.read(answeredQuestionsProvider.notifier);
     final isAnsweredWatch = ref.watch(answeredQuestionsProvider);
+    final getGenerated = ref.watch(getGeneratedQuestions);
     final answerQuestion = ref.read(answerQotProvider.notifier);
     return Scaffold(
       appBar: ExamAppBar(
@@ -107,6 +108,14 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
         IconButton(
           onPressed:selectedAnswers[indexs] == null ? null : (){
             pageControllerNotifier.next(context);
+            print(pageControllers.page);
+            if (pageControllers.page == 99) {
+              isAnswered.resetState();
+              setState(() {
+                selectedAnswers.clear();
+                print(selectedAnswers);
+              });
+            }
             
           },
           icon: Icon(
