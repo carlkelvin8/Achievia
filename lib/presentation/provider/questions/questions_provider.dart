@@ -73,13 +73,16 @@ final answerQotProvider = NotifierProvider<QuestionsProvider, AnswerQuestionNoti
 final pageController = NotifierProvider.autoDispose<PageControllerProvider, PageController>(PageControllerProvider.new);
 final changeIndexProvider = NotifierProvider.autoDispose<IndexProvider, int>(IndexProvider.new);
 class PageControllerProvider extends Notifier<PageController> {
+  late final QuestionsUseCase useCases;
   @override
   PageController build() {
+      useCases = ref.read(getQuestions);
       return PageController();
   }
 
   Future<void> next(BuildContext context)async{
     if (state.page == 99) {
+      await useCases.submitQuiz();
       Navigator.pushNamed(context, '/attempt-screen');
     }
     state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);

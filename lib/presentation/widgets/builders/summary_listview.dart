@@ -15,6 +15,8 @@ class SummaryListview extends StatelessWidget {
     return ListView.builder(
       itemCount: itemCount,
       itemBuilder:itemBuilder,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
     );
   }
 }

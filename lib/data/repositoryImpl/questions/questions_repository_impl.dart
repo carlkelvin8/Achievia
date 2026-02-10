@@ -5,7 +5,6 @@ import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/entities/api/home/results_entity.dart';
 import 'package:achievia/domain/repository/questions/questions_repository.dart';
-import 'package:achievia/presentation/provider/examination/examination_provider.dart';
 import 'package:injectable/injectable.dart';
 
 @lazySingleton
@@ -88,6 +87,20 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
     } catch (e) {
       print(e);
       return null;
+    }
+  }
+  @override
+  Future<String> submitQuiz() async{
+    final isConnected = await network.isConnected;
+    try {
+      if (isConnected) {
+        final responseCached = await remoteDatasource.putToAttempt();
+        return responseCached;
+      }
+      return "";
+    } catch (e) {
+      print(e);
+      return "";
     }
   }
 }

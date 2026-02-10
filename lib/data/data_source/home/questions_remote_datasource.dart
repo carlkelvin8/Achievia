@@ -183,7 +183,6 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
     }
     
     catch (e) {
-      print(e);
       return "";
     }
   }
