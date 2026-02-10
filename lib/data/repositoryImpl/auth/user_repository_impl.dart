@@ -5,21 +5,20 @@ import 'package:injectable/injectable.dart';
 import 'package:achievia/data/data_source/auth/user_remote_datasource.dart';
 import 'package:achievia/domain/entities/api/auth/user_entity.dart';
 import 'package:achievia/domain/repository/auth/user_repository.dart';
+
 @injectable
 @lazySingleton
 class UserRepositoryImpl implements UserRepository {
   final UserRemoteDatasource datasource;
-  UserRepositoryImpl({
-    required this.datasource,
-  });
-  
+  UserRepositoryImpl({required this.datasource});
+
   @override
-  Future<UserEntity> loginRepository(UserEntity dto) async{
-    final entity =  UserDto.fromEntity(dto);
+  Future<UserEntity> loginRepository(UserEntity dto) async {
+    final entity = UserDto.fromEntity(dto);
     final data = await datasource.login(entity);
     return data.toEntity();
   }
-  
+
   @override
   Future<UserEntity> getProfile(String token) async {
     final data = await datasource.getProfile(token);

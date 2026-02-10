@@ -1,4 +1,3 @@
-
 import 'package:achievia/presentation/screens/auth/login_screen.dart';
 import 'package:achievia/presentation/screens/auth/onboarding_screen.dart';
 import 'package:achievia/presentation/screens/main/about_screen.dart';
@@ -43,9 +42,11 @@ class RouteConstants {
   static const String onboardingQuestions = '/onboarding-questions';
   static const String examScreen = '/exam-screen';
   static const String summaryScreen = '/summary-screen';
+  static const String newReminder = '/new-reminder';
+  static const String today = '/today';
+  static const String scheduled = '/scheduled';
+  static const String completed = '/completed';
 }
-
-
 
 final Map<String, WidgetBuilder> appRoutes = {
   // Auth routes
@@ -70,10 +71,9 @@ final Map<String, WidgetBuilder> appRoutes = {
 
   // Other features
   RouteConstants.reminder: (_) => const ReminderScreenContent(),
-  RouteConstants.onboardingQuestions: (_) => const OnboardingMockboardScreen(title: '',),
-  RouteConstants.examScreen:(_) => const ExamScreen(),
-  RouteConstants.attemptScreen:(_) => const AttemptScreen(),
-  RouteConstants.summaryScreen:(_) => const SummaryScreen(),
+  RouteConstants.onboardingQuestions: (_) =>
+      const OnboardingMockboardScreen(title: ''),
+  RouteConstants.examScreen: (_) => const ExamScreen(),
+  RouteConstants.attemptScreen: (_) => const AttemptScreen(),
+  RouteConstants.summaryScreen: (_) => const SummaryScreen(),
 };
-
-

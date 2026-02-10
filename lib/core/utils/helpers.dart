@@ -78,21 +78,106 @@ const List<ReminderEntity> demoReminderItems = [
     title: 'Hematology topic 1',
     subtitle: 'Page 1 - page 32',
     dueDateLabel: 'July 6, 2025',
-    progress: 0.1,
   ),
   ReminderEntity(
     title: 'Parasitology Lecture',
     subtitle: 'Study protozoans until nematodes',
     dueDateLabel: 'July 7, 2025',
-    progress: 0.45,
   ),
   ReminderEntity(
     title: 'DAT Procedure',
     subtitle: 'Need to memorize every reagents and measurement',
     dueDateLabel: 'July 9, 2025',
-    progress: 0.0,
   ),
 ];
+
+// Mock data for Today
+const List<ReminderEntity> demoTodayItems = [
+  ReminderEntity(
+    title: 'Hematology topic 1',
+    subtitle: 'Page 1 - page 32',
+    dueDateLabel: 'February 10, 2026',
+  ),
+  ReminderEntity(
+    title: 'Parasitology Lecture',
+    subtitle: 'study protozoans until nematodes',
+    dueDateLabel: 'February 10, 2026',
+  ),
+  ReminderEntity(
+    title: 'DAT Procedure',
+    subtitle: 'need to memorize every reagents and measurement',
+    dueDateLabel: 'february 10, 2026',
+  ),
+];
+
+// Mock groupings for Scheduled
+const Map<String, List<ReminderEntity>> demoScheduledGroups = {
+  'Today': [
+    ReminderEntity(
+      title: 'Hematology topic 1',
+      subtitle: 'Page 1 - page 32',
+      dueDateLabel: 'February 10, 2026',
+    ),
+    ReminderEntity(
+      title: 'Parasitology Lecture',
+      subtitle: 'study protozoans until nematodes',
+      dueDateLabel: 'February 10, 2026',
+    ),
+    ReminderEntity(
+      title: 'DAT Procedure',
+      subtitle: 'need to memorize every reagents and measurement',
+      dueDateLabel: 'February 10, 2026',
+    ),
+  ],
+  'Tomorrow': [
+    ReminderEntity(
+      title: 'DAT Procedure',
+      subtitle: 'need to memorize every reagents and measurement',
+      dueDateLabel: 'February 11, 2026',
+    ),
+  ],
+  'March': [
+    ReminderEntity(
+      title: 'DAT Procedure',
+      subtitle: 'need to memorize every reagents and measurement',
+      dueDateLabel: 'March 18, 2026',
+    ),
+  ],
+  'April': [
+    ReminderEntity(
+      title: 'DAT Procedure',
+      subtitle: 'need to memorize every reagents and measurement',
+      dueDateLabel: 'April 25, 2026',
+    ),
+  ],
+  // Add placeholders for other months if needed
+  'May': [],
+  'June': [],
+  'July': [],
+  'August': [],
+  'September': [],
+};
+
+// Mock data for Completed
+const Map<String, List<ReminderEntity>> demoCompletedGroups = {
+  'TUE February 10, 2026': [
+    ReminderEntity(
+      title: 'Hematology topic 1',
+      subtitle: 'Page 1 - page 32',
+      dueDateLabel: 'July 5, 2025',
+      isCompleted: true,
+    ),
+  ],
+  'TUE February 10, 2026 ': [
+    // Added space to make key unique for demo
+    ReminderEntity(
+      title: 'Parasitology Lecture',
+      subtitle: 'study protozoans until nematodes',
+      dueDateLabel: 'February 10, 2026',
+      isCompleted: true,
+    ),
+  ],
+};
 
 // Demo data for Author screen
 const List<AuthorEntity> demoAuthorItems = [

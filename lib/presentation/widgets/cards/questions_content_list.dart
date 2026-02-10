@@ -55,7 +55,7 @@ class QuestionsContentList extends StatelessWidget {
                   fontWeight: font,
                 ),
               ),
-              onChanged: null,
+              onChanged: null, // summary mode
             );
           }),
         ],

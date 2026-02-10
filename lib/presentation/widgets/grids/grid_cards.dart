@@ -1,3 +1,5 @@
+import 'package:achievia/core/constants/routers/navigation_service.dart';
+import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/utils/helpers.dart';
 import 'package:achievia/presentation/widgets/cards/reusable_card.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +32,15 @@ class GridCards extends ConsumerWidget {
               icon: reminder.icon,
               label: reminder.title,
               count: int.tryParse(reminder.status) ?? 0,
+              onTap: () {
+                if (index == 0) {
+                  NavigationService.pushNamed(RouteConstants.today);
+                } else if (index == 1) {
+                  NavigationService.pushNamed(RouteConstants.scheduled);
+                } else if (index == 2) {
+                  NavigationService.pushNamed(RouteConstants.completed);
+                }
+              },
             );
           },
         ),
@@ -42,17 +53,22 @@ Widget _buildReminder(BuildContext context) {
   final textTheme = Theme.of(context).textTheme;
   final colorScheme = Theme.of(context).colorScheme;
 
-  return Row(
-    children: [
-      Icon(Icons.add_box, color: colorScheme.primary),
-      const SizedBox(width: 10),
-      Text(
-        'New Reminder',
-        style: textTheme.labelMedium?.copyWith(
-          color: colorScheme.primary,
-          fontWeight: FontWeight.w600,
+  return InkWell(
+    onTap: () {
+      NavigationService.pushNamed(RouteConstants.newReminder);
+    },
+    child: Row(
+      children: [
+        Icon(Icons.add_box, color: colorScheme.primary),
+        const SizedBox(width: 10),
+        Text(
+          'New Reminder',
+          style: textTheme.labelMedium?.copyWith(
+            color: colorScheme.primary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ),
-    ],
+      ],
+    ),
   );
 }

@@ -1,5 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
+import 'dart:convert';
+
 import 'package:achievia/core/di/injection.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
@@ -36,17 +38,28 @@ class UserRemoteDatasource implements UserRepositoryDataSource {
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        return UserDto.fromJson(response.data);
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          type: DioExceptionType.badResponse,
+          error: response.data['message'] ?? 'Login failed',
+        );
       }
 
-      await storageService.saveToken(response.data['data']['token']);
+      await storageService.saveToken(response.data['data']['token'], jsonEncode(response.data['data']['user']['id']));
       final token = storageService.token;
+      final userId = storageService.creds;
+      print(userId);
       print(token);
       return UserDto.fromJson(response.data['data']);
-    } catch (e, st) {
-      print(e);
-      print('stack trace: $st');
+    } on DioException catch(e){
+      print(e.response?.data);
       return UserDto.fromJson({});
+    }
+    
+    
+    catch (e) {
+      rethrow;
     }
   }
 
@@ -67,7 +80,6 @@ class UserRemoteDatasource implements UserRepositoryDataSource {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Handle nested response structure: response.data['data']['data']
         final data = response.data['data'];
         if (data != null && data['data'] != null) {
           return UserDto.fromJson(data['data']);

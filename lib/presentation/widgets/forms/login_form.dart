@@ -21,16 +21,34 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     final isPasswordVisible = ref.watch(toggleProvider);
     final visibilityNotifier = ref.read(toggleProvider.notifier);
     final loginNotifier = ref.read(loginFormProvider.notifier);
-  
+
+    // Listen for error messages
+    // Listen for error messages
+    ref.listen(loginFormProvider, (previous, next) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
+
     return Container(
       padding: level1,
       color: const Color.fromARGB(255, 192, 210, 218),
       child: Form(
-        child: Column(
+        child: ListView(
+          shrinkWrap: true,
+          padding: EdgeInsets.zero,
+          physics: const ClampingScrollPhysics(),
           children: [
             ReusableField(
               hintText: 'Username',
               controller: loginNotifier.usernameController,
+              errorText: ref.watch(loginFormProvider).errorMessage,
             ),
             const SizedBox(height: 10),
             ReusableField(
@@ -43,10 +61,12 @@ class _LoginFormState extends ConsumerState<LoginForm> {
               ),
               isObscure: !isPasswordVisible,
               controller: loginNotifier.passwordController,
+              errorText: ref.watch(loginFormProvider).errorMessage,
             ),
             const SizedBox(height: 10),
             ReusableButton(
               title: 'Log in',
+              isLoading: ref.watch(loginFormProvider).isLoading,
               onPressed: () async {
                 final username = loginNotifier.usernameController.text;
                 final password = loginNotifier.passwordController.text;

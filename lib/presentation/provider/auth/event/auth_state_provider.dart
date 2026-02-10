@@ -1,5 +1,6 @@
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/domain/entities/api/auth/user_entity.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/domain/use_cases/auth/user_use_case.dart';
@@ -12,7 +13,6 @@ class AuthNotifier extends Notifier<bool> {
 }
 
 final toggleProvider = NotifierProvider<AuthNotifier, bool>(AuthNotifier.new);
-
 
 class LoginNotifier extends Notifier<LoginFormState> {
   late final TextEditingController usernameController;
@@ -51,30 +51,53 @@ class LoginNotifier extends Notifier<LoginFormState> {
       profileImage: '',
     );
 
-    await useCase.getLogin(entity);
-    usernameController.clear();
-    passwordController.clear();
-    
+    try {
+      state = state.copyWith(isLoading: true, errorMessage: null);
+      await useCase.getLogin(entity);
+      usernameController.clear();
+      passwordController.clear();
+      state = state.copyWith(isLoading: false);
+    } on DioException catch (e) {
+      final message =
+          e.response?.data['error']['message'] ??
+          e.message ??
+          'An error occurred';
+      state = state.copyWith(isLoading: false, errorMessage: message);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
   }
 }
 
-final loginFormProvider = NotifierProvider<LoginNotifier, LoginFormState>(LoginNotifier.new);
+final loginFormProvider = NotifierProvider<LoginNotifier, LoginFormState>(
+  LoginNotifier.new,
+);
 final userUseCaseProvider = Provider<UserUseCase>((ref) => sl<UserUseCase>());
-
 
 class LoginFormState {
   final String email;
   final String password;
+  final bool isLoading;
+  final String? errorMessage;
 
   const LoginFormState({
     required this.email,
     required this.password,
+    this.isLoading = false,
+    this.errorMessage,
   });
 
-  LoginFormState copyWith({String? email, String? password}) {
+  LoginFormState copyWith({
+    String? email,
+    String? password,
+    bool? isLoading,
+    String? errorMessage,
+  }) {
     return LoginFormState(
       email: email ?? this.email,
       password: password ?? this.password,
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage,
     );
   }
 }

@@ -7,6 +7,7 @@ class ReusableButton extends StatelessWidget {
   final Color? textColor;
   final num width;
   final num height;
+  final bool isLoading;
   const ReusableButton({
     super.key,
     required this.title,
@@ -15,6 +16,7 @@ class ReusableButton extends StatelessWidget {
     this.textColor,
     required this.width,
     required this.height,
+    this.isLoading = false,
   });
 
   @override
@@ -27,16 +29,25 @@ class ReusableButton extends StatelessWidget {
         ),
         fixedSize: Size(width.toDouble(), height.toDouble()),
       ),
-      onPressed: onPressed,
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          fontStyle: FontStyle.normal,
-          color: textColor,
-        ),
-      ),
+      onPressed: isLoading ? null : onPressed,
+      child: isLoading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.normal,
+                color: textColor,
+              ),
+            ),
     );
   }
 }
