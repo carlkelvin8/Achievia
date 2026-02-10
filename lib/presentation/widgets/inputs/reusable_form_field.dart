@@ -8,6 +8,9 @@ class ReusableField extends StatelessWidget {
   final String? hintText;
   final TextEditingController controller;
   final String? errorText;
+  final int? maxLines;
+  final int? minLines;
+
   const ReusableField({
     super.key,
     this.validator,
@@ -17,6 +20,8 @@ class ReusableField extends StatelessWidget {
     this.hintText,
     required this.controller,
     this.errorText,
+    this.maxLines = 1,
+    this.minLines,
   });
 
   @override
@@ -25,6 +30,8 @@ class ReusableField extends StatelessWidget {
       validator: validator,
       controller: controller,
       obscureText: isObscure ?? false,
+      maxLines: maxLines,
+      minLines: minLines,
       decoration: InputDecoration(
         fillColor: Colors.white,
         filled: true,

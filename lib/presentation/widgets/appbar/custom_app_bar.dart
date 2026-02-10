@@ -11,6 +11,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
   final Color? backgroundColor;
   final TextStyle? titleStyle;
+  final bool? centerTitle;
+  final double? leadingWidth;
 
   const CustomAppBar({
     super.key,
@@ -21,35 +23,43 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leading,
     this.backgroundColor,
     this.titleStyle,
+    this.centerTitle,
+    this.leadingWidth,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return AppBar(
       backgroundColor: backgroundColor ?? theme.colorScheme.surface,
       elevation: 0,
+      centerTitle: centerTitle,
+      leadingWidth: leadingWidth,
       leading: showBackButton
           ? (leading ??
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: theme.colorScheme.primary,
-                    size: 24,
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: theme.colorScheme.primary,
+                      size: 24,
+                    ),
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 40,
+                      minHeight: 40,
+                    ),
+                    onPressed: onBackPressed ?? () => NavigationService.pop(),
                   ),
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-                  onPressed: onBackPressed ?? () => NavigationService.pop(),
-                ),
-              ))
+                ))
           : leading,
       title: Text(
         title,
-        style: titleStyle ??
+        style:
+            titleStyle ??
             theme.textTheme.headlineMedium?.copyWith(
               color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.bold,

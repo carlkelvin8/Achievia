@@ -12,6 +12,10 @@ import 'package:achievia/presentation/screens/notifications/notifications_screen
 import 'package:achievia/presentation/screens/settings/examination/examination_screen.dart';
 import 'package:achievia/presentation/screens/settings/pomodoro_timer/pomodoro_timer_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/reminder_screen_content.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/new_reminder_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/today_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/scheduled_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/completed_screen.dart';
 import 'route_constants.dart';
 
 class AppRouter {
@@ -93,6 +97,30 @@ class AppRouter {
       case RouteConstants.reminder:
         return MaterialPageRoute(
           builder: (_) => const ReminderScreenContent(),
+          settings: settings,
+        );
+
+      case RouteConstants.newReminder:
+        return MaterialPageRoute(
+          builder: (_) => const NewReminderScreen(),
+          settings: settings,
+        );
+
+      case RouteConstants.today:
+        return MaterialPageRoute(
+          builder: (_) => const TodayScreen(),
+          settings: settings,
+        );
+
+      case RouteConstants.scheduled:
+        return MaterialPageRoute(
+          builder: (_) => const ScheduledScreen(),
+          settings: settings,
+        );
+
+      case RouteConstants.completed:
+        return MaterialPageRoute(
+          builder: (_) => const CompletedScreen(),
           settings: settings,
         );
 
