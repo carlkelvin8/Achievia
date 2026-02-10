@@ -31,6 +31,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
           SnackBar(
             content: Text(next.errorMessage!),
             backgroundColor: Colors.red,
+            duration: const Duration(milliseconds: 1000),
           ),
         );
       }
@@ -77,6 +78,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                     const SnackBar(
                       content: Text('Please enter username and password'),
                       backgroundColor: Colors.red,
+                      duration: Duration(milliseconds: 1500),
                     ),
                   );
                 }

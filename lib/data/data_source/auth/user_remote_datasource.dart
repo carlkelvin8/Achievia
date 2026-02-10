@@ -46,19 +46,19 @@ class UserRemoteDatasource implements UserRepositoryDataSource {
         );
       }
 
-      await storageService.saveToken(response.data['data']['token'], jsonEncode(response.data['data']['user']['id']));
+      await storageService.saveToken(
+        response.data['data']['token'],
+        jsonEncode(response.data['data']['user']['id']),
+      );
       final token = storageService.token;
       final userId = storageService.creds;
       print(userId);
       print(token);
       return UserDto.fromJson(response.data['data']);
-    } on DioException catch(e){
+    } on DioException catch (e) {
       print(e.response?.data);
-      return UserDto.fromJson({});
-    }
-    
-    
-    catch (e) {
+      rethrow;
+    } catch (e) {
       rethrow;
     }
   }
