@@ -76,31 +76,20 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
   }
 
   @override
-  Future<QuizScoreEntity?> getQuizScores(num noOfAttempt) async {
-    final isConnected = await network.isConnected;
-    try {
-      if (isConnected) {
-        final responseCached = await remoteDatasource.getResults(noOfAttempt);
-        return responseCached.toEntity();
-      }
-      return null;
-    } catch (e) {
-      print(e);
-      return null;
-    }
+  Future<QuizScoreEntity?> getQuizScores(int noOfAttempt) async {
+    final responseCached = await remoteDatasource.getResults(noOfAttempt);
+    print('from impl repo: $noOfAttempt');
+    return responseCached.toEntity();
   }
   @override
-  Future<String> submitQuiz() async{
-    final isConnected = await network.isConnected;
+  Future<int> submitQuiz() async{
     try {
-      if (isConnected) {
-        final responseCached = await remoteDatasource.putToAttempt();
-        return responseCached;
-      }
-      return "";
+      final responseCached = await remoteDatasource.putToAttempt();
+      print('from impl:$responseCached');
+      return responseCached;
     } catch (e) {
       print(e);
-      return "";
+      return 0;
     }
   }
 }

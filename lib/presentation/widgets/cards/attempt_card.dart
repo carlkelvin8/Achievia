@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:achievia/core/constants/app_assets.dart';
+import 'package:achievia/core/constants/app_colors.dart';
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/cards/data_card.dart';
@@ -6,18 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:achievia/core/constants/app_assets.dart';
-import 'package:achievia/core/constants/app_colors.dart';
-
 class AttemptCard extends ConsumerWidget {
-  final num attemptId;
+  final int attemptId;
   const AttemptCard({super.key, required this.attemptId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final watch = ref.watch(getResultsProviderState(attemptId));
-
-    return Container(
+    print('id:$attemptId');
+    print(watch);
+    return Container( 
       width: MediaQuery.of(context).size.width * 0.9,
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: BoxDecoration(
@@ -61,7 +61,10 @@ class AttemptCard extends ConsumerWidget {
           Expanded(
             child: watch.when(
               data: (q) {
-                final data = q!.score.answers;
+                if (q == null) {
+                  return const Center(child: Text('No results available'));
+                }
+                final data = q.score.answers;
                 return Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(

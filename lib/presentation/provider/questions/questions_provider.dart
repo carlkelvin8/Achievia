@@ -8,6 +8,7 @@ import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/use_cases/questions/questions_use_case.dart';
+import 'package:flutter_riverpod/legacy.dart';
 final getQuestions = Provider<QuestionsUseCase>((ref){
   return sl.get<QuestionsUseCase>();
 });
@@ -27,8 +28,9 @@ final getQuestionsProviderState = FutureProvider.family<List<QuestionsEntity>, (
   }
 });
 
-final getResultsProviderState = FutureProvider.family<QuizScoreEntity?, num>((ref, attemptNo) async {
+final getResultsProviderState = FutureProvider.family<QuizScoreEntity?, int>((ref, attemptNo) async {
   final gtQuestions = ref.read(getQuestions);
+  print('from $attemptNo');
   try {
     final result = await gtQuestions.getGWA(attemptNo);
     return result;
@@ -65,6 +67,7 @@ final getGeneratedQuestions = FutureProvider<List<QotyEntity>>((ref)async{
     rethrow;
   }
 });
+final attemptIdProvider = StateProvider<int?>((ref) => null);
 
 
 final answeredQuestionsProvider = NotifierProvider<ShowUnansweredQuestionsProvider, List<int>>(ShowUnansweredQuestionsProvider.new);
@@ -79,11 +82,15 @@ class PageControllerProvider extends Notifier<PageController> {
       useCases = ref.read(getQuestions);
       return PageController();
   }
-
+  
   Future<void> next(BuildContext context)async{
     if (state.page == 99) {
-      await useCases.submitQuiz();
-      Navigator.pushNamed(context, '/attempt-screen');
+      final attemptId = await useCases.submitQuiz();
+      await useCases.getGWA(attemptId);
+      print('sa next ito: $attemptId');
+      ref.read(attemptIdProvider.notifier).state = attemptId;
+
+      Navigator.pushNamed(context, '/attempt-screen', arguments: attemptId);
     }
     state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
   }
@@ -104,6 +111,11 @@ class ShowUnansweredQuestionsProvider extends Notifier<List<int>> {
 
   Future<void> isAnswered(int index)async{
     state.add(index);
+    print(state);
+  }
+
+  Future<void> resetState()async{
+    state.clear();
     print(state);
   }
 }
