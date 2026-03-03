@@ -55,7 +55,7 @@ class ReviewerEvent extends Notifier<TabController?>{
 
 class IndexEvent extends Notifier<int> {
   @override
-  int build() => 0;
+  int build() => 2; // Start on Home tab (index 2)
 
   int changeIndex(int index) => state = index;
 }
