@@ -23,6 +23,8 @@ import 'package:achievia/data/data_source/profile/profile_remote_datasource.dart
     as _i655;
 import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart'
     as _i536;
+import 'package:achievia/data/data_source/task/task_remote_datasource.dart'
+    as _i701;
 import 'package:achievia/data/models/auth/user_dto.dart' as _i235;
 import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart'
     as _i581;
@@ -34,6 +36,8 @@ import 'package:achievia/data/repositoryImpl/questions/questions_repository_impl
     as _i1000;
 import 'package:achievia/data/repositoryImpl/reviewer/module_repository_impl.dart'
     as _i656;
+import 'package:achievia/data/repositoryImpl/task/task_repository_impl.dart'
+    as _i702;
 import 'package:achievia/domain/entities/api/home/questions_entity.dart'
     as _i416;
 import 'package:achievia/domain/use_cases/auth/user_use_case.dart' as _i879;
@@ -41,6 +45,7 @@ import 'package:achievia/domain/use_cases/questions/questions_use_case.dart'
     as _i803;
 import 'package:achievia/domain/use_cases/reviewer/module_use_case.dart'
     as _i533;
+import 'package:achievia/domain/use_cases/task/task_use_case.dart' as _i703;
 import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:dio/dio.dart' as _i361;
 import 'package:get_it/get_it.dart' as _i174;
@@ -160,6 +165,15 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i533.ModuleUseCase>(
       () => _i533.ModuleUseCase(impl: gh<_i656.ModuleRepositoryImpl>()),
+    );
+    gh.lazySingleton<_i701.TaskRemoteDatasource>(
+      () => _i701.TaskRemoteDatasource(gh<_i361.Dio>()),
+    );
+    gh.lazySingleton<_i702.TaskRepositoryImpl>(
+      () => _i702.TaskRepositoryImpl(gh<_i701.TaskRemoteDatasource>()),
+    );
+    gh.factory<_i703.TaskUseCase>(
+      () => _i703.TaskUseCase(gh<_i702.TaskRepositoryImpl>()),
     );
     return this;
   }

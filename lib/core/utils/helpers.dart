@@ -4,10 +4,8 @@ import 'package:achievia/domain/entities/widgets/medical_abbreviation_entity.dar
 import 'package:achievia/domain/entities/widgets/notes_entity.dart';
 import 'package:achievia/domain/entities/widgets/pdf_entity.dart';
 import 'package:achievia/domain/entities/widgets/questions_entity.dart';
-import 'package:achievia/domain/entities/widgets/reminders_entity.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:flutter/material.dart';
-import 'package:achievia/domain/entities/widgets/reminder_entity.dart';
 import 'package:achievia/domain/entities/widgets/author_entity.dart';
 import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 
@@ -26,23 +24,6 @@ final List<ExaminationResult> results = [
   ),
 ];
 
-final List<RemindersEntity> reminders = [
-  RemindersEntity(
-    'Today',
-    const Icon(Icons.calendar_today_outlined, color: Colors.white),
-    '1',
-  ),
-  RemindersEntity(
-    ' Scheduled',
-    const Icon(Icons.calendar_month, color: Colors.white),
-    '3',
-  ),
-  RemindersEntity(
-    'Completed',
-    const Icon(Icons.check_circle, color: Colors.white),
-    '2',
-  ),
-];
 
 final List<Map<String, dynamic>> messages = [
   {
@@ -71,113 +52,6 @@ final List<Map<String, dynamic>> messages = [
     'isGroup': false,
   },
 ];
-
-// Demo data for Reminder screen
-const List<ReminderEntity> demoReminderItems = [
-  ReminderEntity(
-    title: 'Hematology topic 1',
-    subtitle: 'Page 1 - page 32',
-    dueDateLabel: 'July 6, 2025',
-  ),
-  ReminderEntity(
-    title: 'Parasitology Lecture',
-    subtitle: 'Study protozoans until nematodes',
-    dueDateLabel: 'July 7, 2025',
-  ),
-  ReminderEntity(
-    title: 'DAT Procedure',
-    subtitle: 'Need to memorize every reagents and measurement',
-    dueDateLabel: 'July 9, 2025',
-  ),
-];
-
-// Mock data for Today
-const List<ReminderEntity> demoTodayItems = [
-  ReminderEntity(
-    title: 'Hematology topic 1',
-    subtitle: 'Page 1 - page 32',
-    dueDateLabel: 'February 10, 2026',
-  ),
-  ReminderEntity(
-    title: 'Parasitology Lecture',
-    subtitle: 'study protozoans until nematodes',
-    dueDateLabel: 'February 10, 2026',
-  ),
-  ReminderEntity(
-    title: 'DAT Procedure',
-    subtitle: 'need to memorize every reagents and measurement',
-    dueDateLabel: 'february 10, 2026',
-  ),
-];
-
-// Mock groupings for Scheduled
-const Map<String, List<ReminderEntity>> demoScheduledGroups = {
-  'Today': [
-    ReminderEntity(
-      title: 'Hematology topic 1',
-      subtitle: 'Page 1 - page 32',
-      dueDateLabel: 'February 10, 2026',
-    ),
-    ReminderEntity(
-      title: 'Parasitology Lecture',
-      subtitle: 'study protozoans until nematodes',
-      dueDateLabel: 'February 10, 2026',
-    ),
-    ReminderEntity(
-      title: 'DAT Procedure',
-      subtitle: 'need to memorize every reagents and measurement',
-      dueDateLabel: 'February 10, 2026',
-    ),
-  ],
-  'Tomorrow': [
-    ReminderEntity(
-      title: 'DAT Procedure',
-      subtitle: 'need to memorize every reagents and measurement',
-      dueDateLabel: 'February 11, 2026',
-    ),
-  ],
-  'March': [
-    ReminderEntity(
-      title: 'DAT Procedure',
-      subtitle: 'need to memorize every reagents and measurement',
-      dueDateLabel: 'March 18, 2026',
-    ),
-  ],
-  'April': [
-    ReminderEntity(
-      title: 'DAT Procedure',
-      subtitle: 'need to memorize every reagents and measurement',
-      dueDateLabel: 'April 25, 2026',
-    ),
-  ],
-  // Add placeholders for other months if needed
-  'May': [],
-  'June': [],
-  'July': [],
-  'August': [],
-  'September': [],
-};
-
-// Mock data for Completed
-const Map<String, List<ReminderEntity>> demoCompletedGroups = {
-  'TUE February 10, 2026': [
-    ReminderEntity(
-      title: 'Hematology topic 1',
-      subtitle: 'Page 1 - page 32',
-      dueDateLabel: 'July 5, 2025',
-      isCompleted: true,
-    ),
-  ],
-  'TUE February 10, 2026 ': [
-    // Added space to make key unique for demo
-    ReminderEntity(
-      title: 'Parasitology Lecture',
-      subtitle: 'study protozoans until nematodes',
-      dueDateLabel: 'February 10, 2026',
-      isCompleted: true,
-    ),
-  ],
-};
 
 // Demo data for Author screen
 const List<AuthorEntity> demoAuthorItems = [
