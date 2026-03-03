@@ -1,4 +1,5 @@
 import 'package:achievia/core/constants/app_paddings.dart';
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/presentation/provider/auth/event/auth_state_provider.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/checkboxes/checkboxes.dart';
@@ -27,13 +28,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     ref.listen(loginFormProvider, (previous, next) {
       if (next.errorMessage != null &&
           next.errorMessage != previous?.errorMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: Colors.red,
-            duration: const Duration(milliseconds: 1000),
-          ),
-        );
+        SnackBarUtils.showError(context, next.errorMessage!);
       }
     });
 
@@ -74,13 +69,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                 if (username.isNotEmpty && password.isNotEmpty) {
                   await loginNotifier.submit();
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter username and password'),
-                      backgroundColor: Colors.red,
-                      duration: Duration(milliseconds: 1500),
-                    ),
-                  );
+                  SnackBarUtils.showError(context, 'Please enter username and password');
                 }
               },
               width: MediaQuery.of(context).size.width,

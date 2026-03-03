@@ -1,4 +1,5 @@
 import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:flutter/material.dart';
 
 class MedicalAbbreviationsList extends StatelessWidget {
@@ -31,9 +32,7 @@ class MedicalAbbreviationsList extends StatelessWidget {
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () {
               // Optional: Handle tap, e.g., show details or copy
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Tapped: ${abbrev.abbreviation}')),
-              );
+              SnackBarUtils.showInfo(context, 'Tapped: ${abbrev.abbreviation}');
             },
           );
         },

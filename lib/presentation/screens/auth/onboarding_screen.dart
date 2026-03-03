@@ -1,3 +1,4 @@
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/presentation/widgets/headers/header1.dart';
 import 'package:achievia/presentation/widgets/headers/header2.dart';
 import 'package:achievia/presentation/widgets/headers/sub_header.dart';
@@ -55,9 +56,7 @@ class OnboardingScreen extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Sign up still in development')),
-                      );
+                      SnackBarUtils.showInfo(context, 'Sign up still in development');
                     },
                     child: const Text('Get Started'),
                   ),

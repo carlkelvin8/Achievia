@@ -1,3 +1,4 @@
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/domain/entities/api/task/task_entity.dart';
 import 'package:achievia/presentation/provider/task/task_provider.dart';
 import 'package:achievia/presentation/widgets/reminder/reminder_date_time_section.dart';
@@ -35,9 +36,7 @@ class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
     final notes = _notesController.text.trim();
 
     if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a title')),
-      );
+      SnackBarUtils.showWarning(context, 'Please enter a title');
       return;
     }
 
@@ -63,18 +62,11 @@ class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Reminder saved!')),
-      );
+      SnackBarUtils.showSuccess(context, 'Reminder saved!');
       Navigator.pop(context);
     } else {
       final error = ref.read(createTaskProvider).error;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error?.toString() ?? 'Failed to save reminder'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarUtils.showError(context, error?.toString() ?? 'Failed to save reminder');
     }
   }
 

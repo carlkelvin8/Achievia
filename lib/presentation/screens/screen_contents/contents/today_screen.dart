@@ -1,4 +1,5 @@
 import 'package:achievia/core/constants/app_paddings.dart';
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/presentation/provider/task/task_provider.dart';
 import 'package:achievia/presentation/widgets/buttons/back_button_with_label.dart';
 import 'package:achievia/presentation/widgets/cards/reminder_card.dart';
@@ -51,6 +52,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       _selectedIds.clear();
       _isConfirming = false;
     });
+    if (mounted) SnackBarUtils.showSuccess(context, 'Task marked as done!');
   }
 
   @override
