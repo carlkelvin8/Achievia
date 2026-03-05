@@ -7,6 +7,7 @@ import 'package:achievia/presentation/screens/main/reviewers_screen.dart';
 import 'package:achievia/presentation/widgets/appbar/main_appbar.dart';
 import 'package:achievia/presentation/widgets/navigation/bottom_nav_bar.dart';
 import 'package:achievia/core/constants/routers/navigation_service.dart';
+import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -109,7 +110,23 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Widget _buildTabNavigator(int index, Widget child) {
     return Navigator(
       key: _navigatorKeys[index],
-      onGenerateRoute: (_) => MaterialPageRoute(builder: (_) => child),
+      onGenerateRoute: (settings) {
+        // Root route → always show this tab's own screen
+        if (settings.name == Navigator.defaultRouteName) {
+          return MaterialPageRoute(builder: (_) => child);
+        }
+        // Any named push resolves through the appRoutes map
+        final builder = appRoutes[settings.name];
+        if (builder != null) {
+          return MaterialPageRoute(builder: builder, settings: settings);
+        }
+        // Unrecognised route — show a clear error instead of looping
+        return MaterialPageRoute(
+          builder: (_) => Scaffold(
+            body: Center(child: Text('No route defined for ${settings.name}')),
+          ),
+        );
+      },
     );
   }
 

@@ -1,5 +1,4 @@
 import 'package:achievia/core/constants/app_theme.dart';
-import 'package:achievia/core/constants/routers/app_router.dart';
 import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/di/injection.dart';
@@ -27,8 +26,8 @@ class MyApp extends ConsumerWidget {
       title: 'Achievia',
       debugShowCheckedModeBanner: false,
       navigatorKey: NavigationService.navigatorKey,
-      onGenerateRoute: AppRouter.generateRoute,
-      onUnknownRoute: AppRouter.unknownRoute,
+      onGenerateRoute: RouteConstants.generateRoute,
+      onUnknownRoute: RouteConstants.unknownRoute,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
