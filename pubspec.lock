@@ -537,7 +537,7 @@ packages:
     source: hosted
     version: "4.1.2"
   injectable:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: injectable
       sha256: "29559f7e3daebf0084597de86a825ae7f149d9e30264b7fbc71d1069ae82697d"
