@@ -41,6 +41,8 @@ import 'package:achievia/data/repositoryImpl/task/task_repository_impl.dart'
 import 'package:achievia/domain/entities/api/home/questions_entity.dart'
     as _i416;
 import 'package:achievia/domain/use_cases/auth/user_use_case.dart' as _i879;
+import 'package:achievia/domain/use_cases/profile/profile_use_case.dart'
+  as _i622;
 import 'package:achievia/domain/use_cases/questions/questions_use_case.dart'
     as _i803;
 import 'package:achievia/domain/use_cases/reviewer/module_use_case.dart'
@@ -156,6 +158,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i879.UserUseCase>(
       () => _i879.UserUseCase(impl: gh<_i581.UserRepositoryImpl>()),
+    );
+    gh.factory<_i622.ProfileUseCase>(
+      () => _i622.ProfileUseCase(impl: gh<_i662.ProfileRepositoryImpl>()),
     );
     gh.factory<_i656.ModuleRepositoryImpl>(
       () => _i656.ModuleRepositoryImpl(
