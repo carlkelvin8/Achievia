@@ -1,4 +1,5 @@
 import 'package:achievia/core/constants/app_paddings.dart';
+import 'package:achievia/core/utils/helpers.dart';
 import 'package:achievia/presentation/provider/progress/progress_provider.dart';
 import 'package:achievia/presentation/widgets/progress/calendar_card.dart';
 import 'package:achievia/presentation/widgets/progress/grading_bracket_table.dart';
@@ -14,17 +15,38 @@ class ProgressScreenContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final progress = ref.watch(progressProvider);
+    final progressAsync = ref.watch(progressProvider);
     final gradingBrackets = ref.watch(gradingBracketsProvider);
+
+    final progress = progressAsync.value ?? demoProgressData;
+    final isLoading = progressAsync.isLoading && progressAsync.value == null;
+    final hasError = progressAsync.hasError && progressAsync.value == null;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Padding(
           padding: level1,
-          child: Column(
+          child: isLoading
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (hasError)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    'Unable to fetch latest progress. Showing fallback data.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                ),
               // Calendar Section
               CalendarCard(calendarData: progress.calendarData),
               const SizedBox(height: 20),

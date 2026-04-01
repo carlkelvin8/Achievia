@@ -21,6 +21,8 @@ import 'package:achievia/data/data_source/home/questions_remote_datasource.dart'
     as _i557;
 import 'package:achievia/data/data_source/profile/profile_remote_datasource.dart'
     as _i655;
+import 'package:achievia/data/data_source/progress/progress_remote_datasource.dart'
+    as _i781;
 import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart'
     as _i536;
 import 'package:achievia/data/data_source/task/task_remote_datasource.dart'
@@ -30,6 +32,8 @@ import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart'
     as _i581;
 import 'package:achievia/data/repositoryImpl/profile/profile_repository_impl.dart'
     as _i662;
+import 'package:achievia/data/repositoryImpl/progress/progress_repository_impl.dart'
+    as _i754;
 import 'package:achievia/data/repositoryImpl/questions/qot_repository_impl.dart'
     as _i548;
 import 'package:achievia/data/repositoryImpl/questions/questions_repository_impl.dart'
@@ -43,6 +47,8 @@ import 'package:achievia/domain/entities/api/home/questions_entity.dart'
 import 'package:achievia/domain/use_cases/auth/user_use_case.dart' as _i879;
 import 'package:achievia/domain/use_cases/profile/profile_use_case.dart'
     as _i501;
+import 'package:achievia/domain/use_cases/progress/progress_use_case.dart'
+    as _i192;
 import 'package:achievia/domain/use_cases/questions/questions_use_case.dart'
     as _i803;
 import 'package:achievia/domain/use_cases/reviewer/module_use_case.dart'
@@ -83,6 +89,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i64.OfflineCaching>(),
       ),
     );
+    gh.lazySingleton<_i781.ProgressRemoteDatasource>(
+      () => _i781.ProgressRemoteDatasource(gh<_i361.Dio>()),
+    );
     gh.lazySingleton<_i1006.TaskRemoteDatasource>(
       () => _i1006.TaskRemoteDatasource(gh<_i361.Dio>()),
     );
@@ -101,6 +110,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i536.ModuleRemoteDatasource>(
       () => _i536.ModuleRemoteDatasource(dio: gh<_i361.Dio>()),
+    );
+    gh.lazySingleton<_i754.ProgressRepositoryImpl>(
+      () => _i754.ProgressRepositoryImpl(gh<_i781.ProgressRemoteDatasource>()),
     );
     gh.factory<_i235.UserDto>(
       () => _i235.UserDto(
@@ -152,6 +164,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i581.UserRepositoryImpl(
         datasource: gh<_i528.UserRemoteDatasource>(),
       ),
+    );
+    gh.factory<_i192.ProgressUseCase>(
+      () => _i192.ProgressUseCase(gh<_i754.ProgressRepositoryImpl>()),
     );
     gh.lazySingleton<_i724.TaskRepositoryImpl>(
       () => _i724.TaskRepositoryImpl(gh<_i1006.TaskRemoteDatasource>()),

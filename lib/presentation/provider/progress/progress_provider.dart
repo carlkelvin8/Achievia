@@ -1,15 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/domain/use_cases/progress/progress_use_case.dart';
+import 'package:achievia/presentation/provider/auth/event/token_state_provider.dart';
 import 'package:achievia/presentation/provider/profile/profile_provider.dart';
 
-final progressProvider = Provider<ProgressEntity>((ref) {
-  final profileAsync = ref.watch(profileProvider);
-  final profile = profileAsync.asData?.value;
+final progressUseCaseProvider = Provider<ProgressUseCase>((ref) {
+  return sl<ProgressUseCase>();
+});
 
-  if (profile == null) {
+final progressProvider = FutureProvider.autoDispose<ProgressEntity>((ref) async {
+  final token = ref.watch(tokenStream).value;
+  if (token == null || token.isEmpty) {
     return demoProgressData;
   }
+
+  final profile = await ref.watch(profileProvider.future);
 
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
@@ -17,10 +24,24 @@ final progressProvider = Provider<ProgressEntity>((ref) {
   final createdAt = DateTime(createdRaw.year, createdRaw.month, createdRaw.day);
   final startDate = createdAt.isAfter(today) ? today : createdAt;
 
+  final useCase = ref.read(progressUseCaseProvider);
+  final activeDays = await useCase.getActiveDays();
+  final activeDayKeys = activeDays
+      .where((d) => d.isActive)
+      .map((d) => _dateKey(d.activityDate))
+      .toSet();
+  final todayKey = _dateKey(today);
+
+  // Avoid an extra write call when today's activity is already recorded.
+  if (!activeDayKeys.contains(todayKey)) {
+    await useCase.markTodayActive();
+    activeDayKeys.add(todayKey);
+  }
+
   final days = _buildCalendarDays(
     startDate: startDate,
     today: today,
-    thisMonthStreak: demoProgressData.calendarData.thisMonthStreak,
+    activeDayKeys: activeDayKeys,
   );
   final thisMonthStreak = _calculateCurrentStreak(days, today);
   final longestStreak = _calculateLongestStreak(days);
@@ -38,25 +59,14 @@ final progressProvider = Provider<ProgressEntity>((ref) {
 List<CalendarDay> _buildCalendarDays({
   required DateTime startDate,
   required DateTime today,
-  required int thisMonthStreak,
+  required Set<String> activeDayKeys,
 }) {
   final days = <CalendarDay>[];
-  final completedStart = DateTime(
-    today.year,
-    today.month,
-    (today.day - thisMonthStreak + 1).clamp(1, today.day),
-  );
 
   DateTime cursor = startDate;
   while (!cursor.isAfter(today)) {
     final dayOnly = DateTime(cursor.year, cursor.month, cursor.day);
-
-    final isCurrentMonth =
-        dayOnly.year == today.year && dayOnly.month == today.month;
-    final isCompleted =
-        isCurrentMonth &&
-        !dayOnly.isBefore(completedStart) &&
-        !dayOnly.isAfter(today);
+    final isCompleted = activeDayKeys.contains(_dateKey(dayOnly));
 
     days.add(
       CalendarDay(
@@ -69,6 +79,11 @@ List<CalendarDay> _buildCalendarDays({
   }
 
   return days;
+}
+
+String _dateKey(DateTime date) {
+  final normalized = DateTime(date.year, date.month, date.day);
+  return normalized.toIso8601String().split('T').first;
 }
 
 int _calculateCurrentStreak(List<CalendarDay> days, DateTime today) {
