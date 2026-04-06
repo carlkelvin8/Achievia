@@ -1,5 +1,9 @@
-import 'package:achievia/domain/entities/api/reviewer/module_entity.dart';
+import 'package:achievia/domain/entities/api/reviewer/paginated_modules_entity.dart';
 
 abstract class ModuleRepository {
-  Future<List<ModuleEntity>> getModules(String token);
+  Future<PaginatedModulesEntity> getModules(
+    String token, {
+    int page = 1,
+    int limit = 20,
+  });
 }
