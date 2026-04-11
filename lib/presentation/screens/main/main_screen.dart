@@ -24,7 +24,7 @@ class MainScreen extends ConsumerStatefulWidget {
 
 class _MainScreenState extends ConsumerState<MainScreen> {
   /// One navigator key per tab — replacing a key destroys & recreates the Navigator
-  List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
+  final List<GlobalKey<NavigatorState>> _navigatorKeys = List.generate(
     5,
     (_) => GlobalKey<NavigatorState>(),
   );

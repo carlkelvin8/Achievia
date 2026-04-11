@@ -10,7 +10,7 @@ class QuestionsUseCase {
   final QotRepositoryImpl impqot;
   QuestionsUseCase(this.impl, this.impqot);
   Future<List<QuestionsEntity>> getQuestions(String token,String id) async => await impl.getAllQuestions(token,  id);
-  Future<List<QuestionsEntity>> randomizeQuestions() async => await impl.generateQuestions();
+  Future<List<QuestionsEntity>> randomizeQuestions(int index) async => await impl.generateQuestions(index);
   Future<QotyEntity> getQotQueston() async => await impqot.getQuestionOfTheDay();
   Future<QotyEntityPost> answerQuestion(QotyEntityPost dto) async => await impqot.answerQuestion(dto);
   Future<List<QotyEntity>> getGeneratedQuestions() async => await impl.getRandomizedQuestions();
