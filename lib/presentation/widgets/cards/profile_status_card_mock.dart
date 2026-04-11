@@ -102,20 +102,28 @@ class ProfileStatusCardMock extends StatelessWidget {
           Padding(
             padding: level1_widget,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset('assets/images/logo.png', width: 40, height: 40),
-                Center(
+                Image.asset('assets/images/logo.png', width: 36, height: 36),
+                const SizedBox(width: 8),
+                Expanded(
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         'Republic of the Philippines',
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                       Text(
                         'ACHIEVIA REVIEW',
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppColors.primaryVariant,
@@ -123,6 +131,9 @@ class ProfileStatusCardMock extends StatelessWidget {
                       ),
                       Text(
                         'PROFESSIONAL IDENTIFICATION CARD',
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: colorScheme.onSurfaceVariant,
@@ -131,7 +142,16 @@ class ProfileStatusCardMock extends StatelessWidget {
                     ],
                   ),
                 ),
-                Row(children: stars),
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 44,
+                  child: Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 0,
+                    runSpacing: 0,
+                    children: stars,
+                  ),
+                ),
               ],
             ),
           ),

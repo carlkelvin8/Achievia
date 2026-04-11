@@ -8,6 +8,7 @@ import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:achievia/data/models/quiz/results_dto.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class QuestionRepoDataSource  {
@@ -15,7 +16,7 @@ abstract class QuestionRepoDataSource  {
   Future<QotdDto> getQotd();
   Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
   Future<List<QotdDto>> getTheGeneratedQuiz();
-  Future<List<QuestionsDto>> randomizeQuestion();
+  Future<List<QuestionsDto>> randomizeQuestion(int index);
   Future<QuizScoreResponse> getResults(int noOfAttempt);
   Future<int> putToAttempt();
 }
@@ -105,7 +106,7 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
   }
   
   @override
-  Future<List<QuestionsDto>> randomizeQuestion() async{
+  Future<List<QuestionsDto>> randomizeQuestion(int index) async{
     try {
       final response = await dio.post('$BASE_URL/tasks/randomizeQuestions', 
       options: Options(
@@ -116,7 +117,8 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = await response.data['data']['response']['subjects'] as List<dynamic>;
-        final questions = await response.data['data']['response']['questions'] as List<dynamic>;
+        final questions = await response.data['data']['response']['quiz'][index]['questions'] as List<dynamic>;
+        print('from datasource: $questions');
         final list =  data.map((e)=> QuestionsDto.fromJson(e)).toList();
         final questionsList = questions.map((e)=>QotdDto.fromJson(e)).toList();
         await local.insertQuestionsToCache(list);

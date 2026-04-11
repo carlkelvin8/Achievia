@@ -1,5 +1,4 @@
 import 'package:achievia/core/constants/app_theme.dart';
-import 'package:achievia/core/constants/routers/app_router.dart';
 import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/di/injection.dart';
@@ -9,7 +8,6 @@ import 'package:achievia/presentation/screens/auth_checker.dart';
 import 'package:achievia/presentation/screens/main/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart' as path;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,8 +25,8 @@ class MyApp extends ConsumerWidget {
       title: 'Achievia',
       debugShowCheckedModeBanner: false,
       navigatorKey: NavigationService.navigatorKey,
-      onGenerateRoute: AppRouter.generateRoute,
-      onUnknownRoute: AppRouter.unknownRoute,
+      onGenerateRoute: RouteConstants.generateRoute,
+      onUnknownRoute: RouteConstants.unknownRoute,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,

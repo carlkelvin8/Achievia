@@ -1,34 +1,19 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'questions_dto.g.dart';
 
-@HiveType(typeId: 1)
 @JsonSerializable()
 class QuestionsDto {
 
-  @HiveField(0)
   final int id;
-
-  @HiveField(1)
   final String title;
-
-  @HiveField(2)
   final int courseId;
-
-  @HiveField(3)
   final String description;
-
-  @HiveField(4)
   final String? image; // nullable
-
-  @HiveField(5)
   final String? day_subject;
-
-  @HiveField(6)
   final String createdAt;
 
   QuestionsDto({

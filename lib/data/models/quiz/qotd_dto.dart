@@ -2,22 +2,15 @@
 
 import 'dart:convert';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'qotd_dto.g.dart';
-@HiveType(typeId: 2)
 @JsonSerializable()
 class QotdDto {
-  @HiveField(0)
   final int quizId;
-  @HiveField(1)
   final int id;
-  @HiveField(2)
   final String questionText;
-  @HiveField(3)
   final List<Map<String,dynamic>> choices;
-  @HiveField(4)
   final Map<String,dynamic>? quiz;
   QotdDto({
     required this.quizId,

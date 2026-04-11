@@ -59,7 +59,7 @@ class _OnboardingMockboardScreenState extends ConsumerState<OnboardingMockboardS
       ),
       persistentFooterButtons: [ReusableButton(title: 'START EXAM', onPressed: (){
         notifier.start();
-        Navigator.pushNamed(context, '/exam-screen');
+        Navigator.of(context, rootNavigator: true).pushNamed('/exam-screen');
       }, width: 300, height: 50)],
     );
   }

@@ -12,6 +12,10 @@ import 'package:achievia/presentation/screens/main/reviewers_screen.dart';
 import 'package:achievia/presentation/screens/main/summary_screen.dart';
 import 'package:achievia/presentation/screens/notifications/notifications_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/reminder_screen_content.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/new_reminder_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/today_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/scheduled_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/completed_screen.dart';
 import 'package:achievia/presentation/screens/settings/examination/examination_screen.dart';
 import 'package:achievia/presentation/screens/settings/pomodoro_timer/pomodoro_timer_screen.dart';
 import 'package:achievia/presentation/screens/settings/settings_screen.dart';
@@ -46,6 +50,25 @@ class RouteConstants {
   static const String today = '/today';
   static const String scheduled = '/scheduled';
   static const String completed = '/completed';
+
+  /// Resolves named routes using the [appRoutes] map.
+  /// Used by MaterialApp.onGenerateRoute.
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    final builder = appRoutes[settings.name];
+    if (builder != null) {
+      return MaterialPageRoute(builder: builder, settings: settings);
+    }
+    return unknownRoute(settings);
+  }
+
+  /// Fallback for unrecognised routes.
+  static Route<dynamic> unknownRoute(RouteSettings settings) {
+    return MaterialPageRoute(
+      builder: (_) => Scaffold(
+        body: Center(child: Text('No route defined for ${settings.name}')),
+      ),
+    );
+  }
 }
 
 final Map<String, WidgetBuilder> appRoutes = {
@@ -71,6 +94,10 @@ final Map<String, WidgetBuilder> appRoutes = {
 
   // Other features
   RouteConstants.reminder: (_) => const ReminderScreenContent(),
+  RouteConstants.newReminder: (_) => const NewReminderScreen(),
+  RouteConstants.today: (_) => const TodayScreen(),
+  RouteConstants.scheduled: (_) => const ScheduledScreen(),
+  RouteConstants.completed: (_) => const CompletedScreen(),
   RouteConstants.onboardingQuestions: (_) =>
       const OnboardingMockboardScreen(title: ''),
   RouteConstants.examScreen: (_) => const ExamScreen(),

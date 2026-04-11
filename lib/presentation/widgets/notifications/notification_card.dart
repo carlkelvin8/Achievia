@@ -1,3 +1,4 @@
+import 'package:achievia/core/utils/time_ago_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:achievia/domain/entities/widgets/notification_entity.dart';
 
@@ -92,7 +93,7 @@ class NotificationCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          _formatTimestamp(notification.timestamp),
+                          TimeAgoFormatter.format(notification.timestamp),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 color: Theme.of(
@@ -167,18 +168,4 @@ class NotificationCard extends StatelessWidget {
     }
   }
 
-  String _formatTimestamp(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
-    } else {
-      return 'Just now';
-    }
-  }
 }

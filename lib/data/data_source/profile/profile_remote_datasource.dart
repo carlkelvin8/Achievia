@@ -16,6 +16,15 @@ class ProfileRemoteDatasource implements ProfileDataSource {
 
   ProfileRemoteDatasource({required this.dio});
 
+  DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    if (value is String && value.trim().isNotEmpty) {
+      return DateTime.tryParse(value);
+    }
+    return null;
+  }
+
   @override
   Future<ProfileEntity> getProfile() async {
     final LocalStorageService storageService = sl<LocalStorageService>();
@@ -50,15 +59,11 @@ class ProfileRemoteDatasource implements ProfileDataSource {
           role: data['role'],
           university: data['university'],
           purpose: data['purpose'],
-          dateOfExamination: data['date_of_examination'] != null
-              ? DateTime.parse(data['date_of_examination'])
-              : null,
-          createdAt: data['createdAt'] != null
-              ? DateTime.parse(data['createdAt'])
-              : null,
-          updatedAt: data['updatedAt'] != null
-              ? DateTime.parse(data['updatedAt'])
-              : null,
+          dateOfExamination: _parseDate(
+            data['date_of_examination'] ?? data['dateOfExamination'],
+          ),
+          createdAt: _parseDate(data['createdAt'] ?? data['created_at']),
+          updatedAt: _parseDate(data['updatedAt'] ?? data['updated_at']),
           status: data['status'],
           profileImage: data['profile_image'],
           courseId: data['courseId'],

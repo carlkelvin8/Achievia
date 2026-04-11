@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class CountdownBadge extends StatelessWidget {
   final String label;
   final String value;
+  final VoidCallback? onValueTap;
   final Color? backgroundColor;
   final Color? textColor;
   final Color? valueColor;
@@ -15,6 +16,7 @@ class CountdownBadge extends StatelessWidget {
     super.key,
     required this.label,
     required this.value,
+    this.onValueTap,
     this.backgroundColor,
     this.textColor,
     this.valueColor,
@@ -41,28 +43,36 @@ class CountdownBadge extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Container(
-            padding: badgePadding ??
-                const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
+          MouseRegion(
+            cursor: onValueTap != null
+                ? SystemMouseCursors.click
+                : SystemMouseCursors.basic,
+            child: GestureDetector(
+              onTap: onValueTap,
+              child: Container(
+                padding: badgePadding ??
+                    const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                decoration: BoxDecoration(
+                  color: backgroundColor ?? theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-            decoration: BoxDecoration(
-              color: backgroundColor ?? theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
+                child: Text(
+                  value,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: valueColor ?? theme.colorScheme.primary,
+                  ),
                 ),
-              ],
-            ),
-            child: Text(
-              value,
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: valueColor ?? theme.colorScheme.primary,
               ),
             ),
           ),

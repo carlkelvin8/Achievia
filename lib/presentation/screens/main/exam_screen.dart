@@ -34,7 +34,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
       appBar: ExamAppBar(
       callback: ()=>pageControllerNotifier.next(context),
       title: asyncQuestions.when(data: (q){
-        return q[indexs].quiz?['title'];
+        return q[indexs].questionText;
       }, 
       error: (_,_)=>'Err', 
       loading: ()=>'Loading'),

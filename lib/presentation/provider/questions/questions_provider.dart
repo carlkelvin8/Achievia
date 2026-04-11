@@ -153,8 +153,8 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier>{
     await useCase.answerQuestion(entity);
   }
 
-  Future<void> randomizeQuestion()async{
-    await useCase.randomizeQuestions();
+  Future<void> randomizeQuestion(int index)async{
+    await useCase.randomizeQuestions(index);
   }
 }
 

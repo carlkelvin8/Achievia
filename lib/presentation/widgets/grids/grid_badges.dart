@@ -25,8 +25,8 @@ class GridBadges extends ConsumerWidget {
       label: questions[index].label, 
       sub_label: questions[index].sub_label,
       callback:()async{
-        await provider.randomizeQuestion();
-        Navigator.pushNamed(context, '/onboarding-questions');
+        await provider.randomizeQuestion(index);
+        Navigator.of(context, rootNavigator: true).pushNamed('/onboarding-questions');
       },
       ), 
       separatorBuilder: (context, index) => const SizedBox(height: 10,), 

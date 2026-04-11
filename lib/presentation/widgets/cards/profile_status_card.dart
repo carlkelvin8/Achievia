@@ -1,10 +1,27 @@
 import 'package:achievia/core/constants/app_colors.dart';
 import 'package:achievia/core/constants/widget_paddings.dart';
+import 'package:achievia/presentation/widgets/placeholder_gestures/network_image_with_fallback.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfileStatusCard extends ConsumerWidget {
-  const ProfileStatusCard({super.key});
+class ProfileStatusCard extends StatelessWidget {
+  final String lastName;
+  final String firstName;
+  final String middleName;
+  final String university;
+  final String purpose;
+  final String dateOfExam;
+  final String profileImageUrl;
+
+  const ProfileStatusCard({
+    super.key,
+    this.lastName = 'N/A',
+    this.firstName = 'N/A',
+    this.middleName = 'N/A',
+    this.university = 'N/A',
+    this.purpose = 'N/A',
+    this.dateOfExam = 'N/A',
+    this.profileImageUrl = '',
+  });
 
   Widget _buildDetailRow(BuildContext context, String label, String value) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -47,7 +64,7 @@ class ProfileStatusCard extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -112,15 +129,20 @@ class ProfileStatusCard extends ConsumerWidget {
               children: [
                 Container(
                   width: 120,
+                  height: 120,
                   decoration: BoxDecoration(
                     border: Border.all(color: colorScheme.outlineVariant),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      'https://imgs.search.brave.com/06y_UGpqC2WO7A0wUNodf1gbBVQFeVd4B6Wx2VLw8oQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvNTAwcC8y/Ni80MC9wcm9maWxl/LXBsYWNlaG9sZGVy/LWltYWdlLWdyYXkt/c2lsaG91ZXR0ZS12/ZWN0b3ItMjIxMjI2/NDAuanBn',
+                    child: NetworkImageWithFallback(
+                      imageUrl: profileImageUrl,
+                      width: 120,
+                      height: 120,
                       fit: BoxFit.cover,
+                      fallbackIcon: Icons.person,
+                      fallbackIconSize: 56,
                     ),
                   ),
                 ),
@@ -129,12 +151,36 @@ class ProfileStatusCard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildDetailRow(context, 'LAST NAME', 'SINDAO'),
-                      _buildDetailRow(context, 'FIRST NAME', 'CHARLES'),
-                      _buildDetailRow(context, 'MIDDLE NAME', 'MARTINEZ'),
-                      _buildDetailRow(context, 'UNIVERSITY', 'LPU'),
-                      _buildDetailRow(context, 'PURPOSE', 'MTLE'),
-                      _buildDetailRow(context, 'DATE OF EXAM', 'AUGUST 2025'),
+                      _buildDetailRow(
+                        context,
+                        'LAST NAME',
+                        lastName,
+                      ),
+                      _buildDetailRow(
+                        context,
+                        'FIRST NAME',
+                        firstName,
+                      ),
+                      _buildDetailRow(
+                        context,
+                        'MIDDLE NAME',
+                        middleName,
+                      ),
+                      _buildDetailRow(
+                        context,
+                        'UNIVERSITY',
+                        university,
+                      ),
+                      _buildDetailRow(
+                        context,
+                        'PURPOSE',
+                        purpose,
+                      ),
+                      _buildDetailRow(
+                        context,
+                        'DATE OF EXAM',
+                        dateOfExam,
+                      ),
                     ],
                   ),
                 ),
@@ -148,7 +194,7 @@ class ProfileStatusCard extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: 12),
             color: AppColors.success,
             child: Text(
-              'MEDICAL TECHNOLOGIST',
+              purpose,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: Colors.white,

@@ -15,6 +15,7 @@ class LocalStorageService {
   }
 
   static const auth_token = "auth_token";
+  static const board_exam_date = 'board_exam_date';
 
   Future<void> saveToken(String token, String user) async {
     await prefs.setString(auth_token, token);
@@ -25,6 +26,18 @@ class LocalStorageService {
 
   String? get token => prefs.getString(auth_token);
   String? get creds =>prefs.getString('user_creds');
+
+  DateTime? get boardExamDate {
+    final raw = prefs.getString(board_exam_date);
+    if (raw == null || raw.isEmpty) return null;
+    return DateTime.tryParse(raw);
+  }
+
+  Future<void> saveBoardExamDate(DateTime date) async {
+    final normalized = DateTime(date.year, date.month, date.day);
+    await prefs.setString(board_exam_date, normalized.toIso8601String());
+  }
+
   Future<void> clearToken() async {
     await prefs.remove(auth_token);
     await prefs.remove('user_creds');

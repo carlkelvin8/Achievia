@@ -42,11 +42,11 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
   }
 
   @override
-  Future<List<QuestionsEntity>> generateQuestions() async {
+  Future<List<QuestionsEntity>> generateQuestions(int index) async {
     final isConnected = await network.isConnected;
     try {
       if (isConnected) {
-      final response = await remoteDatasource.randomizeQuestion();
+      final response = await remoteDatasource.randomizeQuestion(index);
       await local.insertQuestionsToCache(response);
       print('REPO${response.map((e)=>e.toEntity()).toList()}');
       final mapped =  response.map((e)=>e.toEntity()).toList();

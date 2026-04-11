@@ -21,15 +21,19 @@ import 'package:achievia/data/data_source/home/questions_remote_datasource.dart'
     as _i557;
 import 'package:achievia/data/data_source/profile/profile_remote_datasource.dart'
     as _i655;
+import 'package:achievia/data/data_source/progress/progress_remote_datasource.dart'
+    as _i781;
 import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart'
     as _i536;
 import 'package:achievia/data/data_source/task/task_remote_datasource.dart'
-    as _i701;
+    as _i1006;
 import 'package:achievia/data/models/auth/user_dto.dart' as _i235;
 import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart'
     as _i581;
 import 'package:achievia/data/repositoryImpl/profile/profile_repository_impl.dart'
     as _i662;
+import 'package:achievia/data/repositoryImpl/progress/progress_repository_impl.dart'
+    as _i754;
 import 'package:achievia/data/repositoryImpl/questions/qot_repository_impl.dart'
     as _i548;
 import 'package:achievia/data/repositoryImpl/questions/questions_repository_impl.dart'
@@ -37,15 +41,19 @@ import 'package:achievia/data/repositoryImpl/questions/questions_repository_impl
 import 'package:achievia/data/repositoryImpl/reviewer/module_repository_impl.dart'
     as _i656;
 import 'package:achievia/data/repositoryImpl/task/task_repository_impl.dart'
-    as _i702;
+    as _i724;
 import 'package:achievia/domain/entities/api/home/questions_entity.dart'
     as _i416;
 import 'package:achievia/domain/use_cases/auth/user_use_case.dart' as _i879;
+import 'package:achievia/domain/use_cases/profile/profile_use_case.dart'
+    as _i501;
+import 'package:achievia/domain/use_cases/progress/progress_use_case.dart'
+    as _i192;
 import 'package:achievia/domain/use_cases/questions/questions_use_case.dart'
     as _i803;
 import 'package:achievia/domain/use_cases/reviewer/module_use_case.dart'
     as _i533;
-import 'package:achievia/domain/use_cases/task/task_use_case.dart' as _i703;
+import 'package:achievia/domain/use_cases/task/task_use_case.dart' as _i981;
 import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:dio/dio.dart' as _i361;
 import 'package:get_it/get_it.dart' as _i174;
@@ -81,6 +89,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i64.OfflineCaching>(),
       ),
     );
+    gh.lazySingleton<_i781.ProgressRemoteDatasource>(
+      () => _i781.ProgressRemoteDatasource(gh<_i361.Dio>()),
+    );
+    gh.lazySingleton<_i1006.TaskRemoteDatasource>(
+      () => _i1006.TaskRemoteDatasource(gh<_i361.Dio>()),
+    );
     gh.lazySingleton<_i1000.QuestionsRepositoryImpl>(
       () => _i1000.QuestionsRepositoryImpl(
         gh<_i557.QuestionsRemoteDatasource>(),
@@ -91,11 +105,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i528.UserRemoteDatasource>(
       () => _i528.UserRemoteDatasource(dio: gh<_i361.Dio>()),
     );
+    gh.factory<_i655.ProfileRemoteDatasource>(
+      () => _i655.ProfileRemoteDatasource(dio: gh<_i361.Dio>()),
+    );
     gh.factory<_i536.ModuleRemoteDatasource>(
       () => _i536.ModuleRemoteDatasource(dio: gh<_i361.Dio>()),
     );
-    gh.factory<_i655.ProfileRemoteDatasource>(
-      () => _i655.ProfileRemoteDatasource(dio: gh<_i361.Dio>()),
+    gh.lazySingleton<_i754.ProgressRepositoryImpl>(
+      () => _i754.ProgressRepositoryImpl(gh<_i781.ProgressRemoteDatasource>()),
     );
     gh.factory<_i235.UserDto>(
       () => _i235.UserDto(
@@ -148,6 +165,15 @@ extension GetItInjectableX on _i174.GetIt {
         datasource: gh<_i528.UserRemoteDatasource>(),
       ),
     );
+    gh.factory<_i192.ProgressUseCase>(
+      () => _i192.ProgressUseCase(gh<_i754.ProgressRepositoryImpl>()),
+    );
+    gh.lazySingleton<_i724.TaskRepositoryImpl>(
+      () => _i724.TaskRepositoryImpl(gh<_i1006.TaskRemoteDatasource>()),
+    );
+    gh.factory<_i501.ProfileUseCase>(
+      () => _i501.ProfileUseCase(impl: gh<_i662.ProfileRepositoryImpl>()),
+    );
     gh.factory<_i803.QuestionsUseCase>(
       () => _i803.QuestionsUseCase(
         gh<_i1000.QuestionsRepositoryImpl>(),
@@ -163,17 +189,11 @@ extension GetItInjectableX on _i174.GetIt {
         network: gh<_i790.NetworkInfo>(),
       ),
     );
+    gh.factory<_i981.TaskUseCase>(
+      () => _i981.TaskUseCase(gh<_i724.TaskRepositoryImpl>()),
+    );
     gh.factory<_i533.ModuleUseCase>(
       () => _i533.ModuleUseCase(impl: gh<_i656.ModuleRepositoryImpl>()),
-    );
-    gh.lazySingleton<_i701.TaskRemoteDatasource>(
-      () => _i701.TaskRemoteDatasource(gh<_i361.Dio>()),
-    );
-    gh.lazySingleton<_i702.TaskRepositoryImpl>(
-      () => _i702.TaskRepositoryImpl(gh<_i701.TaskRemoteDatasource>()),
-    );
-    gh.factory<_i703.TaskUseCase>(
-      () => _i703.TaskUseCase(gh<_i702.TaskRepositoryImpl>()),
     );
     return this;
   }

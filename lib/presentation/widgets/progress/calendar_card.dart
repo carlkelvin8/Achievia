@@ -1,5 +1,6 @@
 import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
 class CalendarCard extends StatefulWidget {
@@ -14,6 +15,27 @@ class CalendarCard extends StatefulWidget {
 class _CalendarCardState extends State<CalendarCard> {
   late DateTime _currentMonth;
 
+  DateTime _monthOnly(DateTime date) => DateTime(date.year, date.month);
+
+  bool _isSameMonth(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month;
+
+  DateTime get _minMonth {
+    if (widget.calendarData.days.isEmpty) {
+      return _monthOnly(widget.calendarData.currentMonth);
+    }
+
+    final firstDate = widget.calendarData.days
+        .map((d) => d.date)
+        .reduce((a, b) => a.isBefore(b) ? a : b);
+    return _monthOnly(firstDate);
+  }
+
+  DateTime get _maxMonth {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -21,8 +43,15 @@ class _CalendarCardState extends State<CalendarCard> {
   }
 
   void _changeMonth(int delta) {
+    final candidate = DateTime(_currentMonth.year, _currentMonth.month + delta);
+    final candidateMonth = _monthOnly(candidate);
+
+    if (candidateMonth.isBefore(_minMonth) || candidateMonth.isAfter(_maxMonth)) {
+      return;
+    }
+
     setState(() {
-      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + delta);
+      _currentMonth = candidateMonth;
     });
   }
 
@@ -32,9 +61,6 @@ class _CalendarCardState extends State<CalendarCard> {
     final lastDay = DateTime(month.year, month.month + 1, 0);
     final firstWeekday = firstDay.weekday;
     final prevMonthLastDay = DateTime(month.year, month.month, 0);
-    final isOriginalMonth =
-        month.year == widget.calendarData.currentMonth.year &&
-        month.month == widget.calendarData.currentMonth.month;
 
     // Previous month padding
     for (int i = firstWeekday - 1; i > 0; i--) {
@@ -53,22 +79,15 @@ class _CalendarCardState extends State<CalendarCard> {
     // Current month days
     for (int day = 1; day <= lastDay.day; day++) {
       final date = DateTime(month.year, month.month, day);
-      final status = isOriginalMonth
-          ? widget.calendarData.days
-                .firstWhere(
-                  (d) =>
-                      d.date.year == date.year &&
-                      d.date.month == date.month &&
-                      d.date.day == date.day,
-                  orElse: () =>
-                      CalendarDay(date: date, status: DayStatus.inactive),
-                )
-                .status
-          : (day <= 17
-                ? DayStatus.completed
-                : day <= 19
-                ? DayStatus.current
-                : DayStatus.inactive);
+      final status = widget.calendarData.days
+          .firstWhere(
+            (d) =>
+                d.date.year == date.year &&
+                d.date.month == date.month &&
+                d.date.day == date.day,
+            orElse: () => CalendarDay(date: date, status: DayStatus.inactive),
+          )
+          .status;
       days.add(CalendarDay(date: date, status: status));
     }
 
@@ -97,6 +116,8 @@ class _CalendarCardState extends State<CalendarCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final monthName = DateFormat('MMMM yyyy').format(_currentMonth);
+    final canGoPrev = !_isSameMonth(_currentMonth, _minMonth);
+    final canGoNext = !_isSameMonth(_currentMonth, _maxMonth);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -113,7 +134,7 @@ class _CalendarCardState extends State<CalendarCard> {
             children: [
               IconButton(
                 icon: const Icon(Icons.chevron_left),
-                onPressed: () => _changeMonth(-1),
+                onPressed: canGoPrev ? () => _changeMonth(-1) : null,
                 color: theme.colorScheme.primary,
               ),
               Text(
@@ -125,7 +146,7 @@ class _CalendarCardState extends State<CalendarCard> {
               ),
               IconButton(
                 icon: const Icon(Icons.chevron_right),
-                onPressed: () => _changeMonth(1),
+                onPressed: canGoNext ? () => _changeMonth(1) : null,
                 color: theme.colorScheme.primary,
               ),
             ],
@@ -243,73 +264,74 @@ class _CalendarCardState extends State<CalendarCard> {
 
   Widget _buildDayCell(BuildContext context, CalendarDay day) {
     final theme = Theme.of(context);
-    final (backgroundColor, textColor, logo) = _getDayStyle(theme, day.status);
+    final (backgroundColor, textColor, svgPath) = _getDayStyle(day.status);
+    final showDayNumber = day.status == DayStatus.inactive;
+    final hasSvg = svgPath != null;
 
     return Container(
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: theme.dividerColor.withValues(alpha: 0.2),
-          width: 0.5,
-        ),
+        border: hasSvg
+            ? null
+            : Border.all(
+                color: theme.dividerColor.withValues(alpha: 0.2),
+                width: 0.5,
+              ),
       ),
       child: Stack(
         alignment: Alignment.center,
         children: [
-          if (day.status == DayStatus.completed && logo != null)
-            ClipRRect(borderRadius: BorderRadius.circular(4), child: logo),
-          Text(
-            '${day.date.day}',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: textColor,
-              fontSize: 10,
-              fontWeight:
-                  day.status == DayStatus.completed ||
-                      day.status == DayStatus.current ||
-                      day.status == DayStatus.upcoming
-                  ? FontWeight.bold
-                  : FontWeight.normal,
+          if (svgPath != null)
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: SvgPicture.asset(
+                  svgPath,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-          ),
-          if (logo != null && day.status != DayStatus.completed)
-            Positioned(bottom: 2, child: logo),
+          if (showDayNumber)
+            Positioned(
+              top: 2,
+              left: 2,
+              child: Text(
+                '${day.date.day}',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: textColor,
+                  fontSize: 10,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ),
         ],
       ),
     );
   }
 
-  (Color, Color, Widget?) _getDayStyle(ThemeData theme, DayStatus status) {
+  (Color, Color, String?) _getDayStyle(DayStatus status) {
     switch (status) {
       case DayStatus.completed:
+        // Logged-in day
         return (
           Colors.transparent,
           Colors.white,
-          Image.asset(
-            'assets/images/logo.png',
-            width: double.infinity,
-            height: double.infinity,
-            fit: BoxFit.cover,
-          ),
+          'assets/images/LOGO/16.svg',
         );
       case DayStatus.current:
       case DayStatus.upcoming:
+        // No-login activity day
         return (
-          Colors.white,
-          theme.colorScheme.primary,
-          Text(
-            'AX',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.primary,
-              fontWeight: FontWeight.bold,
-              fontSize: 8,
-            ),
-          ),
+          Colors.transparent,
+          const Color(0xFF455267),
+          'assets/images/LOGO/2.svg',
         );
       case DayStatus.inactive:
+        // Padding/future day
         return (
-          theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-          theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+          const Color(0xFFE6E8EE),
+          const Color(0xFF8F96A3),
           null,
         );
     }
@@ -317,7 +339,9 @@ class _CalendarCardState extends State<CalendarCard> {
 
   Widget _buildStreakBar(BuildContext context, int streakDays) {
     final theme = Theme.of(context);
-    final height = (streakDays / 31) * 200.0;
+    const maxVisualStreak = 20;
+    final normalizedStreak = streakDays.clamp(0, maxVisualStreak);
+    final height = (normalizedStreak / maxVisualStreak) * 200.0;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -340,12 +364,25 @@ class _CalendarCardState extends State<CalendarCard> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              const Positioned(
+              Positioned(
                 bottom: 4,
-                child: Icon(
-                  Icons.local_fire_department,
-                  color: Colors.white,
-                  size: 16,
+                child: Container(
+                  width: 18,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0A2E86),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFF009DC5), width: 1.2),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '$streakDays',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 7,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
               ),
             ],
