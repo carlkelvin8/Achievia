@@ -25,7 +25,7 @@ class QotRepositoryImpl implements QotdRepository {
         final entity = remoteQuestion.toEntity();
         return entity;
       }
-      return QotyEntity(quizId: 0, id: 0, questionText: '', choices: []);
+      return QotyEntity(quizId: 0, id: 0, questionText: '', choices: [], title: '');
     } catch (e) {
       print('repo: $e');
       rethrow;

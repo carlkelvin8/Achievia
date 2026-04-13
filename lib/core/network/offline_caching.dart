@@ -45,7 +45,8 @@ Future<Database> _initDB() async {
           quizId INTEGER,
           questionText TEXT,
           choices TEXT,
-          quiz TEXT
+          questions TEXT,
+          title TEXT
         )
       ''');
     },
@@ -57,7 +58,8 @@ Future<Database> _initDB() async {
             quizId INTEGER,
             questionText TEXT,
             choices TEXT,
-            quiz TEXT
+            questions TEXT,
+            title TEXT
           )
         ''');
       }
@@ -105,11 +107,12 @@ Future<Database> _initDB() async {
     final List<Map<String, dynamic>> maps = await db.query('qotd');
     return maps.map((map) {
       return QotdDto(
+        title: (map['title'] ?? '').toString(),
         id: map['id'],
         quizId: map['quizId'],
         questionText: map['questionText'],
         choices: List<Map<String, dynamic>>.from(jsonDecode(map['choices'])),
-        quiz: map['quiz'] != null ? Map<String, dynamic>.from(jsonDecode(map['quiz'])) : null,
+        questions: map['questions'] != null ? List<Map<String, dynamic>>.from(jsonDecode(map['questions'])) : null,
       );
     }).toList();
   }

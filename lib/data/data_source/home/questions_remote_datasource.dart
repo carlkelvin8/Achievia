@@ -1,4 +1,3 @@
-
 import 'package:achievia/const.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/core/di/local_storage_service.dart';
@@ -8,10 +7,9 @@ import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:achievia/data/models/quiz/results_dto.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
-abstract class QuestionRepoDataSource  {
+abstract class QuestionRepoDataSource {
   Future<List<QuestionsDto>> getAllQuestions(String token, String id);
   Future<QotdDto> getQotd();
   Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
@@ -20,55 +18,60 @@ abstract class QuestionRepoDataSource  {
   Future<QuizScoreResponse> getResults(int noOfAttempt);
   Future<int> putToAttempt();
 }
+
 @lazySingleton
 @injectable
-class QuestionsRemoteDatasource implements QuestionRepoDataSource{
+class QuestionsRemoteDatasource implements QuestionRepoDataSource {
   final Dio dio;
   final OfflineCaching local;
   QuestionsRemoteDatasource(this.dio, this.local);
- @override
-Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
-  try {
-    final response = await dio.get(
-      '$BASE_URL/tasks/getQuiz?id=$id',
-      options: Options(
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'x-user-id':id
-        },
-      ),
-    );
-    final questionData = response.data['data']['response'] as List<dynamic>;
+  @override
+  Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
+    try {
+      final response = await dio.get(
+        '$BASE_URL/tasks/getQuiz?id=$id',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+            'x-user-id': id,
+          },
+        ),
+      );
+      final questionData = response.data['data']['response'] as List<dynamic>;
 
-    final questionsList = questionData.map((e)=>QuestionsDto.fromJson(e)).toList();
+      final questionsList = questionData
+          .map((e) => QuestionsDto.fromJson(e))
+          .toList();
 
-    return questionsList;
-  } catch (e) {
-    rethrow;
+      return questionsList;
+    } catch (e) {
+      rethrow;
+    }
   }
-}
 
   @override
-  Future<QotdDto> getQotd() async{
+  Future<QotdDto> getQotd() async {
     try {
-      final response = await dio.get('$BASE_URL/tasks/get1Question', 
-      options: Options(
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      )
+      final response = await dio.get(
+        '$BASE_URL/tasks/get1Question',
+        options: Options(headers: {'Content-Type': 'application/json'}),
       );
-      final questionMap = Map<String, dynamic>.from(response.data['data']['response']['question']);
-      final choicesList = List<Map<String, dynamic>>.from(response.data['data']['response']['choices'] ?? []);
+      final questionMap = Map<String, dynamic>.from(
+        response.data['data']['response']['question'],
+      );
+      final choicesList = List<Map<String, dynamic>>.from(
+        response.data['data']['response']['choices'] ?? [],
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final flattened = {
           ...questionMap,
+          'title': questionMap['title'] ?? '',
           'choices': choicesList,
         };
         return QotdDto.fromJson(flattened);
-      }else{
+      } else {
         return QotdDto.fromJson(await response.data);
       }
     } catch (e) {
@@ -76,122 +79,125 @@ Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
       return QotdDto.fromJson({});
     }
   }
-  
+
   @override
-  Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token) async{
+  Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token) async {
     try {
-      final response  =  await dio.post('$BASE_URL/tasks/ansQuestion', 
-      options: Options(
-        headers: {
-          'Content-Type':'application/json',
-          'Authorization': 'Bearer $token'
-        }
-      ),
-      data: dto.toJson()
+      final response = await dio.post(
+        '$BASE_URL/tasks/ansQuestion',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+        data: dto.toJson(),
       );
       print('datasource: ${response.data}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         return dto;
       }
       return dto;
-    } on DioException catch(e){
+    } on DioException catch (e) {
       print(e.response?.data);
       return QotdDtoPost.fromJson({});
-    }
-    
-    catch (e) {
+    } catch (e) {
       print(e);
       return QotdDtoPost.fromJson({});
     }
   }
-  
+
   @override
-  Future<List<QuestionsDto>> randomizeQuestion(int index) async{
+  Future<List<QuestionsDto>> randomizeQuestion(int index) async {
     try {
-      final response = await dio.post('$BASE_URL/tasks/randomizeQuestions', 
-      options: Options(
-        headers: {
-          'Content-Type':'application/json'
-        }
-      )
+      final response = await dio.post(
+        '$BASE_URL/tasks/randomizeQuestions',
+        options: Options(headers: {'Content-Type': 'application/json'}),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = await response.data['data']['response']['subjects'] as List<dynamic>;
-        final questions = await response.data['data']['response']['quiz'][index]['questions'] as List<dynamic>;
+        final data =
+            await response.data['data']['response']['subjects']
+                as List<dynamic>;
+        final selectedQuiz = Map<String, dynamic>.from(
+          response.data['data']['response']['quiz'][index] as Map,
+        );
+        final questions = List<dynamic>.from(selectedQuiz['questions'] ?? []);
         print('from datasource: $questions');
-        final list =  data.map((e)=> QuestionsDto.fromJson(e)).toList();
-        final questionsList = questions.map((e)=>QotdDto.fromJson(e)).toList();
+        final list = data.map((e) => QuestionsDto.fromJson(e)).toList();
+        final questionsList = questions.map((e) {
+          final questionMap = Map<String, dynamic>.from(e as Map);
+          questionMap['title'] = selectedQuiz['title'] ?? '';
+          return QotdDto.fromJson(questionMap);
+        }).toList();
         await local.insertQuestionsToCache(list);
         await local.insertQotdToCache(questionsList);
         return list;
       }
       return [];
-    }on DioException catch(e){
+    } on DioException catch (e) {
       print('DIO ERROR: $e');
       return [];
-    } 
-    catch (e) {
+    } catch (e) {
       print(e);
       return [];
     }
   }
-  
+
   @override
-  Future<List<QotdDto>> getTheGeneratedQuiz() async{
-      try {
-        final cache = await local.getQotdFromCache();
-        return cache;
-      } catch (e) {
-        print(e);
-        return [];
-      }
+  Future<List<QotdDto>> getTheGeneratedQuiz() async {
+    try {
+      final cache = await local.getQotdFromCache();
+      return cache;
+    } catch (e) {
+      print(e);
+      return [];
+    }
   }
-  
+
   @override
-  Future<QuizScoreResponse> getResults(int noOfAttempt) async{
+  Future<QuizScoreResponse> getResults(int noOfAttempt) async {
     print('from quiz: $noOfAttempt');
     try {
-      final response = await dio.get('$BASE_URL/tasks/getGWA/$noOfAttempt',
-      options: Options(
-        contentType: 'application/json',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      )
-    );
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return QuizScoreResponse.fromJson(response.data);
-    }
-    return QuizScoreResponse.fromJson({});
-    } on DioException catch(e){
+      final response = await dio.get(
+        '$BASE_URL/tasks/getGWA/$noOfAttempt',
+        options: Options(
+          contentType: 'application/json',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return QuizScoreResponse.fromJson(response.data);
+      }
+      return QuizScoreResponse.fromJson({});
+    } on DioException catch (e) {
       print(e.response?.data);
       return QuizScoreResponse.fromJson({});
     }
   }
-  
+
   @override
-  Future<int> putToAttempt() async{
+  Future<int> putToAttempt() async {
     final LocalStorageService storageService = sl<LocalStorageService>();
     try {
-      final getId =   storageService.creds;
-      final response = await dio.post('$BASE_URL/tasks/putToQuizAttempt/$getId');
+      final getId = storageService.creds;
+      final response = await dio.post(
+        '$BASE_URL/tasks/putToQuizAttempt/$getId',
+      );
       if (response.statusCode == 200 || response.statusCode == 201) {
         print('from datasource: ${response.data['data']['attempt']}');
         return response.data['data']['attempt'];
       }
       print('from datasource: ${response.data['data']['attempt']}');
       return response.data['data']['attempt'];
-    } on DioException catch(e){
+    } on DioException catch (e) {
       print(e.response?.data);
       return e.response?.data['message'];
-    }
-    
-    catch (e) {
+    } catch (e) {
       print('catch from datasource:$e');
       return 0;
     }
   }
-
-  
 }

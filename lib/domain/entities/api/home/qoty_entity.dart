@@ -2,16 +2,18 @@
 class QotyEntity {
   final int quizId;
   final int id;
+  final String title;
   final String questionText;
-  final List<Map<String,dynamic>> choices;
-  final Map<String,dynamic>? quiz;
+  final List<Map<String, dynamic>> choices;
+  final List<Map<String, dynamic>>? questions;
 
   QotyEntity({
     required this.quizId,
+    required this.title,
     required this.id,
     required this.questionText,
     required this.choices,
-    this.quiz
+    this.questions,
   });
 }
 
@@ -25,5 +27,3 @@ class QotyEntityPost {
     required this.student_id,
   });
 }
-
-
