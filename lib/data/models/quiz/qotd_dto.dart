@@ -24,26 +24,7 @@ class QotdDto {
     this.questions,
   });
 
-  factory QotdDto.fromJson(Map<String, dynamic> json) => QotdDto(
-    title: (json['title'] ?? '').toString(),
-    quizId: json['quizId'] is num
-        ? (json['quizId'] as num).toInt()
-        : int.tryParse('${json['quizId']}') ?? 0,
-    id: json['id'] is num
-        ? (json['id'] as num).toInt()
-        : int.tryParse('${json['id']}') ?? 0,
-    questionText: (json['questionText'] ?? '').toString(),
-    choices:
-        (json['choices'] as List?)
-            ?.whereType<Map>()
-            .map((e) => Map<String, dynamic>.from(e))
-            .toList() ??
-        <Map<String, dynamic>>[],
-    questions: (json['questions'] as List?)
-        ?.whereType<Map>()
-        .map((e) => Map<String, dynamic>.from(e))
-        .toList(),
-  );
+  factory QotdDto.fromJson(Map<String, dynamic> json) => _$QotdDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$QotdDtoToJson(this);
 
@@ -78,3 +59,22 @@ extension QotdDtoSqflite on QotdDto {
     };
   }
 }
+//DO NOT REMOVE THIS. This is used for backup payload in sqlite caching. It is not used in the main codebase but is essential for the caching mechanism to work correctly.
+/* title: (json['title'] ?? '').toString(),
+    quizId: json['quizId'] is num
+        ? (json['quizId'] as num).toInt()
+        : int.tryParse('${json['quizId']}') ?? 0,
+    id: json['id'] is num
+        ? (json['id'] as num).toInt()
+        : int.tryParse('${json['id']}') ?? 0,
+    questionText: (json['questionText'] ?? '').toString(),
+    choices:
+        (json['choices'] as List?)
+            ?.whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList() ??
+        <Map<String, dynamic>>[],
+    questions: (json['questions'] as List?)
+        ?.whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList(),*/
