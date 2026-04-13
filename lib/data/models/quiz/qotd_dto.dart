@@ -1,43 +1,70 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'dart:convert';
+
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'qotd_dto.g.dart';
+
 @JsonSerializable()
 class QotdDto {
   final int quizId;
   final int id;
+  final String title;
   final String questionText;
-  final List<Map<String,dynamic>> choices;
-  final Map<String,dynamic>? quiz;
+  final List<Map<String, dynamic>> choices;
+  final List<Map<String, dynamic>>? questions;
   QotdDto({
+    required this.title,
     required this.quizId,
     required this.id,
     required this.questionText,
     required this.choices,
-    this.quiz
+    this.questions,
   });
 
-  factory QotdDto.fromJson(Map<String,dynamic> json) => _$QotdDtoFromJson(json);
+  factory QotdDto.fromJson(Map<String, dynamic> json) => QotdDto(
+    title: (json['title'] ?? '').toString(),
+    quizId: json['quizId'] is num
+        ? (json['quizId'] as num).toInt()
+        : int.tryParse('${json['quizId']}') ?? 0,
+    id: json['id'] is num
+        ? (json['id'] as num).toInt()
+        : int.tryParse('${json['id']}') ?? 0,
+    questionText: (json['questionText'] ?? '').toString(),
+    choices:
+        (json['choices'] as List?)
+            ?.whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList() ??
+        <Map<String, dynamic>>[],
+    questions: (json['questions'] as List?)
+        ?.whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList(),
+  );
 
-  Map<String,dynamic> toJson() => _$QotdDtoToJson(this);
+  Map<String, dynamic> toJson() => _$QotdDtoToJson(this);
 
   QotyEntity toEntity() => QotyEntity(
-    quizId: quizId, id: id, 
+    title: title,
+    quizId: quizId,
+    id: id,
     questionText: questionText,
-    quiz: quiz,
-    choices: choices.map((c) => c).toList(),);
+    questions: questions,
+    choices: choices.map((c) => c).toList(),
+  );
 
-  static QotdDto fromEntity(QotyEntity entity) => 
-  QotdDto(
-    quiz: entity.quiz,
-    quizId: entity.quizId, id: entity.id, questionText: entity.questionText, choices: entity.choices);
-
-    
+  static QotdDto fromEntity(QotyEntity entity) => QotdDto(
+    title: entity.title,
+    questions: entity.questions,
+    quizId: entity.quizId,
+    id: entity.id,
+    questionText: entity.questionText,
+    choices: entity.choices,
+  );
 }
-
 
 extension QotdDtoSqflite on QotdDto {
   Map<String, Object?> toSqliteMap() {
@@ -46,7 +73,8 @@ extension QotdDtoSqflite on QotdDto {
       'quizId': quizId,
       'questionText': questionText,
       'choices': jsonEncode(choices),
-      'quiz': quiz != null ? jsonEncode(quiz) : null,
+      "title": title,
+      'questions': questions != null ? jsonEncode(questions) : null,
     };
   }
 }
