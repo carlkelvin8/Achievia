@@ -92,9 +92,48 @@ final pageController =
     NotifierProvider.autoDispose<PageControllerProvider, PageController>(
       PageControllerProvider.new,
     );
+final pageControllerOuter =
+    NotifierProvider.autoDispose<OuterPageControllerProvider, PageController>(
+      OuterPageControllerProvider.new,
+    );
 final changeIndexProvider = NotifierProvider.autoDispose<IndexProvider, int>(
   IndexProvider.new,
 );
+
+final changeIndexProviderOuter =
+    NotifierProvider.autoDispose<IndexProviderOuter, int>(
+      IndexProviderOuter.new,
+    );
+
+class OuterPageControllerProvider extends Notifier<PageController> {
+  late final QuestionsUseCase useCases;
+  @override
+  PageController build() {
+    useCases = ref.read(getQuestions);
+    return PageController();
+  }
+
+  Future<void> nextAsOuter(BuildContext context, String debugValue) async {
+    debugPrint("${state.page}");
+    debugPrint(debugValue);
+    state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+  }
+
+  Future<void> prev() async {
+    state.previousPage(
+      duration: Duration(milliseconds: 500),
+      curve: Curves.ease,
+    );
+  }
+
+  Future<void> navigateToPage(int index) async {
+    state.animateToPage(
+      index,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.ease,
+    );
+  }
+}
 
 class PageControllerProvider extends Notifier<PageController> {
   late final QuestionsUseCase useCases;
@@ -104,13 +143,12 @@ class PageControllerProvider extends Notifier<PageController> {
     return PageController();
   }
 
-  Future<void> next(BuildContext context) async {
-    if (state.page == 99) {
+  Future<void> next(BuildContext context, int length, int currentIndex) async {
+    if (state.page == 3 && currentIndex >= length - 1) {
       final attemptId = await useCases.submitQuiz();
       await useCases.getGWA(attemptId);
-      print('sa next ito: $attemptId');
       ref.read(attemptIdProvider.notifier).state = attemptId;
-
+      // ignore: use_build_context_synchronously
       Navigator.pushNamed(context, '/attempt-screen', arguments: attemptId);
     }
     state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
@@ -158,6 +196,15 @@ class ShowModalProvider extends Notifier<bool> {
 }
 
 class IndexProvider extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void changeIndex(int index) {
+    state = index;
+  }
+}
+
+class IndexProviderOuter extends Notifier<int> {
   @override
   int build() => 0;
 
