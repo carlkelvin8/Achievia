@@ -115,17 +115,13 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data =
-            await response.data['data']['response']['subjects']
-                as List<dynamic>;
-        final selectedQuiz = Map<String, dynamic>.from(
-          response.data['data']['response']['quiz'][index] as Map,
-        );
+        final data = await response.data['data']['response']['subjects'] as List<dynamic>;
+        final selectedQuiz = Map<String, dynamic>.from(response.data['data']['response']['quiz'][index] as Map);
         final questions = List<dynamic>.from(selectedQuiz['questions'] ?? []);
         print('from datasource: $questions');
         final list = data.map((e) => QuestionsDto.fromJson(e)).toList();
         final questionsList = questions.map((e) {
-          final questionMap = Map<String, dynamic>.from(e as Map);
+        final questionMap = Map<String, dynamic>.from(e as Map);
           questionMap['title'] = selectedQuiz['title'] ?? '';
           return QotdDto.fromJson(questionMap);
         }).toList();
