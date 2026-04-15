@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:achievia/const.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/core/di/local_storage_service.dart';
@@ -7,6 +9,7 @@ import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:achievia/data/models/quiz/results_dto.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class QuestionRepoDataSource {
@@ -93,16 +96,16 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
         ),
         data: dto.toJson(),
       );
-      print('datasource: ${response.data}');
+      debugPrint('datasource: ${response.data}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         return dto;
       }
       return dto;
     } on DioException catch (e) {
-      print(e.response?.data);
+      debugPrint("DioException: ${e.response?.data}");
       return QotdDtoPost.fromJson({});
     } catch (e) {
-      print(e);
+      debugPrint("Exception: $e");
       return QotdDtoPost.fromJson({});
     }
   }
@@ -116,25 +119,21 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = await response.data['data']['response']['subjects'] as List<dynamic>;
+        final quizTitles = await response.data['data']['response']['quiz'] as List<dynamic>;
+        debugPrint('Quiz Titles: ${quizTitles.map((q) => q['title']).toList()}', wrapWidth: 1024);
         final selectedQuiz = Map<String, dynamic>.from(response.data['data']['response']['quiz'][index] as Map);
-        final questions = List<dynamic>.from(selectedQuiz['questions'] ?? []);
-        print('from datasource: $questions');
+        debugPrint('Selected Quiz: ${jsonEncode(selectedQuiz)}', wrapWidth: 1024);
         final list = data.map((e) => QuestionsDto.fromJson(e)).toList();
-        final questionsList = questions.map((e) {
-        final questionMap = Map<String, dynamic>.from(e as Map);
-          questionMap['title'] = selectedQuiz['title'] ?? '';
-          return QotdDto.fromJson(questionMap);
-        }).toList();
         await local.insertQuestionsToCache(list);
-        await local.insertQotdToCache(questionsList);
+        await local.insertQotdToCache(quizTitles.map((q) => QotdDto.fromJson(Map<String, dynamic>.from(q))).toList());
         return list;
       }
       return [];
     } on DioException catch (e) {
-      print('DIO ERROR: $e');
+      debugPrint("DioException: ${e.response?.data}");
       return [];
     } catch (e) {
-      print(e);
+      debugPrint("Exception: $e");
       return [];
     }
   }
@@ -183,16 +182,16 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
         '$BASE_URL/tasks/putToQuizAttempt/$getId',
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print('from datasource: ${response.data['data']['attempt']}');
+        debugPrint('from datasource: ${response.data['data']['attempt']}');
         return response.data['data']['attempt'];
       }
-      print('from datasource: ${response.data['data']['attempt']}');
+      debugPrint('from datasource: ${response.data['data']['attempt']}');
       return response.data['data']['attempt'];
     } on DioException catch (e) {
-      print(e.response?.data);
+      debugPrint("DioException: ${e.response?.data}");
       return e.response?.data['message'];
     } catch (e) {
-      print('catch from datasource:$e');
+      debugPrint("Exception: $e");
       return 0;
     }
   }
