@@ -78,14 +78,14 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
 
                   return !visible
                       ? QuestionsContent(
-                          questionText: question.questionText,
-                          choices: question.choices,
+                          questionText: question.questions[index].questionText,
+                          choices: question.questions[index].choices,
                           selectedIndex: selectedAnswers[index],
                           onSelect: (v) async {
                             if (v != null) {
                               isAnswered.isAnswered(question.id);
                               await answerQuestion.answerQuestion(
-                                question.choices[v]['choiceText'],
+                                question.questions[index].choices[v].id.toString(),
                               );
                               print(selectedAnswers);
                               setState(() {

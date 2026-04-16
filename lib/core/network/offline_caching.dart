@@ -1,9 +1,11 @@
 import 'dart:convert';
-import 'package:achievia/data/models/quiz/questions_dto.dart';
+
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
+import 'package:achievia/data/models/quiz/questions_dto.dart';
+import 'package:achievia/data/models/quiz/quiz_dto.dart';
+import 'package:injectable/injectable.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:injectable/injectable.dart';
 
 @lazySingleton
 @injectable
@@ -16,18 +18,18 @@ class OfflineCaching {
     return _database!;
   }
 
-Future<Database> _initDB() async {
-  final path = join(await getDatabasesPath(), 'cache.db');
+  Future<Database> _initDB() async {
+    final path = join(await getDatabasesPath(), 'cache.db');
 
-  // DELETE old DB (dev only)
-  await deleteDatabase(path); // <- ensures fresh DB is created
+    // DELETE old DB (dev only)
+    await deleteDatabase(path); // <- ensures fresh DB is created
 
-  return await openDatabase(
-    path,
-    version: 2,
-    onCreate: (db, version) async {
-      // Create Questions table
-      await db.execute('''
+    return await openDatabase(
+      path,
+      version: 3,
+      onCreate: (db, version) async {
+        // Create Questions table
+        await db.execute('''
         CREATE TABLE questions (
           id INTEGER PRIMARY KEY,
           title TEXT,
@@ -38,8 +40,8 @@ Future<Database> _initDB() async {
           createdAt TEXT
         )
       ''');
-      // Create QOTD table
-      await db.execute('''
+        // Create QOTD table
+        await db.execute('''
         CREATE TABLE qotd (
           id INTEGER PRIMARY KEY,
           quizId INTEGER,
@@ -49,10 +51,21 @@ Future<Database> _initDB() async {
           title TEXT
         )
       ''');
-    },
-    onUpgrade: (db, oldVersion, newVersion) async {
-      if (oldVersion < 2) {
+        // Create Quiz table
         await db.execute('''
+        CREATE TABLE quiz (
+          id INTEGER PRIMARY KEY,
+          title TEXT,
+          description TEXT,
+          createdAt TEXT,
+          subjectId INTEGER,
+          questions TEXT
+        )
+      ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('''
           CREATE TABLE qotd (
             id INTEGER PRIMARY KEY,
             quizId INTEGER,
@@ -62,11 +75,22 @@ Future<Database> _initDB() async {
             title TEXT
           )
         ''');
-      }
-    },
-  );
-}
-
+        }
+        if (oldVersion < 3) {
+          await db.execute('''
+          CREATE TABLE quiz (
+            id INTEGER PRIMARY KEY,
+            title TEXT,
+            description TEXT,
+            createdAt TEXT,
+            subjectId INTEGER,
+            questions TEXT
+          )
+        ''');
+        }
+      },
+    );
+  }
 
   // ---------------- QuestionsDto caching ----------------
   Future<void> insertQuestionsToCache(List<QuestionsDto> dto) async {
@@ -112,7 +136,53 @@ Future<Database> _initDB() async {
         quizId: map['quizId'],
         questionText: map['questionText'],
         choices: List<Map<String, dynamic>>.from(jsonDecode(map['choices'])),
-        questions: map['questions'] != null ? List<Map<String, dynamic>>.from(jsonDecode(map['questions'])) : null,
+        questions: map['questions'] != null
+            ? List<Map<String, dynamic>>.from(jsonDecode(map['questions']))
+            : null,
+      );
+    }).toList();
+  }
+
+  // ---------------- QuizDto caching ----------------
+  Future<void> insertQuizToCache(List<QuizDtoItems> items) async {
+    final db = await database;
+    Batch batch = db.batch();
+    for (var item in items) {
+      batch.insert(
+        'quiz',
+        item.toSqliteMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
+  }
+
+  Future<List<QuizDtoItems>> getQuizFromCache() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('quiz');
+    return maps.map((map) {
+      final questions = List<Map<String, dynamic>>.from(
+        jsonDecode(map['questions']),
+      );
+      return QuizDtoItems(
+        id: map['id'] as int,
+        title: map['title'] ?? '',
+        description: map['description'] ?? '',
+        createdAt: map['createdAt'] ?? '',
+        subjectId: map['subjectId'] as int,
+        questions: questions
+            .map(
+              (q) => QuestionsItemsDto(
+                id: q['id'] as int,
+                questionText: q['questionText'] ?? '',
+                choices: (q['choices'] as List<dynamic>)
+                    .map(
+                      (c) => ChoicesDto.fromJson(Map<String, dynamic>.from(c)),
+                    )
+                    .toList(),
+              ),
+            )
+            .toList(),
       );
     }).toList();
   }

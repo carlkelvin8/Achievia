@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/core/network/offline_caching.dart';
 import 'package:achievia/domain/entities/api/home/results_entity.dart';
+import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,7 +15,7 @@ final getQuestions = Provider<QuestionsUseCase>((ref) {
   return sl.get<QuestionsUseCase>();
 });
 
-final getHive = Provider<OfflineCaching>((ref) {
+final getOfflineCache = Provider<OfflineCaching>((ref) {
   return sl.get<OfflineCaching>();
 });
 
@@ -53,7 +54,7 @@ final getQoty = FutureProvider<QotyEntity>((ref) async {
 });
 
 final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref) async {
-  final gtQuestions = ref.read(getHive);
+  final gtQuestions = ref.read(getOfflineCache);
   try {
     final result = await gtQuestions.getQuestionsFromCache();
     print(result);
@@ -64,7 +65,7 @@ final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref) async {
   }
 });
 
-final getGeneratedQuestions = FutureProvider<List<QotyEntity>>((ref) async {
+final getGeneratedQuestions = FutureProvider<List<QuizItemEntity>>((ref) async {
   final gtQuestions = ref.read(getQuestions);
   try {
     final results = await gtQuestions.getGeneratedQuestions();

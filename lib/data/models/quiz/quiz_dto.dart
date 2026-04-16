@@ -1,9 +1,42 @@
+import 'dart:convert';
+
+import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
+
 class QuizDto {
   final List<QuizDtoItems> items;
   QuizDto({required this.items});
+
+  static QuizDto fromEntity(QuizEntity entity) {
+    return QuizDto(
+      items: entity.items.map((item) => QuizDtoItems.fromEntity(item)).toList(),
+    );
+  }
+
+  QuizEntity toEntity() {
+    return QuizEntity(
+      items: items.map((item) => QuizItemEntity(
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        createdAt: item.createdAt,
+        subjectId: item.subjectId,
+        questions: item.questions.map((q) => QuestionItemEntity(
+          id: q.id,
+          questionText: q.questionText,
+          choices: q.choices.map((c) => ChoiceEntity(
+            id: c.id,
+            choiceText: c.choiceText,
+            isCorrect: c.isCorrect,
+          )).toList(),
+        )).toList(),
+      )).toList(),
+    );
+  }
+
   factory QuizDto.fromJson(Map<String, dynamic> json) {
     return QuizDto(
-      items: (json['quiz'] as List<dynamic>).map(
+      items: (json['quiz'] as List<dynamic>)
+          .map(
             (item) => QuizDtoItems(
               id: item['id'] as int,
               title: item['title'] ?? "",
@@ -16,13 +49,18 @@ class QuizDto {
                       id: question['id'] as int,
                       questionText: question['questionText'] ?? "",
                       choices: (question['choices'] as List<dynamic>)
-                          .map((choice) => ChoicesDto.fromJson(choice as Map<String, dynamic>))
+                          .map(
+                            (choice) => ChoicesDto.fromJson(
+                              choice as Map<String, dynamic>,
+                            ),
+                          )
                           .toList(),
                     ),
                   )
                   .toList(),
             ),
-          ).toList(),
+          )
+          .toList(),
     );
   }
 }
@@ -56,12 +94,77 @@ class QuizDtoItems {
               id: question['id'] as int,
               questionText: question['questionText'] ?? "",
               choices: (question['choices'] as List<dynamic>)
-                  .map((choice) => ChoicesDto.fromJson(choice as Map<String, dynamic>))
+                  .map(
+                    (choice) =>
+                        ChoicesDto.fromJson(choice as Map<String, dynamic>),
+                  )
                   .toList(),
             ),
           )
           .toList(),
     );
+  }
+
+  static QuizDtoItems fromEntity(QuizItemEntity entity) {
+    return QuizDtoItems(
+      id: entity.id,
+      title: entity.title,
+      description: entity.description,
+      createdAt: entity.createdAt,
+      subjectId: entity.subjectId,
+      questions: entity.questions
+          .map((q) => QuestionsItemsDto.fromEntity(q))
+          .toList(),
+    );
+  }
+
+
+  QuizItemEntity toEntity() {
+    return QuizItemEntity(
+      id: id,
+      title: title,
+      description: description,
+      createdAt: createdAt,
+      subjectId: subjectId,
+      questions: questions
+          .map((q) => QuestionItemEntity(
+                id: q.id,
+                questionText: q.questionText,
+                choices: q.choices
+                    .map((c) => ChoiceEntity(
+                          id: c.id,
+                          choiceText: c.choiceText,
+                          isCorrect: c.isCorrect,
+                        ))
+                    .toList(),
+              ))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toSqliteMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'createdAt': createdAt,
+      'subjectId': subjectId,
+      'questions': jsonEncode(
+        questions
+            .map((q) => {
+                  'id': q.id,
+                  'questionText': q.questionText,
+                  'choices': q.choices
+                      .map((c) => {
+                            'id': c.id,
+                            'choiceText': c.choiceText,
+                            'isCorrect': c.isCorrect,
+                          })
+                      .toList(),
+                })
+            .toList(),
+      ),
+    };
   }
 }
 
@@ -74,6 +177,24 @@ class QuestionsItemsDto {
     required this.questionText,
     required this.choices,
   });
+
+  factory QuestionsItemsDto.fromJson(Map<String, dynamic> json) {
+    return QuestionsItemsDto(
+      id: json['id'] as int,
+      questionText: json['questionText'] ?? "",
+      choices: (json['choices'] as List<dynamic>)
+          .map((choice) => ChoicesDto.fromJson(choice as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  static QuestionsItemsDto fromEntity(QuestionItemEntity entity) {
+    return QuestionsItemsDto(
+      id: entity.id,
+      questionText: entity.questionText,
+      choices: entity.choices.map((c) => ChoicesDto.fromEntity(c)).toList(),
+    );
+  }
 }
 
 class ChoicesDto {
@@ -86,11 +207,19 @@ class ChoicesDto {
     required this.isCorrect,
   });
 
-  static ChoicesDto fromJson(Map<String, dynamic> json) {
+  factory ChoicesDto.fromJson(Map<String, dynamic> json) {
     return ChoicesDto(
       id: json['id'] as int,
       choiceText: json['choiceText'] ?? "",
       isCorrect: json['isCorrect'] as bool,
+    );
+  }
+
+  static ChoicesDto fromEntity(ChoiceEntity entity) {
+    return ChoicesDto(
+      id: entity.id,
+      choiceText: entity.choiceText,
+      isCorrect: entity.isCorrect,
     );
   }
 }

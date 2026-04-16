@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:achievia/const.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/core/di/local_storage_service.dart';
@@ -7,6 +5,7 @@ import 'package:achievia/core/network/offline_caching.dart';
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
 import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
+import 'package:achievia/data/models/quiz/quiz_dto.dart';
 import 'package:achievia/data/models/quiz/results_dto.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -16,7 +15,7 @@ abstract class QuestionRepoDataSource {
   Future<List<QuestionsDto>> getAllQuestions(String token, String id);
   Future<QotdDto> getQotd();
   Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
-  Future<List<QotdDto>> getTheGeneratedQuiz();
+  Future<List<QuizDtoItems>> getTheGeneratedQuiz();
   Future<List<QuestionsDto>> randomizeQuestion(int index);
   Future<QuizScoreResponse> getResults(int noOfAttempt);
   Future<int> putToAttempt();
@@ -118,14 +117,19 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = await response.data['data']['response']['subjects'] as List<dynamic>;
-        final quizTitles = await response.data['data']['response']['quiz'] as List<dynamic>;
-        debugPrint('Quiz Titles: ${quizTitles.map((q) => q['title']).toList()}', wrapWidth: 1024);
-        final selectedQuiz = Map<String, dynamic>.from(response.data['data']['response']['quiz'][index] as Map);
-        debugPrint('Selected Quiz: ${jsonEncode(selectedQuiz)}', wrapWidth: 1024);
+        final data =
+            response.data['data']['response']['subjects'] as List<dynamic>;
+        final quizTitles = await response.data['data']['response']['quiz'];
+        debugPrint(
+          'Quiz Titles: ${quizTitles.map((q) => q['title']).toList()}',
+          wrapWidth: 1024,
+        );
         final list = data.map((e) => QuestionsDto.fromJson(e)).toList();
+        final quizItems = (quizTitles as List<dynamic>)
+            .map((q) => QuizDtoItems.fromJson(Map<String, dynamic>.from(q)))
+            .toList();
         await local.insertQuestionsToCache(list);
-        await local.insertQotdToCache(quizTitles.map((q) => QotdDto.fromJson(Map<String, dynamic>.from(q))).toList());
+        await local.insertQuizToCache(quizItems);
         return list;
       }
       return [];
@@ -139,9 +143,9 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
   }
 
   @override
-  Future<List<QotdDto>> getTheGeneratedQuiz() async {
+  Future<List<QuizDtoItems>> getTheGeneratedQuiz() async {
     try {
-      final cache = await local.getQotdFromCache();
+      final cache = await local.getQuizFromCache();
       return cache;
     } catch (e) {
       print(e);

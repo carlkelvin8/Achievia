@@ -1,9 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
 import 'package:flutter/material.dart';
 
 class QuestionsContent extends StatelessWidget {
   final String questionText;
-  final List choices;
+  final List<ChoiceEntity> choices;
   final int? selectedIndex;
   final void Function(int?) onSelect;
 
@@ -39,7 +40,7 @@ class QuestionsContent extends StatelessWidget {
             Color? textColor;
             FontWeight? font;
             if (selectedIndex != null) {
-              if (choice['isCorrect'] == true) {
+              if (choice.isCorrect) {
                 textColor = Colors.green;
                 font = FontWeight.bold;
               } else if (isSelected) {
@@ -53,10 +54,10 @@ class QuestionsContent extends StatelessWidget {
               groupValue: selectedIndex,
               onChanged: isAnswered ? null : onSelect,
               title: Text(
-                choice['choiceText'],
+                choice.choiceText,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: textColor,
-                  fontWeight: font
+                  fontWeight: font,
                 ),
               ),
             );
