@@ -48,7 +48,7 @@ class ProfileScreenContent extends ConsumerWidget {
                   valueColor: AppColors.primary,
                 ),
                 const SizedBox(height: 20),
-                const MantraCard(),
+                MantraCard(initialMantra: view.mantraText),
                 const SizedBox(height: 20),
                 ExaminationResultsCard(title: 'Examination Results:'),
                 const SizedBox(height: 20),

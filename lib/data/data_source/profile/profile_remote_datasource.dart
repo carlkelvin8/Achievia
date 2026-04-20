@@ -7,6 +7,7 @@ import 'package:injectable/injectable.dart';
 
 abstract class ProfileDataSource {
   Future<ProfileEntity> getProfile();
+  Future<String> updateMantra(String mantra);
 }
 
 @injectable
@@ -59,6 +60,7 @@ class ProfileRemoteDatasource implements ProfileDataSource {
           role: data['role'],
           university: data['university'],
           purpose: data['purpose'],
+          mantra: data['mantra'],
           dateOfExamination: _parseDate(
             data['date_of_examination'] ?? data['dateOfExamination'],
           ),
@@ -74,6 +76,54 @@ class ProfileRemoteDatasource implements ProfileDataSource {
     } catch (e, st) {
       print('Error fetching profile: $e');
       print('Stack trace: $st');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> updateMantra(String mantra) async {
+    final LocalStorageService storageService = sl<LocalStorageService>();
+    final token = storageService.token;
+
+    try {
+      final response = await dio.put(
+        '$BASE_URL/you/mantra',
+        data: {'mantra': mantra},
+        options: Options(
+          sendTimeout: const Duration(seconds: 5),
+          receiveTimeout: const Duration(seconds: 5),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception('Failed to update mantra');
+      }
+
+      final message = response.data?['data']?['message'];
+      if (message is String && message.trim().isNotEmpty) {
+        return message;
+      }
+
+      return 'Mantra has been updated successfully';
+    } catch (e, st) {
+      print('Error updating mantra: $e');
+      print('Stack trace: $st');
+
+      if (e is DioException) {
+        final errorData = e.response?.data;
+        if (errorData is Map<String, dynamic>) {
+          final backendMessage = errorData['error']?['message'];
+          if (backendMessage is String && backendMessage.trim().isNotEmpty) {
+            throw Exception(backendMessage);
+          }
+        }
+      }
+
       rethrow;
     }
   }

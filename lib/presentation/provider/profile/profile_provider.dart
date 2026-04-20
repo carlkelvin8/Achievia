@@ -17,6 +17,29 @@ final profileProvider = FutureProvider<ProfileEntity>((ref) async {
   return useCase.getProfile();
 });
 
+final updateMantraProvider =
+    AsyncNotifierProvider<UpdateMantraNotifier, String?>(
+      UpdateMantraNotifier.new,
+    );
+
+class UpdateMantraNotifier extends AsyncNotifier<String?> {
+  @override
+  Future<String?> build() async => null;
+
+  Future<String> updateMantra(String mantra) async {
+    state = const AsyncLoading();
+    try {
+      final message = await ref.read(profileUseCaseProvider).updateMantra(mantra);
+      state = AsyncData(message);
+      ref.invalidate(profileProvider);
+      return message;
+    } catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+      rethrow;
+    }
+  }
+}
+
 class BoardExamDateNotifier extends Notifier<DateTime?> {
   @override
   DateTime? build() {

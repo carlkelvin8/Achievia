@@ -71,7 +71,8 @@ List<CalendarDay> _buildCalendarDays({
     days.add(
       CalendarDay(
         date: dayOnly,
-        status: isCompleted ? DayStatus.completed : DayStatus.current,
+        // Only real activity days should look like progress.
+        status: isCompleted ? DayStatus.completed : DayStatus.inactive,
       ),
     );
 

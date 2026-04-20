@@ -26,12 +26,14 @@ class ProfileScreenViewData {
   final DateTime? boardExamDate;
   final String boardExamDateLabel;
   final String daysLeftLabel;
+  final String mantraText;
 
   const ProfileScreenViewData({
     required this.card,
     required this.boardExamDate,
     required this.boardExamDateLabel,
     required this.daysLeftLabel,
+    required this.mantraText,
   });
 
   static ProfileScreenViewData fromEntity(
@@ -53,7 +55,15 @@ class ProfileScreenViewData {
       boardExamDate: examDate,
       boardExamDateLabel: _formatExamDateForBadge(examDate),
       daysLeftLabel: _calculateDaysLeft(examDate),
+      mantraText: _resolveMantra(profile.mantra),
     );
+  }
+
+  static String _resolveMantra(String? mantra) {
+    if (mantra == null || mantra.trim().isEmpty) {
+      return '';
+    }
+    return mantra.trim();
   }
 
   static String _safeUpper(String? value) {
