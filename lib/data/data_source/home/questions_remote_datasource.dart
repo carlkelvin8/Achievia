@@ -117,8 +117,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data =
-            response.data['data']['response']['subjects'] as List<dynamic>;
+        final data = response.data['data']['response']['subjects'] as List<dynamic>;
         final quizTitles = await response.data['data']['response']['quiz'];
         debugPrint(
           'Quiz Titles: ${quizTitles.map((q) => q['title']).toList()}',

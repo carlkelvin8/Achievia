@@ -1,9 +1,9 @@
-import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/data/models/quiz/quiz_dto.dart';
+import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
 import 'package:achievia/presentation/widgets/appbar/exam_app_bar.dart';
 import 'package:achievia/presentation/widgets/badges/unanswered_questions_badge.dart';
 import 'package:achievia/presentation/widgets/builders/exam_pageview_builder.dart';
-import 'package:achievia/presentation/widgets/builders/queueing_pageview_builder.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/cards/questions_content.dart';
 import 'package:achievia/presentation/widgets/cards/unanswered_card.dart';
@@ -19,101 +19,106 @@ class ExamScreen extends ConsumerStatefulWidget {
 
 class _ExamScreenState extends ConsumerState<ExamScreen> {
   final Map<int, int> selectedAnswers = {};
+
   @override
   Widget build(BuildContext context) {
     final asyncQuestions = ref.watch(getGeneratedQuestions);
     final pageControllerNotifier = ref.read(pageController.notifier);
     final pageControllers = ref.watch(pageController);
-    final outerControllerState = ref.watch(pageControllerOuter);
-    final outerControllerEvent = ref.read(pageControllerOuter.notifier);
     final indexs = ref.watch(changeIndexProvider);
     final indexNotider = ref.read(changeIndexProvider.notifier);
-    final indexOuter = ref.watch(changeIndexProviderOuter);
-    final indexOuterNotifier = ref.read(changeIndexProviderOuter.notifier);
     final showModal = ref.read(showModalNotifier.notifier);
     final visible = ref.watch(showModalNotifier);
     final isAnswered = ref.read(answeredQuestionsProvider.notifier);
     final isAnsweredWatch = ref.watch(answeredQuestionsProvider);
-    final getGenerated = ref.watch(getGeneratedQuestions);
     final answerQuestion = ref.read(answerQotProvider.notifier);
+
+    final flattenedQuestions =
+        asyncQuestions.value
+            ?.expand(
+              (quiz) => quiz.questions.map(
+                (q) => (title: quiz.title, quizId: quiz.id, question: q),
+              ),
+            )
+            .toList() ??
+        <FlattenedQuestion>[];
+
+    final safeIndex = flattenedQuestions.isEmpty
+        ? 0
+        : indexs.clamp(0, flattenedQuestions.length - 1);
+
     return Scaffold(
       appBar: ExamAppBar(
-        callback: () => outerControllerEvent.nextAsOuter(
-          context,
-          "outer ${asyncQuestions.value?[indexOuter].title.length}",
-        ),
+        callback: () {},
         title: asyncQuestions.when(
-          data: (q) {
-            return q[indexs].title;
+          data: (_) {
+            if (flattenedQuestions.isEmpty) return 'No questions';
+            return flattenedQuestions[safeIndex].title;
           },
           error: (_, _) => 'Err',
           loading: () => 'Loading',
         ),
         toolbarheight: 150,
         page: asyncQuestions.when(
-          data: (questions) => '${indexs + 1} / ${questions.length}',
+          data: (_) => flattenedQuestions.isEmpty
+              ? '0 / 0'
+              : '${safeIndex + 1} / ${flattenedQuestions.length}',
           loading: () => '0 / 0',
           error: (_, __) => '0 / 0',
         ),
       ),
       persistentFooterAlignment: AlignmentDirectional.center,
       body: asyncQuestions.when(
-        data: (questions) {
-          return QueueingPageViewBuilder(
-            onPageChanged: (index) {
-              indexOuterNotifier.changeIndex(index);
-            },
-            controller: outerControllerState,
-            itemCount: questions.length /*questions[indexs].title.length,*/,
-            itemBuilder: (context, index) {
-              return ExamPageviewBuilder(
-                visible: visible,
-                controller: pageControllers,
-                itemCount: questions.length,
-                onPageChanged: (index) {
-                  indexNotider.changeIndex(index);
-                },
-                itemBuilder: (context, index) {
-                  final question = questions[index];
+        data: (_) {
+          if (flattenedQuestions.isEmpty) {
+            return const Center(child: Text('No questions available'));
+          }
 
-                  return !visible
-                      ? QuestionsContent(
-                          questionText: question.questions[index].questionText,
-                          choices: question.questions[index].choices,
-                          selectedIndex: selectedAnswers[index],
-                          onSelect: (v) async {
-                            if (v != null) {
-                              isAnswered.isAnswered(question.id);
-                              await answerQuestion.answerQuestion(
-                                question.questions[index].choices[v].id.toString(),
-                              );
-                              print(selectedAnswers);
-                              setState(() {
-                                selectedAnswers[index] = v;
-                              });
-                            }
-                          },
-                        )
-                      : UnansweredCard(
-                          isShown: () => showModal.showModal(),
-                          itemCount: questions.length,
-                          itemBuilder: (context, indx) =>
-                              UnansweredQuestionsBadge(
-                                callback: () {
-                                  pageControllerNotifier.navigateToPage(indx);
-                                  showModal.showModal();
-                                },
-                                content: '${indx + 1}',
-                                answered: isAnsweredWatch.contains(
-                                  questions[indx].id,
-                                ),
-                                index: indx,
-                              ),
-                          totalItems: isAnsweredWatch.length,
-                          currentItems: questions.length,
-                        );
-                },
-              );
+          return ExamPageviewBuilder(
+            visible: visible,
+            controller: pageControllers,
+            itemCount: flattenedQuestions.length,
+            onPageChanged: (innerIndex) {
+              indexNotider.changeIndex(innerIndex);
+            },
+            itemBuilder: (context, innerIndex) {
+              final item = flattenedQuestions[innerIndex];
+
+              return !visible
+                  ? QuestionsContent(
+                      questionText: item.question.questionText,
+                      choices: item.question.choices,
+                      selectedIndex: selectedAnswers[innerIndex],
+                      onSelect: (v) async {
+                        if (v != null) {
+                          isAnswered.isAnswered(item.question.id);
+                          await answerQuestion.answerQuestion(
+                            item.question.choices[v].choiceText,
+                          );
+                          debugPrint(selectedAnswers.toString());
+                          setState(() {
+                            selectedAnswers[innerIndex] = v;
+                          });
+                        }
+                      },
+                    )
+                  : UnansweredCard(
+                      isShown: () => showModal.showModal(),
+                      itemCount: flattenedQuestions.length,
+                      itemBuilder: (context, indx) => UnansweredQuestionsBadge(
+                        callback: () {
+                          pageControllerNotifier.navigateToPage(indx);
+                          showModal.showModal();
+                        },
+                        content: '${indx + 1}',
+                        answered: isAnsweredWatch.contains(
+                          flattenedQuestions[indx].question.id,
+                        ),
+                        index: indx,
+                      ),
+                      totalItems: isAnsweredWatch.length,
+                      currentItems: flattenedQuestions.length,
+                    );
             },
           );
         },
@@ -131,7 +136,9 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                 ),
               ),
               ReusableButton(
-                title: selectedAnswers[indexs] == null
+                title:
+                    flattenedQuestions.isEmpty ||
+                        selectedAnswers[safeIndex] == null
                     ? 'UNANSWERED'
                     : 'ANSWERED',
                 onPressed: () => showModal.showModal(),
@@ -139,17 +146,19 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                 height: 50,
               ),
               IconButton(
-                onPressed: selectedAnswers[indexs] == null
+                onPressed:
+                    flattenedQuestions.isEmpty ||
+                        selectedAnswers[safeIndex] == null
                     ? null
                     : () {
                         pageControllerNotifier.next(
                           context,
-                          questions.length,
-                          indexs,
+                          flattenedQuestions.length,
+                          safeIndex,
                         );
                         print(pageControllers.page);
                         if (pageControllers.page == 3 &&
-                            indexs >= questions.length - 1) {
+                            safeIndex >= flattenedQuestions.length - 1) {
                           isAnswered.resetState();
                           setState(() {
                             selectedAnswers.clear();

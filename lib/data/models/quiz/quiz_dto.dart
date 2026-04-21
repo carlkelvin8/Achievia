@@ -24,6 +24,7 @@ class QuizDto {
           id: q.id,
           questionText: q.questionText,
           choices: q.choices.map((c) => ChoiceEntity(
+            questiondId: c.questionId,
             id: c.id,
             choiceText: c.choiceText,
             isCorrect: c.isCorrect,
@@ -132,6 +133,7 @@ class QuizDtoItems {
                 questionText: q.questionText,
                 choices: q.choices
                     .map((c) => ChoiceEntity(
+                          questiondId: c.questionId,
                           id: c.id,
                           choiceText: c.choiceText,
                           isCorrect: c.isCorrect,
@@ -159,6 +161,7 @@ class QuizDtoItems {
                             'id': c.id,
                             'choiceText': c.choiceText,
                             'isCorrect': c.isCorrect,
+                            'questionId': c.questionId,
                           })
                       .toList(),
                 })
@@ -201,10 +204,12 @@ class ChoicesDto {
   final int id;
   final String choiceText;
   final bool isCorrect;
+  final int questionId;
   ChoicesDto({
     required this.id,
     required this.choiceText,
     required this.isCorrect,
+    required this.questionId,
   });
 
   factory ChoicesDto.fromJson(Map<String, dynamic> json) {
@@ -212,6 +217,7 @@ class ChoicesDto {
       id: json['id'] as int,
       choiceText: json['choiceText'] ?? "",
       isCorrect: json['isCorrect'] as bool,
+      questionId: json['questionId'] as int,
     );
   }
 
@@ -220,6 +226,13 @@ class ChoicesDto {
       id: entity.id,
       choiceText: entity.choiceText,
       isCorrect: entity.isCorrect,
+      questionId: entity.questiondId,
     );
   }
 }
+/// THIS ONE CAN'T BE DELETED BECAUSE IT'S USED IN THE OFFLINE CACHING OF THE QUIZ QUESTIONS, AND IT'S ALSO USED IN THE EXAM SCREEN TO FLATTEN THE QUESTION DATA FOR EASIER ACCESS. WAG DELETE POTA PLEASE.
+typedef FlattenedQuestion = ({
+  String title,
+  int quizId,
+  QuestionItemEntity question,
+});

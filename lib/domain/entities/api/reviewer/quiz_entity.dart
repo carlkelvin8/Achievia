@@ -35,6 +35,7 @@ class QuestionItemEntity {
 }
 
 class ChoiceEntity {
+  final int questiondId;
   final int id;
   final String choiceText;
   final bool isCorrect;
@@ -43,5 +44,6 @@ class ChoiceEntity {
     required this.id,
     required this.choiceText,
     required this.isCorrect,
+    required this.questiondId,
   });
 }
