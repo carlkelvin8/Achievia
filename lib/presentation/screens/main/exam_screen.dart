@@ -20,6 +20,10 @@ class ExamScreen extends ConsumerStatefulWidget {
 class _ExamScreenState extends ConsumerState<ExamScreen> {
   final Map<int, int> selectedAnswers = {};
 
+  bool _isBatchAnswered(QuizItemEntity batch) {
+    return batch.questions.every((question) => selectedAnswers[question.id] != null);
+  }
+
   @override
   Widget build(BuildContext context) {
     final asyncQuestions = ref.watch(getGeneratedQuestions);
@@ -33,36 +37,28 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
     final isAnsweredWatch = ref.watch(answeredQuestionsProvider);
     final answerQuestion = ref.read(answerQotProvider.notifier);
 
-    final flattenedQuestions =
-        asyncQuestions.value
-            ?.expand(
-              (quiz) => quiz.questions.map(
-                (q) => (title: quiz.title, quizId: quiz.id, question: q),
-              ),
-            )
-            .toList() ??
-        <FlattenedQuestion>[];
+    final quizBatches = asyncQuestions.value ?? <QuizItemEntity>[];
 
-    final safeIndex = flattenedQuestions.isEmpty
+    final safeIndex = quizBatches.isEmpty
         ? 0
-        : indexs.clamp(0, flattenedQuestions.length - 1);
+        : indexs.clamp(0, quizBatches.length - 1);
 
     return Scaffold(
       appBar: ExamAppBar(
         callback: () {},
         title: asyncQuestions.when(
           data: (_) {
-            if (flattenedQuestions.isEmpty) return 'No questions';
-            return flattenedQuestions[safeIndex].title;
+            if (quizBatches.isEmpty) return 'No questions';
+            return quizBatches[safeIndex].title;
           },
           error: (_, _) => 'Err',
           loading: () => 'Loading',
         ),
         toolbarheight: 150,
         page: asyncQuestions.when(
-          data: (_) => flattenedQuestions.isEmpty
+          data: (_) => quizBatches.isEmpty
               ? '0 / 0'
-              : '${safeIndex + 1} / ${flattenedQuestions.length}',
+              : '${safeIndex + 1} / ${quizBatches.length}',
           loading: () => '0 / 0',
           error: (_, __) => '0 / 0',
         ),
@@ -70,54 +66,70 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
       persistentFooterAlignment: AlignmentDirectional.center,
       body: asyncQuestions.when(
         data: (_) {
-          if (flattenedQuestions.isEmpty) {
+          if (quizBatches.isEmpty) {
             return const Center(child: Text('No questions available'));
           }
 
           return ExamPageviewBuilder(
             visible: visible,
             controller: pageControllers,
-            itemCount: flattenedQuestions.length,
-            onPageChanged: (innerIndex) {
-              indexNotider.changeIndex(innerIndex);
+            itemCount: quizBatches.length,
+            onPageChanged: (batchIndex) {
+              indexNotider.changeIndex(batchIndex);
             },
-            itemBuilder: (context, innerIndex) {
-              final item = flattenedQuestions[innerIndex];
+            itemBuilder: (context, batchIndex) {
+              final batch = quizBatches[batchIndex];
 
               return !visible
-                  ? QuestionsContent(
-                      questionText: item.question.questionText,
-                      choices: item.question.choices,
-                      selectedIndex: selectedAnswers[innerIndex],
-                      onSelect: (v) async {
-                        if (v != null) {
-                          isAnswered.isAnswered(item.question.id);
-                          await answerQuestion.answerQuestion(
-                            item.question.choices[v].choiceText,
-                          );
-                          debugPrint(selectedAnswers.toString());
-                          setState(() {
-                            selectedAnswers[innerIndex] = v;
-                          });
-                        }
-                      },
+                  ? SingleChildScrollView(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ...List.generate(batch.questions.length, (questionIndex) {
+                            final question = batch.questions[questionIndex];
+
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                bottom: questionIndex == batch.questions.length - 1 ? 0 : 16,
+                              ),
+                              child: QuestionsContent(
+                                questionText: '${questionIndex + 1}. ${question.questionText}',
+                                choices: question.choices,
+                                selectedIndex: selectedAnswers[question.id],
+                                onSelect: (v) async {
+                                  if (v != null) {
+                                    isAnswered.isAnswered(question.id);
+                                    await answerQuestion.answerQuestion(
+                                      question.choices[v].choiceText,
+                                    );
+                                    setState(() {
+                                      selectedAnswers[question.id] = v;
+                                    });
+                                  }
+                                },
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
                     )
                   : UnansweredCard(
                       isShown: () => showModal.showModal(),
-                      itemCount: flattenedQuestions.length,
+                      itemCount: quizBatches.length,
                       itemBuilder: (context, indx) => UnansweredQuestionsBadge(
                         callback: () {
                           pageControllerNotifier.navigateToPage(indx);
                           showModal.showModal();
                         },
                         content: '${indx + 1}',
-                        answered: isAnsweredWatch.contains(
-                          flattenedQuestions[indx].question.id,
+                        answered: quizBatches[indx].questions.every(
+                          (question) => isAnsweredWatch.contains(question.id),
                         ),
                         index: indx,
                       ),
                       totalItems: isAnsweredWatch.length,
-                      currentItems: flattenedQuestions.length,
+                      currentItems: quizBatches.length,
                     );
             },
           );
@@ -137,8 +149,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
               ),
               ReusableButton(
                 title:
-                    flattenedQuestions.isEmpty ||
-                        selectedAnswers[safeIndex] == null
+                    quizBatches.isEmpty || !_isBatchAnswered(quizBatches[safeIndex])
                     ? 'UNANSWERED'
                     : 'ANSWERED',
                 onPressed: () => showModal.showModal(),
@@ -147,22 +158,18 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
               ),
               IconButton(
                 onPressed:
-                    flattenedQuestions.isEmpty ||
-                        selectedAnswers[safeIndex] == null
+                    quizBatches.isEmpty || !_isBatchAnswered(quizBatches[safeIndex])
                     ? null
                     : () {
                         pageControllerNotifier.next(
                           context,
-                          flattenedQuestions.length,
+                          quizBatches.length,
                           safeIndex,
                         );
-                        print(pageControllers.page);
-                        if (pageControllers.page == 3 &&
-                            safeIndex >= flattenedQuestions.length - 1) {
+                        if (safeIndex >= quizBatches.length - 1) {
                           isAnswered.resetState();
                           setState(() {
                             selectedAnswers.clear();
-                            print(selectedAnswers);
                           });
                         }
                       },

@@ -20,50 +20,47 @@ class QuestionsContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bool isAnswered = selectedIndex != null;
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            questionText,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          questionText,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
           ),
-          const SizedBox(height: 12),
+        ),
+        const SizedBox(height: 12),
 
-          ...List.generate(choices.length, (index) {
-            final choice = choices[index];
-            final isSelected = selectedIndex == index;
+        ...List.generate(choices.length, (index) {
+          final choice = choices[index];
+          final isSelected = selectedIndex == index;
 
-            Color? textColor;
-            FontWeight? font;
-            if (selectedIndex != null) {
-              if (choice.isCorrect) {
-                textColor = Colors.green;
-                font = FontWeight.bold;
-              } else if (isSelected) {
-                textColor = Colors.red;
-                font = FontWeight.bold;
-              }
+          Color? textColor;
+          FontWeight? font;
+          if (selectedIndex != null) {
+            if (choice.isCorrect) {
+              textColor = Colors.green;
+              font = FontWeight.bold;
+            } else if (isSelected) {
+              textColor = Colors.red;
+              font = FontWeight.bold;
             }
+          }
 
-            return RadioListTile<int>(
-              value: index,
-              groupValue: selectedIndex,
-              onChanged: isAnswered ? null : onSelect,
-              title: Text(
-                choice.choiceText,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: textColor,
-                  fontWeight: font,
-                ),
+          return RadioListTile<int>(
+            value: index,
+            groupValue: selectedIndex,
+            onChanged: isAnswered ? null : onSelect,
+            title: Text(
+              choice.choiceText,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: textColor,
+                fontWeight: font,
               ),
-            );
-          }),
-        ],
-      ),
+            ),
+          );
+        }),
+      ],
     );
   }
 }

@@ -9,8 +9,19 @@ class QuizScoreEntity {
 class ScoreEntity {
   final String score;
   final List<AnswerEntity> answers;
+  final bool passed;
+  final double failedWeight;
+  final bool hasMajorBelow50;
+  final List<String> reasons;
 
-  ScoreEntity({required this.score, required this.answers});
+  ScoreEntity({
+    required this.score,
+    required this.answers,
+    required this.passed,
+    required this.failedWeight,
+    required this.hasMajorBelow50,
+    required this.reasons,
+  });
 }
 
 class AnswerEntity {
@@ -18,5 +29,9 @@ class AnswerEntity {
   final String name;
   final double score;
 
-  AnswerEntity({required this.isCorrect, required this.name, required this.score});
+  AnswerEntity({
+    required this.isCorrect,
+    required this.name,
+    required this.score,
+  });
 }
