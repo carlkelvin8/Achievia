@@ -1,4 +1,3 @@
-import 'package:achievia/data/models/quiz/quiz_dto.dart';
 import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
 import 'package:achievia/presentation/widgets/appbar/exam_app_bar.dart';
