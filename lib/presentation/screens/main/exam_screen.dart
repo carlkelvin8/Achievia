@@ -1,4 +1,3 @@
-import 'package:achievia/data/models/quiz/quiz_dto.dart';
 import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
 import 'package:achievia/presentation/widgets/appbar/exam_app_bar.dart';
@@ -20,8 +19,15 @@ class ExamScreen extends ConsumerStatefulWidget {
 class _ExamScreenState extends ConsumerState<ExamScreen> {
   final Map<int, int> selectedAnswers = {};
 
-  bool _isBatchAnswered(QuizItemEntity batch) {
-    return batch.questions.every((question) => selectedAnswers[question.id] != null);
+  void _resetQuestionPage(
+    PageController controller,
+    IndexProviderOuter indexNotifier,
+  ) {
+    indexNotifier.changeIndex(0);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !controller.hasClients) return;
+      controller.jumpToPage(0);
+    });
   }
 
   @override
@@ -29,8 +35,12 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
     final asyncQuestions = ref.watch(getGeneratedQuestions);
     final pageControllerNotifier = ref.read(pageController.notifier);
     final pageControllers = ref.watch(pageController);
+    final pageControllerOuterNotifier = ref.read(pageControllerOuter.notifier);
+    final pageControllerOuterState = ref.watch(pageControllerOuter);
     final indexs = ref.watch(changeIndexProvider);
     final indexNotider = ref.read(changeIndexProvider.notifier);
+    final indexOuter = ref.read(changeIndexProviderOuter.notifier);
+    final indexOuterState = ref.watch(changeIndexProviderOuter);
     final showModal = ref.read(showModalNotifier.notifier);
     final visible = ref.watch(showModalNotifier);
     final isAnswered = ref.read(answeredQuestionsProvider.notifier);
@@ -38,10 +48,20 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
     final answerQuestion = ref.read(answerQotProvider.notifier);
 
     final quizBatches = asyncQuestions.value ?? <QuizItemEntity>[];
-
     final safeIndex = quizBatches.isEmpty
         ? 0
         : indexs.clamp(0, quizBatches.length - 1);
+    final currentBatch = quizBatches.isEmpty ? null : quizBatches[safeIndex];
+    final safeOuterIndex =
+        currentBatch == null || currentBatch.questions.isEmpty
+        ? 0
+        : indexOuterState.clamp(0, currentBatch.questions.length - 1);
+    final currentQuestion =
+        currentBatch == null || currentBatch.questions.isEmpty
+        ? null
+        : currentBatch.questions[safeOuterIndex];
+    final isCurrentQuestionAnswered =
+        currentQuestion != null && selectedAnswers[currentQuestion.id] != null;
 
     return Scaffold(
       appBar: ExamAppBar(
@@ -56,12 +76,13 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
         ),
         toolbarheight: 150,
         page: asyncQuestions.when(
-          data: (_) => quizBatches.isEmpty
+          data: (_) => currentBatch == null || currentBatch.questions.isEmpty
               ? '0 / 0'
-              : '${safeIndex + 1} / ${quizBatches.length}',
+              : '${safeOuterIndex + 1} / ${currentBatch.questions.length}',
           loading: () => '0 / 0',
           error: (_, __) => '0 / 0',
         ),
+        subjects: '${safeIndex + 1} / ${quizBatches.length}',
       ),
       persistentFooterAlignment: AlignmentDirectional.center,
       body: asyncQuestions.when(
@@ -76,43 +97,49 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
             itemCount: quizBatches.length,
             onPageChanged: (batchIndex) {
               indexNotider.changeIndex(batchIndex);
+              _resetQuestionPage(pageControllerOuterState, indexOuter);
             },
             itemBuilder: (context, batchIndex) {
               final batch = quizBatches[batchIndex];
+              final isActiveBatch = batchIndex == safeIndex;
 
               return !visible
-                  ? SingleChildScrollView(
+                  ? Padding(
                       padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ...List.generate(batch.questions.length, (questionIndex) {
-                            final question = batch.questions[questionIndex];
+                      child: batch.questions.isEmpty
+                          ? const Center(child: Text('No questions available'))
+                          : PageView.builder(
+                              key: ValueKey('question-page-$batchIndex'),
+                              physics: const NeverScrollableScrollPhysics(),
+                              controller: isActiveBatch
+                                  ? pageControllerOuterState
+                                  : null,
+                              itemCount: batch.questions.length,
+                              onPageChanged: isActiveBatch
+                                  ? indexOuter.changeIndex
+                                  : null,
+                              itemBuilder: (context, questionIndex) {
+                                final question = batch.questions[questionIndex];
 
-                            return Padding(
-                              padding: EdgeInsets.only(
-                                bottom: questionIndex == batch.questions.length - 1 ? 0 : 16,
-                              ),
-                              child: QuestionsContent(
-                                questionText: '${questionIndex + 1}. ${question.questionText}',
-                                choices: question.choices,
-                                selectedIndex: selectedAnswers[question.id],
-                                onSelect: (v) async {
-                                  if (v != null) {
-                                    isAnswered.isAnswered(question.id);
-                                    await answerQuestion.answerQuestion(
-                                      question.choices[v].choiceText,
-                                    );
-                                    setState(() {
-                                      selectedAnswers[question.id] = v;
-                                    });
-                                  }
-                                },
-                              ),
-                            );
-                          }),
-                        ],
-                      ),
+                                return QuestionsContent(
+                                  questionText:
+                                      '${questionIndex + 1}. ${question.questionText}',
+                                  choices: question.choices,
+                                  selectedIndex: selectedAnswers[question.id],
+                                  onSelect: (v) async {
+                                    if (v != null) {
+                                      isAnswered.isAnswered(question.id);
+                                      await answerQuestion.answerQuestion(
+                                        question.choices[v].choiceText,
+                                      );
+                                      setState(() {
+                                        selectedAnswers[question.id] = v;
+                                      });
+                                    }
+                                  },
+                                );
+                              },
+                            ),
                     )
                   : UnansweredCard(
                       isShown: () => showModal.showModal(),
@@ -141,15 +168,27 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
           ? null
           : [
               IconButton(
-                onPressed: () => pageControllerNotifier.prev(),
+                onPressed: quizBatches.isEmpty
+                    ? null
+                    : () {
+                        if (currentBatch == null) return;
+
+                        if (safeOuterIndex > 0) {
+                          pageControllerOuterNotifier.prev();
+                          return;
+                        }
+
+                        if (safeIndex > 0) {
+                          pageControllerNotifier.prev();
+                        }
+                      },
                 icon: Icon(
                   Icons.arrow_back_ios,
                   color: Theme.of(context).primaryColor,
                 ),
               ),
               ReusableButton(
-                title:
-                    quizBatches.isEmpty || !_isBatchAnswered(quizBatches[safeIndex])
+                title: currentQuestion == null || !isCurrentQuestionAnswered
                     ? 'UNANSWERED'
                     : 'ANSWERED',
                 onPressed: () => showModal.showModal(),
@@ -157,21 +196,42 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                 height: 50,
               ),
               IconButton(
-                onPressed:
-                    quizBatches.isEmpty || !_isBatchAnswered(quizBatches[safeIndex])
+                onPressed: currentQuestion == null || !isCurrentQuestionAnswered
                     ? null
-                    : () {
-                        pageControllerNotifier.next(
+                    : () async {
+                        if (currentBatch == null) return;
+
+                        if (safeOuterIndex <
+                            currentBatch.questions.length - 1) {
+                          await pageControllerOuterNotifier.nextAsOuter(
+                            context,
+                            currentBatch.title,
+                          );
+                          return;
+                        }
+
+                        await pageControllerNotifier.next(
                           context,
                           quizBatches.length,
                           safeIndex,
                         );
+
                         if (safeIndex >= quizBatches.length - 1) {
                           isAnswered.resetState();
                           setState(() {
                             selectedAnswers.clear();
                           });
+                          _resetQuestionPage(
+                            pageControllerOuterState,
+                            indexOuter,
+                          );
+                          return;
                         }
+
+                        _resetQuestionPage(
+                          pageControllerOuterState,
+                          indexOuter,
+                        );
                       },
                 icon: Icon(
                   Icons.arrow_forward_ios,

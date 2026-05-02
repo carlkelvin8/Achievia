@@ -80,7 +80,7 @@ class ReminderDateTimeSection extends StatelessWidget {
                       child: Switch(
                         value: isDateEnabled,
                         onChanged: onDateEnabledChanged,
-                        activeColor: theme.primaryColor,
+                        activeThumbColor: theme.primaryColor,
                       ),
                     ),
                   ],
@@ -139,7 +139,7 @@ class ReminderDateTimeSection extends StatelessWidget {
                       child: Switch(
                         value: isTimeEnabled,
                         onChanged: onTimeEnabledChanged,
-                        activeColor: theme.primaryColor,
+                        activeThumbColor: theme.primaryColor,
                       ),
                     ),
                   ],

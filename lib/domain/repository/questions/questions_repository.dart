@@ -1,4 +1,3 @@
-import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/entities/api/home/results_entity.dart';
 import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';

@@ -7,7 +7,8 @@ import 'package:achievia/domain/entities/api/home/results_entity.dart';
 import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
 import 'package:achievia/domain/use_cases/questions/questions_use_case.dart';
 import 'package:achievia/presentation/provider/questions/questions_state.dart';
-import 'package:flutter/material.dart';
+import 'package:achievia/presentation/widgets/dialogs/loading_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
@@ -224,6 +225,7 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier> {
       quiz_id: '',
       student_id: '',
       chosen_answer: '',
+      isLoading: false,
     );
   }
 
@@ -236,8 +238,19 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier> {
     await useCase.answerQuestion(entity);
   }
 
-  Future<void> randomizeQuestion(int index) async {
+  Future<void> randomizeQuestion(int index, BuildContext context) async {
+    state = state.copyWith(isLoading: true);
+    await showDialog(context, false);
     await useCase.randomizeQuestions(index);
+    Navigator.of(context, rootNavigator: true).pop();
+    state = state.copyWith(isLoading: false);
+  }
+
+  Future<void> showDialog(BuildContext context, bool isLoading) async {
+    showCupertinoDialog(
+      context: context,
+      barrierDismissible: isLoading,
+      builder: (context) => const LoadingDialog(),
+    );
   }
 }
-
