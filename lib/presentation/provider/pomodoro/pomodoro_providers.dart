@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/domain/entities/widgets/pomodoro_settings_entity.dart';
 import 'package:achievia/domain/entities/widgets/pomodoro_state_entity.dart';
 const Duration fixedTimerDuration = Duration(hours: 120);
+const Duration minTimer = Duration(minutes: 5);
 
 class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
   @override
@@ -210,7 +211,7 @@ class MockboardsTimer extends Notifier<PomodoroStateEntity> {
   PomodoroStateEntity build() {
     return PomodoroStateEntity(
       phase: PomodoroPhase.focus,
-      remaining: fixedTimerDuration,
+      remaining: minTimer,
       completedFocusSessions: 0,
       isRunning: false,
     );
@@ -233,7 +234,7 @@ class MockboardsTimer extends Notifier<PomodoroStateEntity> {
   pause();
   state = PomodoroStateEntity(
     phase: PomodoroPhase.focus,
-    remaining: fixedTimerDuration,
+    remaining: minTimer,
     completedFocusSessions: 0,
     isRunning: false,
   );
@@ -285,4 +286,4 @@ final pomodoroProvider =
     );
 
 
-final timerProviser = NotifierProvider<MockboardsTimer, PomodoroStateEntity>(MockboardsTimer.new);
+final timerProvider = NotifierProvider<MockboardsTimer, PomodoroStateEntity>(MockboardsTimer.new);

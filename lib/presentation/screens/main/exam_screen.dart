@@ -1,4 +1,5 @@
 import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
+import 'package:achievia/presentation/provider/pomodoro/pomodoro_providers.dart';
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
 import 'package:achievia/presentation/widgets/appbar/exam_app_bar.dart';
 import 'package:achievia/presentation/widgets/badges/unanswered_questions_badge.dart';
@@ -46,7 +47,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
     final isAnswered = ref.read(answeredQuestionsProvider.notifier);
     final isAnsweredWatch = ref.watch(answeredQuestionsProvider);
     final answerQuestion = ref.read(answerQotProvider.notifier);
-
+    final timerNotifier = ref.read(timerProvider.notifier);
     final quizBatches = asyncQuestions.value ?? <QuizItemEntity>[];
     final safeIndex = quizBatches.isEmpty
         ? 0
@@ -98,6 +99,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
             onPageChanged: (batchIndex) {
               indexNotider.changeIndex(batchIndex);
               _resetQuestionPage(pageControllerOuterState, indexOuter);
+              timerNotifier.reset();
             },
             itemBuilder: (context, batchIndex) {
               final batch = quizBatches[batchIndex];
@@ -143,20 +145,20 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                     )
                   : UnansweredCard(
                       isShown: () => showModal.showModal(),
-                      itemCount: quizBatches.length,
+                      itemCount: currentBatch?.questions.length ?? 0,
                       itemBuilder: (context, indx) => UnansweredQuestionsBadge(
                         callback: () {
                           pageControllerNotifier.navigateToPage(indx);
                           showModal.showModal();
                         },
                         content: '${indx + 1}',
-                        answered: quizBatches[indx].questions.every(
+                        answered: currentBatch?.questions.every(
                           (question) => isAnsweredWatch.contains(question.id),
-                        ),
+                        ) ?? false,
                         index: indx,
                       ),
                       totalItems: isAnsweredWatch.length,
-                      currentItems: quizBatches.length,
+                      currentItems: currentBatch?.questions.length ?? 0,
                     );
             },
           );
@@ -225,6 +227,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                             pageControllerOuterState,
                             indexOuter,
                           );
+                          timerNotifier.reset();
                           return;
                         }
 
@@ -232,6 +235,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                           pageControllerOuterState,
                           indexOuter,
                         );
+                        timerNotifier.reset();
                       },
                 icon: Icon(
                   Icons.arrow_forward_ios,
