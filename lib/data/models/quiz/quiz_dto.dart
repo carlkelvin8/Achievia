@@ -230,9 +230,3 @@ class ChoicesDto {
     );
   }
 }
-/// THIS ONE CAN'T BE DELETED BECAUSE IT'S USED IN THE OFFLINE CACHING OF THE QUIZ QUESTIONS, AND IT'S ALSO USED IN THE EXAM SCREEN TO FLATTEN THE QUESTION DATA FOR EASIER ACCESS. WAG DELETE POTA PLEASE.
-typedef FlattenedQuestion = ({
-  String title,
-  int quizId,
-  QuestionItemEntity question,
-});

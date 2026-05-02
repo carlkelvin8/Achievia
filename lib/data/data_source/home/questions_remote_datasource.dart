@@ -118,13 +118,13 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data']['response']['subjects'] as List<dynamic>;
-        final quizTitles = await response.data['data']['response']['quiz'];
+        final quizTitles = response.data['data']['response']['quiz'] as List<dynamic>;
         debugPrint(
           'Quiz Titles: ${quizTitles.map((q) => q['title']).toList()}',
           wrapWidth: 1024,
         );
         final list = data.map((e) => QuestionsDto.fromJson(e)).toList();
-        final quizItems = (quizTitles as List<dynamic>)
+        final quizItems = quizTitles
             .map((q) => QuizDtoItems.fromJson(Map<String, dynamic>.from(q)))
             .toList();
         await local.insertQuestionsToCache(list);
