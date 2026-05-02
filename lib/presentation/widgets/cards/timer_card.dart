@@ -8,8 +8,8 @@ class TimerCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final timer = ref.watch(timerProviser);
-    final notifier = ref.read(timerProviser.notifier);
+    final timer = ref.watch(timerProvider);
+    final notifier = ref.read(timerProvider.notifier);
 
     return ExamTimerDisplay(
       phaseLabel: notifier.getPhaseLabel(timer.phase),

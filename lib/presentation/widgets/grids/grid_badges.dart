@@ -19,18 +19,24 @@ class GridBadges extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-     final provider = ref.read(answerQotProvider.notifier);
-     return Expanded(child: ListView.separated(itemBuilder: (context, index) => QuestionsCard(
-      icon: questions[index].icon, 
-      label: questions[index].label, 
-      sub_label: questions[index].sub_label,
-      callback:()async{
-        await provider.randomizeQuestion(index);
-        Navigator.of(context, rootNavigator: true).pushNamed('/onboarding-questions');
-      },
-      ), 
-      separatorBuilder: (context, index) => const SizedBox(height: 10,), 
-      itemCount: questions.length)
+    final provider = ref.read(answerQotProvider.notifier);
+    return Expanded(
+      child: ListView.separated(
+        itemBuilder: (context, index) => QuestionsCard(
+          icon: questions[index].icon,
+          label: questions[index].label,
+          sub_label: questions[index].sub_label,
+          callback: () async { 
+            await provider.randomizeQuestion(index, context);
+            Navigator.of(
+              context,
+              rootNavigator: true,
+            ).pushNamed('/onboarding-questions');
+          },
+        ),
+        separatorBuilder: (context, index) => const SizedBox(height: 10),
+        itemCount: questions.length,
+      ),
     );
-}
+  }
 }

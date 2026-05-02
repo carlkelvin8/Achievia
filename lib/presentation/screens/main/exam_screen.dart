@@ -1,9 +1,9 @@
-import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
+import 'package:achievia/presentation/provider/pomodoro/pomodoro_providers.dart';
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
 import 'package:achievia/presentation/widgets/appbar/exam_app_bar.dart';
 import 'package:achievia/presentation/widgets/badges/unanswered_questions_badge.dart';
 import 'package:achievia/presentation/widgets/builders/exam_pageview_builder.dart';
-import 'package:achievia/presentation/widgets/builders/queueing_pageview_builder.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/cards/questions_content.dart';
 import 'package:achievia/presentation/widgets/cards/unanswered_card.dart';
@@ -19,101 +19,173 @@ class ExamScreen extends ConsumerStatefulWidget {
 
 class _ExamScreenState extends ConsumerState<ExamScreen> {
   final Map<int, int> selectedAnswers = {};
+
+  void _resetQuestionPage(
+    PageController controller,
+    IndexProviderOuter indexNotifier,
+  ) {
+    indexNotifier.changeIndex(0);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !controller.hasClients) return;
+      controller.jumpToPage(0);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final asyncQuestions = ref.watch(getGeneratedQuestions);
     final pageControllerNotifier = ref.read(pageController.notifier);
     final pageControllers = ref.watch(pageController);
-    final outerControllerState = ref.watch(pageControllerOuter);
-    final outerControllerEvent = ref.read(pageControllerOuter.notifier);
+    final pageControllerOuterNotifier = ref.read(pageControllerOuter.notifier);
+    final pageControllerOuterState = ref.watch(pageControllerOuter);
     final indexs = ref.watch(changeIndexProvider);
     final indexNotider = ref.read(changeIndexProvider.notifier);
-    final indexOuter = ref.watch(changeIndexProviderOuter);
-    final indexOuterNotifier = ref.read(changeIndexProviderOuter.notifier);
+    final indexOuter = ref.read(changeIndexProviderOuter.notifier);
+    final indexOuterState = ref.watch(changeIndexProviderOuter);
     final showModal = ref.read(showModalNotifier.notifier);
     final visible = ref.watch(showModalNotifier);
     final isAnswered = ref.read(answeredQuestionsProvider.notifier);
     final isAnsweredWatch = ref.watch(answeredQuestionsProvider);
-    final getGenerated = ref.watch(getGeneratedQuestions);
     final answerQuestion = ref.read(answerQotProvider.notifier);
+    final timerNotifier = ref.read(timerProvider.notifier);
+    final quizBatches = asyncQuestions.value ?? <QuizItemEntity>[];
+    final safeIndex = quizBatches.isEmpty
+        ? 0
+        : indexs.clamp(0, quizBatches.length - 1);
+    final currentBatch = quizBatches.isEmpty ? null : quizBatches[safeIndex];
+    final safeOuterIndex =
+        currentBatch == null || currentBatch.questions.isEmpty
+        ? 0
+        : indexOuterState.clamp(0, currentBatch.questions.length - 1);
+    final currentQuestion =
+        currentBatch == null || currentBatch.questions.isEmpty
+        ? null
+        : currentBatch.questions[safeOuterIndex];
+    final isCurrentQuestionAnswered =
+        currentQuestion != null && selectedAnswers[currentQuestion.id] != null;
+
     return Scaffold(
       appBar: ExamAppBar(
-        callback: () => outerControllerEvent.nextAsOuter(
-          context,
-          "outer ${asyncQuestions.value?[indexOuter].title.length}",
-        ),
+        callBackQuit: (){
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Text('End Exam'),
+              content: const Text('Are you sure you want to end the exam?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                    timerNotifier.reset();
+                    timerNotifier.pause();
+                  },
+                  child: const Text('End'),
+                ),
+              ],
+            ),
+          );
+        },
+        callback: () {
+          
+        },
         title: asyncQuestions.when(
-          data: (q) {
-            return q[indexs].title;
+          data: (_) {
+            if (quizBatches.isEmpty) return 'No questions';
+            return quizBatches[safeIndex].title;
           },
           error: (_, _) => 'Err',
           loading: () => 'Loading',
         ),
         toolbarheight: 150,
         page: asyncQuestions.when(
-          data: (questions) => '${indexs + 1} / ${questions.length}',
+          data: (_) => currentBatch == null || currentBatch.questions.isEmpty
+              ? '0 / 0'
+              : '${safeOuterIndex + 1} / ${currentBatch.questions.length}',
           loading: () => '0 / 0',
           error: (_, __) => '0 / 0',
         ),
+        subjects: '${safeIndex + 1} / ${quizBatches.length}',
       ),
       persistentFooterAlignment: AlignmentDirectional.center,
       body: asyncQuestions.when(
-        data: (questions) {
-          return QueueingPageViewBuilder(
-            onPageChanged: (index) {
-              indexOuterNotifier.changeIndex(index);
-            },
-            controller: outerControllerState,
-            itemCount: questions.length /*questions[indexs].title.length,*/,
-            itemBuilder: (context, index) {
-              return ExamPageviewBuilder(
-                visible: visible,
-                controller: pageControllers,
-                itemCount: questions.length,
-                onPageChanged: (index) {
-                  indexNotider.changeIndex(index);
-                },
-                itemBuilder: (context, index) {
-                  final question = questions[index];
+        data: (_) {
+          if (quizBatches.isEmpty) {
+            return const Center(child: Text('No questions available'));
+          }
 
-                  return !visible
-                      ? QuestionsContent(
-                          questionText: question.questionText,
-                          choices: question.choices,
-                          selectedIndex: selectedAnswers[index],
-                          onSelect: (v) async {
-                            if (v != null) {
-                              isAnswered.isAnswered(question.id);
-                              await answerQuestion.answerQuestion(
-                                question.choices[v]['choiceText'],
-                              );
-                              print(selectedAnswers);
-                              setState(() {
-                                selectedAnswers[index] = v;
-                              });
-                            }
-                          },
-                        )
-                      : UnansweredCard(
-                          isShown: () => showModal.showModal(),
-                          itemCount: questions.length,
-                          itemBuilder: (context, indx) =>
-                              UnansweredQuestionsBadge(
-                                callback: () {
-                                  pageControllerNotifier.navigateToPage(indx);
-                                  showModal.showModal();
-                                },
-                                content: '${indx + 1}',
-                                answered: isAnsweredWatch.contains(
-                                  questions[indx].id,
-                                ),
-                                index: indx,
-                              ),
-                          totalItems: isAnsweredWatch.length,
-                          currentItems: questions.length,
-                        );
-                },
-              );
+          return ExamPageviewBuilder(
+            visible: visible,
+            controller: pageControllers,
+            itemCount: quizBatches.length,
+            onPageChanged: (batchIndex) {
+              indexNotider.changeIndex(batchIndex);
+              _resetQuestionPage(pageControllerOuterState, indexOuter);
+              timerNotifier.reset();
+            },
+            itemBuilder: (context, batchIndex) {
+              final batch = quizBatches[batchIndex];
+              final isActiveBatch = batchIndex == safeIndex;
+
+              return !visible
+                  ? Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: batch.questions.isEmpty
+                          ? const Center(child: Text('No questions available'))
+                          : PageView.builder(
+                              key: ValueKey('question-page-$batchIndex'),
+                              physics: const NeverScrollableScrollPhysics(),
+                              controller: isActiveBatch
+                                  ? pageControllerOuterState
+                                  : null,
+                              itemCount: batch.questions.length,
+                              onPageChanged: isActiveBatch
+                                  ? indexOuter.changeIndex
+                                  : null,
+                              itemBuilder: (context, questionIndex) {
+                                final question = batch.questions[questionIndex];
+
+                                return QuestionsContent(
+                                  questionText:
+                                      '${questionIndex + 1}. ${question.questionText}',
+                                  choices: question.choices,
+                                  selectedIndex: selectedAnswers[question.id],
+                                  onSelect: (v) async {
+                                    if (v != null) {
+                                      isAnswered.isAnswered(question.id);
+                                      await answerQuestion.answerQuestion(
+                                        question.choices[v].choiceText,
+                                      );
+                                      setState(() {
+                                        selectedAnswers[question.id] = v;
+                                      });
+                                    }
+                                  },
+                                );
+                              },
+                            ),
+                    )
+                  : UnansweredCard(
+                      isShown: () => showModal.showModal(),
+                      itemCount: currentBatch?.questions.length ?? 0,
+                      itemBuilder: (context, indx) => UnansweredQuestionsBadge(
+                        callback: () {
+                          pageControllerNotifier.navigateToPage(indx);
+                          showModal.showModal();
+                        },
+                        content: '${indx + 1}',
+                        answered: currentBatch?.questions.every(
+                          (question) => isAnsweredWatch.contains(question.id),
+                        ) ?? false,
+                        index: indx,
+                      ),
+                      totalItems: isAnsweredWatch.length,
+                      currentItems: currentBatch?.questions.length ?? 0,
+                    );
             },
           );
         },
@@ -124,14 +196,27 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
           ? null
           : [
               IconButton(
-                onPressed: () => pageControllerNotifier.prev(),
+                onPressed: quizBatches.isEmpty
+                    ? null
+                    : () {
+                        if (currentBatch == null) return;
+
+                        if (safeOuterIndex > 0) {
+                          pageControllerOuterNotifier.prev();
+                          return;
+                        }
+
+                        if (safeIndex > 0) {
+                          pageControllerNotifier.prev();
+                        }
+                      },
                 icon: Icon(
                   Icons.arrow_back_ios,
                   color: Theme.of(context).primaryColor,
                 ),
               ),
               ReusableButton(
-                title: selectedAnswers[indexs] == null
+                title: currentQuestion == null || !isCurrentQuestionAnswered
                     ? 'UNANSWERED'
                     : 'ANSWERED',
                 onPressed: () => showModal.showModal(),
@@ -139,23 +224,44 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                 height: 50,
               ),
               IconButton(
-                onPressed: selectedAnswers[indexs] == null
+                onPressed: currentQuestion == null || !isCurrentQuestionAnswered
                     ? null
-                    : () {
-                        pageControllerNotifier.next(
+                    : () async {
+                        if (currentBatch == null) return;
+
+                        if (safeOuterIndex <
+                            currentBatch.questions.length - 1) {
+                          await pageControllerOuterNotifier.nextAsOuter(
+                            context,
+                            currentBatch.title,
+                          );
+                          return;
+                        }
+
+                        await pageControllerNotifier.next(
                           context,
-                          questions.length,
-                          indexs,
+                          quizBatches.length,
+                          safeIndex,
                         );
-                        print(pageControllers.page);
-                        if (pageControllers.page == 3 &&
-                            indexs >= questions.length - 1) {
+
+                        if (safeIndex >= quizBatches.length - 1) {
                           isAnswered.resetState();
                           setState(() {
                             selectedAnswers.clear();
-                            print(selectedAnswers);
                           });
+                          _resetQuestionPage(
+                            pageControllerOuterState,
+                            indexOuter,
+                          );
+                          timerNotifier.reset();
+                          return;
                         }
+
+                        _resetQuestionPage(
+                          pageControllerOuterState,
+                          indexOuter,
+                        );
+                        timerNotifier.reset();
                       },
                 icon: Icon(
                   Icons.arrow_forward_ios,

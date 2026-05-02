@@ -1,9 +1,9 @@
 import 'package:achievia/core/network/conntectivity.dart';
 import 'package:achievia/core/network/offline_caching.dart';
 import 'package:achievia/data/data_source/home/questions_remote_datasource.dart';
-import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/entities/api/home/results_entity.dart';
+import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
 import 'package:achievia/domain/repository/questions/questions_repository.dart';
 import 'package:injectable/injectable.dart';
 
@@ -60,7 +60,7 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
   }
 
   @override
-  Future<List<QotyEntity>> getRandomizedQuestions() async {
+  Future<List<QuizItemEntity>> getRandomizedQuestions() async {
     final isConnected = await network.isConnected;
     try {
       if (isConnected) {

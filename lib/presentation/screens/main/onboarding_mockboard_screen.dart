@@ -19,7 +19,7 @@ class OnboardingMockboardScreen extends ConsumerStatefulWidget {
 class _OnboardingMockboardScreenState extends ConsumerState<OnboardingMockboardScreen> {
   @override
   Widget build(BuildContext context) {
-    final notifier = ref.read(timerProviser.notifier);
+    final notifier = ref.read(timerProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         title: Text('Mock Boards',

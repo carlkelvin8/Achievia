@@ -1,19 +1,20 @@
 import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/presentation/widgets/grids/grid_badges.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class QuestionsContentScreen extends StatefulWidget {
+class QuestionsContentScreen extends ConsumerStatefulWidget {
   const QuestionsContentScreen({super.key});
 
   @override
-  State<QuestionsContentScreen> createState() => _QuestionsContentScreenState();
+  ConsumerState<QuestionsContentScreen> createState() => _QuestionsContentScreenState();
 }
 
-class _QuestionsContentScreenState extends State<QuestionsContentScreen> {
+class _QuestionsContentScreenState extends ConsumerState<QuestionsContentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      body:  Padding(
         padding:level1,
         child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

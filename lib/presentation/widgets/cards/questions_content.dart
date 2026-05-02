@@ -1,9 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
 import 'package:flutter/material.dart';
 
 class QuestionsContent extends StatelessWidget {
   final String questionText;
-  final List choices;
+  final List<ChoiceEntity> choices;
   final int? selectedIndex;
   final void Function(int?) onSelect;
 
@@ -19,50 +20,47 @@ class QuestionsContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bool isAnswered = selectedIndex != null;
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            questionText,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          questionText,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
           ),
-          const SizedBox(height: 12),
+        ),
+        const SizedBox(height: 12),
 
-          ...List.generate(choices.length, (index) {
-            final choice = choices[index];
-            final isSelected = selectedIndex == index;
+        ...List.generate(choices.length, (index) {
+          final choice = choices[index];
+          final isSelected = selectedIndex == index;
 
-            Color? textColor;
-            FontWeight? font;
-            if (selectedIndex != null) {
-              if (choice['isCorrect'] == true) {
-                textColor = Colors.green;
-                font = FontWeight.bold;
-              } else if (isSelected) {
-                textColor = Colors.red;
-                font = FontWeight.bold;
-              }
+          Color? textColor;
+          FontWeight? font;
+          if (selectedIndex != null) {
+            if (choice.isCorrect) {
+              textColor = Colors.green;
+              font = FontWeight.bold;
+            } else if (isSelected) {
+              textColor = Colors.red;
+              font = FontWeight.bold;
             }
+          }
 
-            return RadioListTile<int>(
-              value: index,
-              groupValue: selectedIndex,
-              onChanged: isAnswered ? null : onSelect,
-              title: Text(
-                choice['choiceText'],
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: textColor,
-                  fontWeight: font
-                ),
+          return RadioListTile<int>(
+            value: index,
+            groupValue: selectedIndex,
+            onChanged: isAnswered ? null : onSelect,
+            title: Text(
+              choice.choiceText,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: textColor,
+                fontWeight: font,
               ),
-            );
-          }),
-        ],
-      ),
+            ),
+          );
+        }),
+      ],
     );
   }
 }

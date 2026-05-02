@@ -17,7 +17,7 @@ class AttemptCard extends ConsumerWidget {
     final watch = ref.watch(getResultsProviderState(attemptId));
     print('id:$attemptId');
     print(watch);
-    return Container( 
+    return Container(
       width: MediaQuery.of(context).size.width * 0.9,
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: BoxDecoration(
@@ -65,6 +65,7 @@ class AttemptCard extends ConsumerWidget {
                   return const Center(child: Text('No results available'));
                 }
                 final data = q.score.answers;
+                final passed = q.score.passed;
                 return Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -73,27 +74,50 @@ class AttemptCard extends ConsumerWidget {
                   ),
                   child: Column(
                     children: [
-                    Expanded(child: ListView.separated(
-                    separatorBuilder: (_, __) => const SizedBox(height: 8),
-                    itemCount: data.length,
-                    itemBuilder: (context, index) {
-                      int value = double.parse(data[index].score.toStringAsFixed(1)).round();
-                      return DataCard(
-                          dataNum: value.toString(),
-                          subject: data[index].name, 
-                          scores: q.score.score,
+                      Expanded(
+                        child: ListView.separated(
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 8),
+                          itemCount: data.length,
+                          itemBuilder: (context, index) {
+                            int value = double.parse(
+                              data[index].score.toStringAsFixed(1),
+                            ).round();
+                            return DataCard(
+                              dataNum: value.toString(),
+                              subject: data[index].name,
+                              scores: q.score.score,
                             );
                           },
-                        )
+                        ),
                       ),
-                    DataCard(dataNum: q.score.score, subject: 'Average', scores: q.score.score),
-                    const SizedBox(height: 8),
-                    DataCard(dataNum: double.parse(q.score.score) >= 75 ? 'Pass' : 'Failed', 
-                    subject: 'Remarks', 
-                    scores: q.score.score,
-                    textColor: double.parse(q.score.score) >= 75 ? Colors.black : Colors.white,
-                    color: double.parse(q.score.score) >= 75 ? Colors.green : Colors.red,
-                    )
+                      DataCard(
+                        dataNum: q.score.score,
+                        subject: 'Average',
+                        scores: q.score.score,
+                      ),
+                      const SizedBox(height: 8),
+                      DataCard(
+                        dataNum: passed ? 'Pass' : 'Failed',
+                        subject: 'Remarks',
+                        scores: q.score.score,
+                        textColor: passed ? Colors.black : Colors.white,
+                        color: passed ? Colors.green : Colors.red,
+                      ),
+                      if (q.score.reasons.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            q.score.reasons.join('\n'),
+                            style: GoogleFonts.poppins(
+                              color: Colors.red.shade700,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 );
@@ -105,10 +129,17 @@ class AttemptCard extends ConsumerWidget {
           const SizedBox(height: 12),
           Align(
             alignment: Alignment.bottomRight,
-            child: ReusableButton(title: 'Summary', onPressed: (){
-              Navigator.pushNamed(context, '/summary-screen');
-            }, width: 150, height: 40, backgroundColor: Colors.white, textColor: Colors.blue,),
-          )
+            child: ReusableButton(
+              title: 'Summary',
+              onPressed: () {
+                Navigator.pushNamed(context, '/summary-screen');
+              },
+              width: 150,
+              height: 40,
+              backgroundColor: Colors.white,
+              textColor: Colors.blue,
+            ),
+          ),
         ],
       ),
     );

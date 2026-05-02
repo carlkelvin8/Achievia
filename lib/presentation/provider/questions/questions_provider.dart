@@ -1,20 +1,22 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:achievia/core/network/offline_caching.dart';
-import 'package:achievia/domain/entities/api/home/results_entity.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/core/network/offline_caching.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
+import 'package:achievia/domain/entities/api/home/results_entity.dart';
+import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
 import 'package:achievia/domain/use_cases/questions/questions_use_case.dart';
+import 'package:achievia/presentation/provider/questions/questions_state.dart';
+import 'package:achievia/presentation/widgets/dialogs/loading_dialog.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 final getQuestions = Provider<QuestionsUseCase>((ref) {
   return sl.get<QuestionsUseCase>();
 });
 
-final getHive = Provider<OfflineCaching>((ref) {
+final getOfflineCache = Provider<OfflineCaching>((ref) {
   return sl.get<OfflineCaching>();
 });
 
@@ -53,7 +55,7 @@ final getQoty = FutureProvider<QotyEntity>((ref) async {
 });
 
 final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref) async {
-  final gtQuestions = ref.read(getHive);
+  final gtQuestions = ref.read(getOfflineCache);
   try {
     final result = await gtQuestions.getQuestionsFromCache();
     print(result);
@@ -64,7 +66,7 @@ final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref) async {
   }
 });
 
-final getGeneratedQuestions = FutureProvider<List<QotyEntity>>((ref) async {
+final getGeneratedQuestions = FutureProvider<List<QuizItemEntity>>((ref) async {
   final gtQuestions = ref.read(getQuestions);
   try {
     final results = await gtQuestions.getGeneratedQuestions();
@@ -144,12 +146,13 @@ class PageControllerProvider extends Notifier<PageController> {
   }
 
   Future<void> next(BuildContext context, int length, int currentIndex) async {
-    if (state.page == 3 && currentIndex >= length - 1) {
+    if (currentIndex >= length - 1) {
       final attemptId = await useCases.submitQuiz();
       await useCases.getGWA(attemptId);
       ref.read(attemptIdProvider.notifier).state = attemptId;
       // ignore: use_build_context_synchronously
       Navigator.pushNamed(context, '/attempt-screen', arguments: attemptId);
+      return;
     }
     state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
   }
@@ -222,6 +225,7 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier> {
       quiz_id: '',
       student_id: '',
       chosen_answer: '',
+      isLoading: false,
     );
   }
 
@@ -234,30 +238,19 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier> {
     await useCase.answerQuestion(entity);
   }
 
-  Future<void> randomizeQuestion(int index) async {
+  Future<void> randomizeQuestion(int index, BuildContext context) async {
+    state = state.copyWith(isLoading: true);
+    await showDialog(context, false);
     await useCase.randomizeQuestions(index);
+    Navigator.of(context, rootNavigator: true).pop();
+    state = state.copyWith(isLoading: false);
   }
-}
 
-class AnswerQuestionNotifier {
-  final String quiz_id;
-  final String student_id;
-  final String chosen_answer;
-  AnswerQuestionNotifier({
-    required this.quiz_id,
-    required this.student_id,
-    required this.chosen_answer,
-  });
-
-  AnswerQuestionNotifier copyWith({
-    String? quiz_id,
-    String? student_id,
-    String? chosen_answer,
-  }) {
-    return AnswerQuestionNotifier(
-      quiz_id: quiz_id ?? this.quiz_id,
-      student_id: student_id ?? this.student_id,
-      chosen_answer: chosen_answer ?? this.chosen_answer,
+  Future<void> showDialog(BuildContext context, bool isLoading) async {
+    showCupertinoDialog(
+      context: context,
+      barrierDismissible: isLoading,
+      builder: (context) => const LoadingDialog(),
     );
   }
 }

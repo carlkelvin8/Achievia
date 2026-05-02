@@ -16,10 +16,7 @@ class QuizScoreResponse {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'success': success,
-      'data': data.toJson(),
-    };
+    return {'success': success, 'data': data.toJson()};
   }
 
   // DTO ↔ Entity
@@ -31,10 +28,7 @@ class QuizScoreResponse {
   }
 
   QuizScoreEntity toEntity() {
-    return QuizScoreEntity(
-      success: success,
-      score: data.toEntity(),
-    );
+    return QuizScoreEntity(success: success, score: data.toEntity());
   }
 }
 
@@ -63,19 +57,45 @@ class Data {
 class Score {
   final String score;
   final List<Answer> answer;
+  final bool passed;
+  final double failedWeight;
+  final bool hasMajorBelow50;
+  final List<String> reasons;
 
-  Score({required this.score, required this.answer});
+  Score({
+    required this.score,
+    required this.answer,
+    required this.passed,
+    required this.failedWeight,
+    required this.hasMajorBelow50,
+    required this.reasons,
+  });
 
   factory Score.fromJson(Map<String, dynamic> json) {
     var answerJson = jsonDecode(json['answer']) as List;
     List<Answer> answers = answerJson.map((e) => Answer.fromJson(e)).toList();
-    return Score(score: json['score'], answer: answers);
+    return Score(
+      score: json['score'].toString(),
+      answer: answers,
+      passed:
+          json['passed'] as bool? ??
+          (double.tryParse(json['score'].toString()) ?? 0) >= 75,
+      failedWeight: (json['failedWeight'] as num?)?.toDouble() ?? 0,
+      hasMajorBelow50: json['hasMajorBelow50'] as bool? ?? false,
+      reasons: (json['reasons'] as List<dynamic>? ?? const [])
+          .map((e) => e.toString())
+          .toList(),
+    );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'score': score,
       'answer': jsonEncode(answer.map((e) => e.toJson()).toList()),
+      'passed': passed,
+      'failedWeight': failedWeight,
+      'hasMajorBelow50': hasMajorBelow50,
+      'reasons': reasons,
     };
   }
 
@@ -83,6 +103,10 @@ class Score {
     return Score(
       score: entity.score,
       answer: entity.answers.map((e) => Answer.fromEntity(e)).toList(),
+      passed: entity.passed,
+      failedWeight: entity.failedWeight,
+      hasMajorBelow50: entity.hasMajorBelow50,
+      reasons: entity.reasons,
     );
   }
 
@@ -90,6 +114,10 @@ class Score {
     return ScoreEntity(
       score: score,
       answers: answer.map((e) => e.toEntity()).toList(),
+      passed: passed,
+      failedWeight: failedWeight,
+      hasMajorBelow50: hasMajorBelow50,
+      reasons: reasons,
     );
   }
 }
@@ -122,10 +150,6 @@ class Answer {
   }
 
   AnswerEntity toEntity() {
-    return AnswerEntity(
-      isCorrect: isCorrect,
-      name: name,
-      score: score,
-    );
+    return AnswerEntity(isCorrect: isCorrect, name: name, score: score);
   }
 }

@@ -16,19 +16,29 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
   Widget build(BuildContext context) {
     final asyncQuestions = ref.watch(getGeneratedQuestions);
     return Scaffold(
-      appBar: AppBar(
-        
-        title: const Text('Summary'),
-      ),
+      appBar: AppBar(title: const Text('Summary')),
       body: SingleChildScrollView(
         child: asyncQuestions.when(
-        data: (questions) => SummaryListview(
-          itemCount: questions.length,
-          itemBuilder: (context, index) => QuestionsContentList(questionText: '${index + 1}. ${questions[index].questionText}', choices: questions[index].choices, selectedIndex: 0),
+          data: (questions) {
+            final flattened = questions
+                .expand((quiz) => quiz.questions)
+                .toList();
+
+            return SummaryListview(
+              itemCount: flattened.length,
+              itemBuilder: (context, index) {
+                final question = flattened[index];
+                return QuestionsContentList(
+                  questionText: '${index + 1}. ${question.questionText}',
+                  choices: question.choices,
+                  selectedIndex: 0,
+                );
+              },
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) => Center(child: Text('Error: $error')),
         ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) => Center(child: Text('Error: $error')),
-      ),
       ),
     );
   }

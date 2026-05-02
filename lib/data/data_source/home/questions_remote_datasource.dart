@@ -5,15 +5,17 @@ import 'package:achievia/core/network/offline_caching.dart';
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
 import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
+import 'package:achievia/data/models/quiz/quiz_dto.dart';
 import 'package:achievia/data/models/quiz/results_dto.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class QuestionRepoDataSource {
   Future<List<QuestionsDto>> getAllQuestions(String token, String id);
   Future<QotdDto> getQotd();
   Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
-  Future<List<QotdDto>> getTheGeneratedQuiz();
+  Future<List<QuizDtoItems>> getTheGeneratedQuiz();
   Future<List<QuestionsDto>> randomizeQuestion(int index);
   Future<QuizScoreResponse> getResults(int noOfAttempt);
   Future<int> putToAttempt();
@@ -93,16 +95,16 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
         ),
         data: dto.toJson(),
       );
-      print('datasource: ${response.data}');
+      debugPrint('datasource: ${response.data}');
       if (response.statusCode == 200 || response.statusCode == 201) {
         return dto;
       }
       return dto;
     } on DioException catch (e) {
-      print(e.response?.data);
+      debugPrint("DioException: ${e.response?.data}");
       return QotdDtoPost.fromJson({});
     } catch (e) {
-      print(e);
+      debugPrint("Exception: $e");
       return QotdDtoPost.fromJson({});
     }
   }
@@ -115,38 +117,34 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data =
-            await response.data['data']['response']['subjects']
-                as List<dynamic>;
-        final selectedQuiz = Map<String, dynamic>.from(
-          response.data['data']['response']['quiz'][index] as Map,
+        final data = response.data['data']['response']['subjects'] as List<dynamic>;
+        final quizTitles = response.data['data']['response']['quiz'] as List<dynamic>;
+        debugPrint(
+          'Quiz Titles: ${quizTitles.map((q) => q['title']).toList()}',
+          wrapWidth: 1024,
         );
-        final questions = List<dynamic>.from(selectedQuiz['questions'] ?? []);
-        print('from datasource: $questions');
         final list = data.map((e) => QuestionsDto.fromJson(e)).toList();
-        final questionsList = questions.map((e) {
-          final questionMap = Map<String, dynamic>.from(e as Map);
-          questionMap['title'] = selectedQuiz['title'] ?? '';
-          return QotdDto.fromJson(questionMap);
-        }).toList();
+        final quizItems = quizTitles
+            .map((q) => QuizDtoItems.fromJson(Map<String, dynamic>.from(q)))
+            .toList();
         await local.insertQuestionsToCache(list);
-        await local.insertQotdToCache(questionsList);
+        await local.insertQuizToCache(quizItems);
         return list;
       }
       return [];
     } on DioException catch (e) {
-      print('DIO ERROR: $e');
+      debugPrint("DioException: ${e.response?.data}");
       return [];
     } catch (e) {
-      print(e);
+      debugPrint("Exception: $e");
       return [];
     }
   }
 
   @override
-  Future<List<QotdDto>> getTheGeneratedQuiz() async {
+  Future<List<QuizDtoItems>> getTheGeneratedQuiz() async {
     try {
-      final cache = await local.getQotdFromCache();
+      final cache = await local.getQuizFromCache();
       return cache;
     } catch (e) {
       print(e);
@@ -187,16 +185,16 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
         '$BASE_URL/tasks/putToQuizAttempt/$getId',
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print('from datasource: ${response.data['data']['attempt']}');
+        debugPrint('from datasource: ${response.data['data']['attempt']}');
         return response.data['data']['attempt'];
       }
-      print('from datasource: ${response.data['data']['attempt']}');
+      debugPrint('from datasource: ${response.data['data']['attempt']}');
       return response.data['data']['attempt'];
     } on DioException catch (e) {
-      print(e.response?.data);
+      debugPrint("DioException: ${e.response?.data}");
       return e.response?.data['message'];
     } catch (e) {
-      print('catch from datasource:$e');
+      debugPrint("Exception: $e");
       return 0;
     }
   }
