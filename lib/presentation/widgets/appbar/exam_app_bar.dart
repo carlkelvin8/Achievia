@@ -10,6 +10,7 @@ class ExamAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? page;
   final String subjects;
   final VoidCallback callback;
+  final VoidCallback callBackQuit;
   const ExamAppBar({
     super.key,
     required this.toolbarheight,
@@ -17,6 +18,7 @@ class ExamAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.page,
     required this.subjects,
     required this.callback,
+    required this.callBackQuit,
   });
 
   @override
@@ -24,6 +26,7 @@ class ExamAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       toolbarHeight: toolbarheight,
       centerTitle: true,
+      leading: IconButton(onPressed: callBackQuit, icon: Icon(Icons.arrow_back_ios)),
       actions: [
         Column(
           mainAxisAlignment: MainAxisAlignment.center,

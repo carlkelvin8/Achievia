@@ -66,7 +66,33 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
 
     return Scaffold(
       appBar: ExamAppBar(
-        callback: () {},
+        callBackQuit: (){
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Text('End Exam'),
+              content: const Text('Are you sure you want to end the exam?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                    timerNotifier.reset();
+                    timerNotifier.pause();
+                  },
+                  child: const Text('End'),
+                ),
+              ],
+            ),
+          );
+        },
+        callback: () {
+          
+        },
         title: asyncQuestions.when(
           data: (_) {
             if (quizBatches.isEmpty) return 'No questions';
