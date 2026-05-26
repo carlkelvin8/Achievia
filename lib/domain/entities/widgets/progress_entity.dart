@@ -175,4 +175,5 @@ enum DayStatus {
   current, // White with light blue AX
   upcoming, // White with light blue AX
   inactive, // Light gray
+  blank, // Padding / out-of-account-range
 }

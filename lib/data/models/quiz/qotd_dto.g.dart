@@ -7,23 +7,15 @@ part of 'qotd_dto.dart';
 // **************************************************************************
 
 QotdDto _$QotdDtoFromJson(Map<String, dynamic> json) => QotdDto(
-  title: (json['title'] ?? '').toString(),
-  quizId: json['quizId'] is num
-      ? (json['quizId'] as num).toInt()
-      : int.tryParse('${json['quizId']}') ?? 0,
-  id: json['id'] is num
-      ? (json['id'] as num).toInt()
-      : int.tryParse('${json['id']}') ?? 0,
-  questionText: (json['questionText'] ?? '').toString(),
-  choices:
-      (json['choices'] as List?)
-          ?.whereType<Map>()
-          .map((e) => Map<String, dynamic>.from(e))
-          .toList() ??
-      <Map<String, dynamic>>[],
-  questions: (json['questions'] as List?)
-      ?.whereType<Map>()
-      .map((e) => Map<String, dynamic>.from(e))
+  title: json['title'] as String,
+  quizId: (json['quizId'] as num).toInt(),
+  id: (json['id'] as num).toInt(),
+  questionText: json['questionText'] as String,
+  choices: (json['choices'] as List<dynamic>)
+      .map((e) => e as Map<String, dynamic>)
+      .toList(),
+  questions: (json['questions'] as List<dynamic>?)
+      ?.map((e) => e as Map<String, dynamic>)
       .toList(),
 );
 

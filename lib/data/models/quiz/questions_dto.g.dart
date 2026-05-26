@@ -7,9 +7,9 @@ part of 'questions_dto.dart';
 // **************************************************************************
 
 QuestionsDto _$QuestionsDtoFromJson(Map<String, dynamic> json) => QuestionsDto(
-  id: (json['id'] as num?)?.toInt() ?? 0,
+  id: (json['id'] as num).toInt(),
   title: json['title'] as String,
-  courseId: (json['courseId'] as num?)?.toInt() ?? 0,
+  courseId: (json['courseId'] as num).toInt(),
   description: json['description'] as String,
   image: json['image'] as String?,
   day_subject: json['day_subject'] as String?,
