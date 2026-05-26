@@ -33,7 +33,7 @@ class LogoMeaningSection extends ConsumerWidget {
           onExpandedChanged: (expanded) {
             ref.read(expandableItemsProvider.notifier).setExpanded(0, expanded);
           },
-          imagePath: 'assets/images/logo.png',
+          imagePath: 'assets/images/LOGO/1.svg',
         ),
         const SizedBox(height: 8),
         ExpandableItem(
@@ -43,7 +43,7 @@ class LogoMeaningSection extends ConsumerWidget {
           onExpandedChanged: (expanded) {
             ref.read(expandableItemsProvider.notifier).setExpanded(1, expanded);
           },
-          imagePath: 'assets/images/logo.png',
+          imagePath: 'assets/images/LOGO/4.svg',
         ),
         const SizedBox(height: 8),
         ExpandableItem(
@@ -53,7 +53,7 @@ class LogoMeaningSection extends ConsumerWidget {
           onExpandedChanged: (expanded) {
             ref.read(expandableItemsProvider.notifier).setExpanded(2, expanded);
           },
-          imagePath: 'assets/images/logo.png',
+          imagePath: 'assets/images/LOGO/6.svg',
         ),
         const SizedBox(height: 8),
         ExpandableItem(
@@ -63,7 +63,7 @@ class LogoMeaningSection extends ConsumerWidget {
           onExpandedChanged: (expanded) {
             ref.read(expandableItemsProvider.notifier).setExpanded(3, expanded);
           },
-          imagePath: 'assets/images/logo.png',
+          imagePath: 'assets/images/LOGO/7.svg',
         ),
         const SizedBox(height: 8),
         ExpandableItem(
@@ -73,7 +73,7 @@ class LogoMeaningSection extends ConsumerWidget {
           onExpandedChanged: (expanded) {
             ref.read(expandableItemsProvider.notifier).setExpanded(4, expanded);
           },
-          imagePath: 'assets/images/logo.png',
+          imagePath: 'assets/images/LOGO/8.svg',
         ),
       ],
     );
