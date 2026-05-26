@@ -13,7 +13,7 @@ class BuildBanner extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF0C1E62),
+          color: theme.colorScheme.primary,
           borderRadius: BorderRadius.circular(9),
         ),
           child: Text(
