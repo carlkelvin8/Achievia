@@ -29,6 +29,8 @@ class HomeScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: 8),
               BuildBanner(),
+              const SizedBox(height: 4),
+              const MotivationQuoteBanner(),
               const SizedBox(height: 12),
               const SectionLabel(title: 'Question of the day'),
               Padding(

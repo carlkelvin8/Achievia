@@ -48,28 +48,20 @@ class MotivationQuoteBanner extends StatelessWidget {
             children: [
               SvgPicture.asset(
                 'assets/Motivation Background.svg',
-                fit: BoxFit.cover,
+                fit: BoxFit.fill,
               ),
-              // darken background for readable white text
-              Container(color: Colors.black.withOpacity(0.28)),
-              Center(
+              Align(
+                alignment: const Alignment(0, 0.15),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28),
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: Text(
                     'You did not come this far to only come this far. Every late night, every sacrificed moment — they are all shaping your victory. Keep going.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
+                      color: const Color(0xFF0C1E62),
                       fontWeight: FontWeight.w700,
-                      fontSize: 15,
+                      fontSize: 12,
                       height: 1.35,
-                      shadows: const [
-                        Shadow(
-                          color: Colors.black26,
-                          blurRadius: 2,
-                          offset: Offset(0, 1),
-                        ),
-                      ],
                     ),
                   ),
                 ),
