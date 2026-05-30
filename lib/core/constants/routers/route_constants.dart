@@ -1,26 +1,3 @@
-import 'package:achievia/presentation/screens/auth/login_screen.dart';
-import 'package:achievia/presentation/screens/auth/onboarding_screen.dart';
-import 'package:achievia/presentation/screens/main/about_screen.dart';
-import 'package:achievia/presentation/screens/main/attempt_screen.dart';
-import 'package:achievia/presentation/screens/main/exam_screen.dart';
-import 'package:achievia/presentation/screens/main/home_screen.dart';
-import 'package:achievia/presentation/screens/main/main_screen.dart';
-import 'package:achievia/presentation/screens/main/messages_screen.dart';
-import 'package:achievia/presentation/screens/main/onboarding_mockboard_screen.dart';
-import 'package:achievia/presentation/screens/main/profile_screen.dart';
-import 'package:achievia/presentation/screens/main/reviewers_screen.dart';
-import 'package:achievia/presentation/screens/main/summary_screen.dart';
-import 'package:achievia/presentation/screens/notifications/notifications_screen.dart';
-import 'package:achievia/presentation/screens/screen_contents/contents/reminder_screen_content.dart';
-import 'package:achievia/presentation/screens/screen_contents/contents/new_reminder_screen.dart';
-import 'package:achievia/presentation/screens/screen_contents/contents/today_screen.dart';
-import 'package:achievia/presentation/screens/screen_contents/contents/scheduled_screen.dart';
-import 'package:achievia/presentation/screens/screen_contents/contents/completed_screen.dart';
-import 'package:achievia/presentation/screens/settings/examination/examination_screen.dart';
-import 'package:achievia/presentation/screens/settings/pomodoro_timer/pomodoro_timer_screen.dart';
-import 'package:achievia/presentation/screens/settings/settings_screen.dart';
-import 'package:flutter/material.dart';
-
 class RouteConstants {
   // Auth routes
   static const String onboarding = '/onboarding';
@@ -50,57 +27,4 @@ class RouteConstants {
   static const String today = '/today';
   static const String scheduled = '/scheduled';
   static const String completed = '/completed';
-
-  /// Resolves named routes using the [appRoutes] map.
-  /// Used by MaterialApp.onGenerateRoute.
-  static Route<dynamic> generateRoute(RouteSettings settings) {
-    final builder = appRoutes[settings.name];
-    if (builder != null) {
-      return MaterialPageRoute(builder: builder, settings: settings);
-    }
-    return unknownRoute(settings);
-  }
-
-  /// Fallback for unrecognised routes.
-  static Route<dynamic> unknownRoute(RouteSettings settings) {
-    return MaterialPageRoute(
-      builder: (_) => Scaffold(
-        body: Center(child: Text('No route defined for ${settings.name}')),
-      ),
-    );
-  }
 }
-
-final Map<String, WidgetBuilder> appRoutes = {
-  // Auth routes
-  RouteConstants.onboarding: (_) => const OnboardingScreen(),
-  RouteConstants.login: (_) => const LoginScreen(),
-
-  // Main app entry
-  RouteConstants.main: (_) => const MainScreen(),
-
-  // Main tabs
-  RouteConstants.reviewers: (_) => const ReviewersScreen(),
-  RouteConstants.messages: (_) => const MessagesScreen(),
-  RouteConstants.home: (_) => const HomeScreen(),
-  RouteConstants.profile: (_) => const ProfileScreen(),
-  RouteConstants.about: (_) => const AboutScreen(),
-
-  // Settings & notifications
-  RouteConstants.settings: (_) => const SettingsScreen(),
-  RouteConstants.notifications: (_) => const NotificationsScreen(),
-  RouteConstants.examination: (_) => const ExaminationScreen(),
-  RouteConstants.pomodoroTimer: (_) => const PomodoroTimerScreen(),
-
-  // Other features
-  RouteConstants.reminder: (_) => const ReminderScreenContent(),
-  RouteConstants.newReminder: (_) => const NewReminderScreen(),
-  RouteConstants.today: (_) => const TodayScreen(),
-  RouteConstants.scheduled: (_) => const ScheduledScreen(),
-  RouteConstants.completed: (_) => const CompletedScreen(),
-  RouteConstants.onboardingQuestions: (_) =>
-      const OnboardingMockboardScreen(title: ''),
-  RouteConstants.examScreen: (_) => const ExamScreen(),
-  RouteConstants.attemptScreen: (_) => const AttemptScreen(),
-  RouteConstants.summaryScreen: (_) => const SummaryScreen(),
-};

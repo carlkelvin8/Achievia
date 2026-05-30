@@ -1,13 +1,15 @@
+import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/domain/entities/api/auth/user_entity.dart';
+import 'package:achievia/domain/entities/widgets/author_entity.dart';
 import 'package:achievia/domain/entities/widgets/examination_results_entity.dart';
 import 'package:achievia/domain/entities/widgets/medical_abbreviation_entity.dart';
 import 'package:achievia/domain/entities/widgets/notes_entity.dart';
 import 'package:achievia/domain/entities/widgets/pdf_entity.dart';
+import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 import 'package:achievia/domain/entities/widgets/questions_entity.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:flutter/material.dart';
-import 'package:achievia/domain/entities/widgets/author_entity.dart';
-import 'package:achievia/domain/entities/widgets/progress_entity.dart';
+import 'package:go_router/go_router.dart';
 
 final List<ExaminationResult> results = [
   ExaminationResult(
@@ -23,7 +25,6 @@ final List<ExaminationResult> results = [
     passingScore: 75.0,
   ),
 ];
-
 
 final List<Map<String, dynamic>> messages = [
   {
@@ -350,8 +351,7 @@ final List<QuestionsEntityWidget> questions = [
     label: 'Question Bank',
     sub_label:
         'A comprehensive collection of board exam–style questions designed to cover all major topics, helping you practice, assess your understanding, and prepare effectively for the actual exam.',
-    callback: (context) =>
-        Navigator.pushNamed(context, '/onboarding-questions'),
+    callback: (context) => context.push(RouteConstants.onboardingQuestions),
   ),
   QuestionsEntityWidget(
     icon: Icons.edit_document,
@@ -365,8 +365,7 @@ final List<QuestionsEntityWidget> questions = [
     label: 'Pre Boards',
     sub_label:
         'A final one-take comprehensive exam that simulates the actual board, available only once and unlocked 2 weeks before the scheduled board exam to help you gauge your ultimate readiness.',
-    callback: (context) =>
-        Navigator.pushNamed(context, '/onboarding-questions'),
+    callback: (context) => context.push(RouteConstants.onboardingQuestions),
   ),
 ];
 

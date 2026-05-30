@@ -5,6 +5,7 @@ import 'package:achievia/presentation/widgets/buttons/back_button_with_label.dar
 import 'package:achievia/presentation/widgets/cards/reminder_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class ReminderScreenContent extends ConsumerStatefulWidget {
@@ -31,11 +32,11 @@ class _ReminderScreenContentState extends ConsumerState<ReminderScreenContent> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
+            onPressed: () => ctx.pop(false),
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
+            onPressed: () => ctx.pop(true),
             child: const Text('Confirm'),
           ),
         ],
@@ -102,8 +103,10 @@ class _ReminderScreenContentState extends ConsumerState<ReminderScreenContent> {
       body: tasksAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
-          child: Text('Error: $e',
-              style: TextStyle(color: theme.colorScheme.error)),
+          child: Text(
+            'Error: $e',
+            style: TextStyle(color: theme.colorScheme.error),
+          ),
         ),
         data: (tasks) {
           final reminders = tasks.where((t) => !t.isDone).toList()
@@ -146,8 +149,9 @@ class _ReminderScreenContentState extends ConsumerState<ReminderScreenContent> {
                         return ReminderCard(
                           title: item.taskName,
                           subtitle: item.description,
-                          dueDateLabel: DateFormat('MMMM d, yyyy')
-                              .format(item.deadline.toLocal()),
+                          dueDateLabel: DateFormat(
+                            'MMMM d, yyyy',
+                          ).format(item.deadline.toLocal()),
                           isCompleted: isSelected,
                           onStatusChanged: (_) {
                             setState(() {
@@ -170,4 +174,3 @@ class _ReminderScreenContentState extends ConsumerState<ReminderScreenContent> {
     );
   }
 }
-

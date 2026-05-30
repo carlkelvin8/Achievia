@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/presentation/provider/pomodoro/pomodoro_providers.dart';
 import 'package:achievia/presentation/widgets/settings/setting_tile.dart';
 import 'package:achievia/presentation/widgets/settings/settings_group_card.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// Customize section for pomodoro duration settings
 class PomodoroCustomizeSection extends ConsumerWidget {
@@ -109,7 +110,7 @@ class PomodoroCustomizeSection extends ConsumerWidget {
     final controller = TextEditingController(text: initial.toString());
     final value = await showDialog<int>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(title),
         content: TextField(
           controller: controller,
@@ -120,18 +121,18 @@ class PomodoroCustomizeSection extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => dialogContext.pop(),
             child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () {
               final parsed = int.tryParse(controller.text.trim());
               if (parsed == null) {
-                Navigator.of(context).pop();
+                dialogContext.pop();
                 return;
               }
               final clamped = parsed.clamp(min, max);
-              Navigator.of(context).pop(clamped);
+              dialogContext.pop(clamped);
             },
             child: const Text('Save'),
           ),

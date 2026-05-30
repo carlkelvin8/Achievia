@@ -1,11 +1,11 @@
 import 'package:achievia/core/constants/app_paddings.dart';
-import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/presentation/provider/task/task_provider.dart';
 import 'package:achievia/presentation/widgets/grids/grid_cards.dart';
 import 'package:achievia/presentation/widgets/list_items/list_item_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class TaskScreenContent extends ConsumerStatefulWidget {
   const TaskScreenContent({super.key});
@@ -18,9 +18,11 @@ class _TaskScreenContentState extends ConsumerState<TaskScreenContent> {
   @override
   Widget build(BuildContext context) {
     final tasksAsync = ref.watch(tasksProvider);
-    final remindersCount = tasksAsync.whenData(
-      (tasks) => tasks.where((t) => !t.isDone).length,
-    ).value ?? 0;
+    final remindersCount =
+        tasksAsync
+            .whenData((tasks) => tasks.where((t) => !t.isDone).length)
+            .value ??
+        0;
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -43,7 +45,7 @@ class _TaskScreenContentState extends ConsumerState<TaskScreenContent> {
                 label: 'Reminders',
                 trailingText: '$remindersCount',
                 onTap: () {
-                  NavigationService.pushNamed(RouteConstants.reminder);
+                  context.push(RouteConstants.reminder);
                 },
               ),
             ],
@@ -53,4 +55,3 @@ class _TaskScreenContentState extends ConsumerState<TaskScreenContent> {
     );
   }
 }
-

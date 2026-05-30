@@ -1,4 +1,3 @@
-import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/core/di/local_storage_service.dart';
 import 'package:achievia/presentation/widgets/placeholder_gestures/dialog_builder.dart';
@@ -41,9 +40,6 @@ class LogoutSettingsSection extends ConsumerWidget {
       final singleton = sl<LocalStorageService>();
       await Supabase.instance.client.auth.signOut();
       await singleton.clearToken();
-      if (context.mounted) {
-        NavigationService.pop();
-      }
     }
   }
 }

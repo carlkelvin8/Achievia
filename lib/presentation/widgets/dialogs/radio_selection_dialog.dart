@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// A reusable dialog builder for radio selection lists
 /// Perfect for configuration dialogs, option pickers, or any single-choice selection
@@ -27,7 +28,7 @@ class RadioSelectionDialog<T> extends StatelessWidget {
   }) {
     return showDialog<T>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(title),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -38,7 +39,7 @@ class RadioSelectionDialog<T> extends StatelessWidget {
               groupValue: selectedValue,
               onChanged: (value) {
                 if (value != null) {
-                  Navigator.of(context).pop(value);
+                  dialogContext.pop(value);
                 }
               },
             );
@@ -46,7 +47,7 @@ class RadioSelectionDialog<T> extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => dialogContext.pop(),
             child: const Text('Cancel'),
           ),
         ],
@@ -68,17 +69,14 @@ class RadioSelectionDialog<T> extends StatelessWidget {
             onChanged: (value) {
               if (value != null) {
                 onSelected(value);
-                Navigator.of(context).pop();
+                context.pop();
               }
             },
           );
         }).toList(),
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
+        TextButton(onPressed: () => context.pop(), child: const Text('Cancel')),
       ],
     );
   }

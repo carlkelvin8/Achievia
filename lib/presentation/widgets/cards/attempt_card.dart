@@ -1,11 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/core/constants/app_assets.dart';
 import 'package:achievia/core/constants/app_colors.dart';
+import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/cards/data_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AttemptCard extends ConsumerWidget {
@@ -132,7 +134,7 @@ class AttemptCard extends ConsumerWidget {
             child: ReusableButton(
               title: 'Summary',
               onPressed: () {
-                Navigator.pushNamed(context, '/summary-screen');
+                context.push(RouteConstants.summaryScreen);
               },
               width: 150,
               height: 40,

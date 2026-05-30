@@ -1,10 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
+import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/utils/helpers.dart';
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
 import 'package:achievia/presentation/widgets/cards/questions_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class GridBadges extends ConsumerWidget {
   final String token;
@@ -33,10 +35,7 @@ class GridBadges extends ConsumerWidget {
                 ? (context) async {
                     await provider.randomizeQuestion(index, context);
                     if (!context.mounted) return;
-                    Navigator.of(
-                      context,
-                      rootNavigator: true,
-                    ).pushNamed('/onboarding-questions');
+                    context.push(RouteConstants.onboardingQuestions);
                   }
                 : item.callback,
           );

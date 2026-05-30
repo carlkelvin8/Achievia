@@ -5,6 +5,7 @@ import 'package:achievia/presentation/widgets/buttons/back_button_with_label.dar
 import 'package:achievia/presentation/widgets/cards/reminder_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class TodayScreen extends ConsumerStatefulWidget {
@@ -30,11 +31,11 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
+            onPressed: () => ctx.pop(false),
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
+            onPressed: () => ctx.pop(true),
             child: const Text('Confirm'),
           ),
         ],
@@ -101,8 +102,10 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       body: tasksAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
-          child: Text('Error: $e',
-              style: TextStyle(color: theme.colorScheme.error)),
+          child: Text(
+            'Error: $e',
+            style: TextStyle(color: theme.colorScheme.error),
+          ),
         ),
         data: (tasks) {
           final now = DateTime.now();
@@ -175,4 +178,3 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
   String _formatDate(DateTime dt) =>
       DateFormat('MMMM d, yyyy').format(dt.toLocal());
 }
-

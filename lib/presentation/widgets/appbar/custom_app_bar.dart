@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:achievia/core/constants/routers/navigation_service.dart';
+import 'package:go_router/go_router.dart';
 
 /// A reusable custom AppBar with consistent styling across the app
 /// Supports back button, title, and optional actions
@@ -52,7 +52,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       minWidth: 40,
                       minHeight: 40,
                     ),
-                    onPressed: onBackPressed ?? () => NavigationService.pop(),
+                    onPressed: onBackPressed ?? () => context.pop(),
                   ),
                 ))
           : leading,

@@ -1,4 +1,3 @@
-import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:flutter/material.dart';
 
 class MainAppbar extends StatelessWidget implements PreferredSizeWidget {
@@ -90,7 +89,7 @@ class MainAppbar extends StatelessWidget implements PreferredSizeWidget {
           ),
           // Settings Icon
           IconButton(
-            onPressed: () => NavigationService.goToSettings(),
+            onPressed: onSettingsTap,
             icon: Icon(
               Icons.settings_outlined,
               color: Theme.of(context).colorScheme.primary,

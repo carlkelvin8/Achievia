@@ -9,6 +9,7 @@ import 'package:achievia/presentation/widgets/cards/questions_content.dart';
 import 'package:achievia/presentation/widgets/cards/unanswered_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class ExamScreen extends ConsumerStatefulWidget {
   const ExamScreen({super.key});
@@ -73,18 +74,18 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
         callBackQuit: () {
           showDialog(
             context: context,
-            builder: (_) => AlertDialog(
+            builder: (dialogContext) => AlertDialog(
               title: const Text('End Exam'),
               content: const Text('Are you sure you want to end the exam?'),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => dialogContext.pop(),
                   child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
+                    dialogContext.pop();
+                    context.pop();
                     timerNotifier.reset();
                     timerNotifier.pause();
                   },

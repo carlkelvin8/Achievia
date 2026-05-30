@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// A reusable back button with text label
 /// Commonly used in app bars for navigation with context
@@ -21,9 +22,9 @@ class BackButtonWithLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return GestureDetector(
-      onTap: onTap ?? () => Navigator.of(context).pop(),
+      onTap: onTap ?? () => context.pop(),
       child: Padding(
         padding: const EdgeInsets.only(left: 8, right: 4),
         child: Row(

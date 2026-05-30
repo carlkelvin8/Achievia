@@ -1,13 +1,13 @@
 import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/domain/entities/api/task/task_entity.dart';
 import 'package:achievia/presentation/provider/task/task_provider.dart';
+import 'package:achievia/presentation/widgets/appbar/custom_app_bar.dart';
+import 'package:achievia/presentation/widgets/buttons/back_button_with_label.dart';
 import 'package:achievia/presentation/widgets/reminder/reminder_date_time_section.dart';
 import 'package:achievia/presentation/widgets/reminder/reminder_form_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:achievia/presentation/widgets/appbar/custom_app_bar.dart';
-import 'package:achievia/presentation/widgets/buttons/back_button_with_label.dart';
+import 'package:go_router/go_router.dart';
 
 class NewReminderScreen extends ConsumerStatefulWidget {
   const NewReminderScreen({super.key});
@@ -63,10 +63,13 @@ class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
 
     if (success) {
       SnackBarUtils.showSuccess(context, 'Reminder saved!');
-      Navigator.pop(context);
+      context.pop();
     } else {
       final error = ref.read(createTaskProvider).error;
-      SnackBarUtils.showError(context, error?.toString() ?? 'Failed to save reminder');
+      SnackBarUtils.showError(
+        context,
+        error?.toString() ?? 'Failed to save reminder',
+      );
     }
   }
 

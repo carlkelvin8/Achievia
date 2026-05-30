@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:go_router/go_router.dart';
 
 class DialogBuilder {
   static Future<bool?> showConfirmation({
@@ -13,26 +13,30 @@ class DialogBuilder {
     IconData? icon,
   }) {
     final theme = Theme.of(context);
-    
+
     return showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         icon: icon != null ? Icon(icon, size: 48, color: confirmColor) : null,
         title: Text(title),
         content: Text(content),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => dialogContext.pop(false),
             child: Text(
               cancelText,
-              style: TextStyle(color: cancelColor ?? theme.colorScheme.onSurface),
+              style: TextStyle(
+                color: cancelColor ?? theme.colorScheme.onSurface,
+              ),
             ),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => dialogContext.pop(true),
             child: Text(
               confirmText,
-              style: TextStyle(color: confirmColor ?? theme.colorScheme.primary),
+              style: TextStyle(
+                color: confirmColor ?? theme.colorScheme.primary,
+              ),
             ),
           ),
         ],
@@ -50,15 +54,12 @@ class DialogBuilder {
   }) {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         icon: icon != null ? Icon(icon, size: 48, color: iconColor) : null,
         title: Text(title),
         content: Text(content),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(okText),
-          ),
+          TextButton(onPressed: () => dialogContext.pop(), child: Text(okText)),
         ],
       ),
     );

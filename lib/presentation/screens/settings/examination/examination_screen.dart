@@ -1,8 +1,9 @@
+import 'package:achievia/presentation/widgets/examination/examination_customize_section.dart';
+import 'package:achievia/presentation/widgets/examination/examination_info_card.dart';
+import 'package:achievia/presentation/widgets/examination/examination_reset_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:achievia/presentation/widgets/examination/examination_info_card.dart';
-import 'package:achievia/presentation/widgets/examination/examination_customize_section.dart';
-import 'package:achievia/presentation/widgets/examination/examination_reset_section.dart';
+import 'package:go_router/go_router.dart';
 
 class ExaminationScreen extends ConsumerWidget {
   const ExaminationScreen({super.key});
@@ -19,7 +20,7 @@ class ExaminationScreen extends ConsumerWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
         actions: [
           Padding(

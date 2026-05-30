@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/core/network/offline_caching.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
@@ -11,6 +12,7 @@ import 'package:achievia/presentation/widgets/dialogs/loading_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:go_router/go_router.dart';
 
 final getQuestions = Provider<QuestionsUseCase>((ref) {
   return sl.get<QuestionsUseCase>();
@@ -161,7 +163,7 @@ class PageControllerProvider extends Notifier<PageController> {
       await useCases.getGWA(attemptId);
       ref.read(attemptIdProvider.notifier).state = attemptId;
       // ignore: use_build_context_synchronously
-      Navigator.pushNamed(context, '/attempt-screen', arguments: attemptId);
+      context.push(RouteConstants.attemptScreen, extra: attemptId);
       return;
     }
     if (!_isAttached) return;
@@ -259,7 +261,7 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier> {
     state = state.copyWith(isLoading: true);
     await showDialog(context, false);
     await useCase.randomizeQuestions(index);
-    Navigator.of(context, rootNavigator: true).pop();
+    if (context.mounted) context.pop();
     state = state.copyWith(isLoading: false);
   }
 

@@ -1,4 +1,5 @@
 import 'package:achievia/core/constants/app_paddings.dart';
+import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/headers/header1.dart';
 import 'package:achievia/presentation/widgets/headers/header2.dart';
 import 'package:achievia/presentation/widgets/headers/sub_header.dart';
@@ -41,22 +42,12 @@ class OnboardingScreen extends StatelessWidget {
                     "The Philippines' premier e-learning platform for board exam preparation.",
               ),
               const SizedBox(height: 30),
-
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    FaIcon(FontAwesomeIcons.facebook, size: 30),
-                    SizedBox(width: 16),
-                    FaIcon(FontAwesomeIcons.xTwitter, size: 30),
-                    SizedBox(width: 16),
-                    FaIcon(FontAwesomeIcons.instagram, size: 30),
-                    SizedBox(width: 16),
-                    FaIcon(FontAwesomeIcons.tiktok, size: 30),
-                  ],
-                ),
-              ),
+              Spacer(),
+              ReusableButton(
+                title: 'Log In', 
+                onPressed: (){}, 
+                width: MediaQuery.of(context).size.width, 
+                height: 50)
             ],
           ),
         ),

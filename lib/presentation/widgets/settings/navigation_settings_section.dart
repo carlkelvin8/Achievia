@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:achievia/core/constants/app_colors.dart';
-import 'package:achievia/core/constants/routers/navigation_service.dart';
+import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/presentation/widgets/settings/settings_card.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// Navigation settings section containing Pomodoro Timer and Examination links
 class NavigationSettingsSection extends StatelessWidget {
@@ -14,7 +15,7 @@ class NavigationSettingsSection extends StatelessWidget {
         // Pomodoro Timer
         SettingsCard(
           onTap: () {
-            NavigationService.goToPomodoroTimer();
+            context.push(RouteConstants.pomodoroTimer);
           },
           child: SettingsItem(
             icon: Icons.timer_outlined,
@@ -30,7 +31,7 @@ class NavigationSettingsSection extends StatelessWidget {
         // Examination
         SettingsCard(
           onTap: () {
-            NavigationService.goToExamination();
+            context.push(RouteConstants.examination);
           },
           child: SettingsItem(
             icon: Icons.assignment_outlined,

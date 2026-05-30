@@ -1,9 +1,9 @@
-import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/presentation/provider/task/task_provider.dart';
 import 'package:achievia/presentation/widgets/cards/reusable_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class GridCards extends ConsumerWidget {
   const GridCards({super.key});
@@ -78,7 +78,7 @@ class GridCards extends ConsumerWidget {
               icon: card.icon,
               label: card.label,
               count: card.count,
-              onTap: () => NavigationService.pushNamed(card.route),
+              onTap: () => context.push(card.route),
             );
           },
         ),
@@ -106,7 +106,7 @@ Widget _buildReminder(BuildContext context) {
 
   return InkWell(
     onTap: () {
-      NavigationService.pushNamed(RouteConstants.newReminder);
+      context.push(RouteConstants.newReminder);
     },
     child: Row(
       children: [
