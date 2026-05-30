@@ -24,6 +24,7 @@ import 'package:achievia/data/data_source/progress/progress_remote_datasource.da
     as _i781;
 import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart'
     as _i536;
+import 'package:achievia/data/data_source/supabase_user_context.dart' as _i741;
 import 'package:achievia/data/data_source/task/task_remote_datasource.dart'
     as _i1006;
 import 'package:achievia/data/models/auth/user_dto.dart' as _i235;
@@ -71,6 +72,10 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.prefs,
       preResolve: true,
     );
+    gh.factory<_i528.UserRemoteDatasource>(() => _i528.UserRemoteDatasource());
+    gh.factory<_i741.SupabaseUserContext>(
+      () => const _i741.SupabaseUserContext(),
+    );
     gh.lazySingleton<_i64.OfflineCaching>(() => _i64.OfflineCaching());
     gh.lazySingleton<_i895.Connectivity>(() => registerModules.connectivity);
     gh.lazySingleton<_i982.LocalStorageService>(
@@ -80,13 +85,30 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i790.NetworkInfoImpl(gh<_i895.Connectivity>()),
     );
     gh.lazySingleton<_i557.QuestionsRemoteDatasource>(
-      () => _i557.QuestionsRemoteDatasource(gh<_i64.OfflineCaching>()),
+      () => _i557.QuestionsRemoteDatasource(
+        gh<_i64.OfflineCaching>(),
+        userContext: gh<_i741.SupabaseUserContext>(),
+      ),
+    );
+    gh.factory<_i655.ProfileRemoteDatasource>(
+      () => _i655.ProfileRemoteDatasource(
+        userContext: gh<_i741.SupabaseUserContext>(),
+      ),
+    );
+    gh.factory<_i536.ModuleRemoteDatasource>(
+      () => _i536.ModuleRemoteDatasource(
+        userContext: gh<_i741.SupabaseUserContext>(),
+      ),
     );
     gh.lazySingleton<_i781.ProgressRemoteDatasource>(
-      () => _i781.ProgressRemoteDatasource(),
+      () => _i781.ProgressRemoteDatasource(
+        userContext: gh<_i741.SupabaseUserContext>(),
+      ),
     );
     gh.lazySingleton<_i1006.TaskRemoteDatasource>(
-      () => _i1006.TaskRemoteDatasource(),
+      () => _i1006.TaskRemoteDatasource(
+        userContext: gh<_i741.SupabaseUserContext>(),
+      ),
     );
     gh.lazySingleton<_i1000.QuestionsRepositoryImpl>(
       () => _i1000.QuestionsRepositoryImpl(
@@ -95,12 +117,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i64.OfflineCaching>(),
       ),
     );
-    gh.factory<_i528.UserRemoteDatasource>(() => _i528.UserRemoteDatasource());
-    gh.factory<_i655.ProfileRemoteDatasource>(
-      () => _i655.ProfileRemoteDatasource(),
-    );
-    gh.factory<_i536.ModuleRemoteDatasource>(
-      () => _i536.ModuleRemoteDatasource(),
+    gh.factory<_i656.ModuleRepositoryImpl>(
+      () => _i656.ModuleRepositoryImpl(
+        remoteDatasource: gh<_i536.ModuleRemoteDatasource>(),
+        network: gh<_i790.NetworkInfo>(),
+      ),
     );
     gh.lazySingleton<_i754.ProgressRepositoryImpl>(
       () => _i754.ProgressRepositoryImpl(gh<_i781.ProgressRemoteDatasource>()),
@@ -174,17 +195,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i879.UserUseCase>(
       () => _i879.UserUseCase(impl: gh<_i581.UserRepositoryImpl>()),
     );
-    gh.factory<_i656.ModuleRepositoryImpl>(
-      () => _i656.ModuleRepositoryImpl(
-        remoteDatasource: gh<_i536.ModuleRemoteDatasource>(),
-        network: gh<_i790.NetworkInfo>(),
-      ),
+    gh.factory<_i533.ModuleUseCase>(
+      () => _i533.ModuleUseCase(impl: gh<_i656.ModuleRepositoryImpl>()),
     );
     gh.factory<_i981.TaskUseCase>(
       () => _i981.TaskUseCase(gh<_i724.TaskRepositoryImpl>()),
-    );
-    gh.factory<_i533.ModuleUseCase>(
-      () => _i533.ModuleUseCase(impl: gh<_i656.ModuleRepositoryImpl>()),
     );
     return this;
   }
