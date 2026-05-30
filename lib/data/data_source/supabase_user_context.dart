@@ -24,7 +24,7 @@ class SupabaseUserContext {
     }
 
     final profile = await _supabase
-        .from('users')
+        .from('profiles')
         .select('id')
         .eq('email', email)
         .maybeSingle();
