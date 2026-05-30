@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:achievia/core/constants/routers/navigation_service.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/core/di/local_storage_service.dart';
-import 'package:achievia/core/constants/routers/navigation_service.dart';
-import 'package:achievia/presentation/widgets/settings/settings_card.dart';
 import 'package:achievia/presentation/widgets/placeholder_gestures/dialog_builder.dart';
+import 'package:achievia/presentation/widgets/settings/settings_card.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Logout settings section with confirmation dialog
 class LogoutSettingsSection extends ConsumerWidget {
@@ -38,6 +39,7 @@ class LogoutSettingsSection extends ConsumerWidget {
 
     if (confirmed == true) {
       final singleton = sl<LocalStorageService>();
+      await Supabase.instance.client.auth.signOut();
       await singleton.clearToken();
       if (context.mounted) {
         NavigationService.pop();

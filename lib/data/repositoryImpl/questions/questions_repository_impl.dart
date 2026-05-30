@@ -26,13 +26,12 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
         );
         print('Repository - Remote questions received: $remoteQuestions');
         await local.insertQuestionsToCache(remoteQuestions);
-        final mapped = remoteQuestions.map((e)=>e.toEntity()).toList();
+        final mapped = remoteQuestions.map((e) => e.toEntity()).toList();
         print('Repository - Mapped to entities: $mapped');
         return mapped;
-
-      }else{
+      } else {
         final cached = await local.getQuestionsFromCache();
-        return cached.map((e)=>e.toEntity()).toList();
+        return cached.map((e) => e.toEntity()).toList();
       }
     } catch (e, st) {
       print('Repository error: $e');
@@ -81,8 +80,9 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
     print('from impl repo: $noOfAttempt');
     return responseCached.toEntity();
   }
+
   @override
-  Future<int> submitQuiz() async{
+  Future<int> submitQuiz() async {
     try {
       final responseCached = await remoteDatasource.putToAttempt();
       print('from impl:$responseCached');

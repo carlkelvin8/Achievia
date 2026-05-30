@@ -358,8 +358,7 @@ final List<QuestionsEntityWidget> questions = [
     label: 'Mock Boards',
     sub_label:
         'Simulated board examinations designed to mirror the actual exam experience, helping you assess your readiness, build confidence, and identify areas that need improvement before the real test.',
-    callback: (context) =>
-        Navigator.pushNamed(context, '/onboarding-questions'),
+    callback: null,
   ),
   QuestionsEntityWidget(
     icon: Icons.emoji_events_sharp,

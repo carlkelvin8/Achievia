@@ -1,9 +1,8 @@
-import 'package:achievia/const.dart';
-import 'package:achievia/core/di/injection.dart';
-import 'package:achievia/core/di/local_storage_service.dart';
+import 'package:achievia/data/data_source/supabase_user_context.dart';
 import 'package:achievia/domain/entities/api/profile/profile_entity.dart';
-import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class ProfileDataSource {
   Future<ProfileEntity> getProfile();
@@ -12,9 +11,11 @@ abstract class ProfileDataSource {
 @injectable
 @lazySingleton
 class ProfileRemoteDatasource implements ProfileDataSource {
-  final Dio dio;
+  final SupabaseUserContext userContext;
 
-  ProfileRemoteDatasource({required this.dio});
+  ProfileRemoteDatasource({this.userContext = const SupabaseUserContext()});
+
+  SupabaseClient get _supabase => Supabase.instance.client;
 
   DateTime? _parseDate(dynamic value) {
     if (value == null) return null;
@@ -25,55 +26,46 @@ class ProfileRemoteDatasource implements ProfileDataSource {
     return null;
   }
 
+  int? _parseInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value);
+    return null;
+  }
+
   @override
   Future<ProfileEntity> getProfile() async {
-    final LocalStorageService storageService = sl<LocalStorageService>();
-    final token = storageService.token;
-
     try {
-      final response = await dio.get(
-        '$BASE_URL/you/profile',
-        options: Options(
-          sendTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 5),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
-        ),
+      final userId = await userContext.currentUserId();
+      final data = await _supabase
+          .from('users')
+          .select()
+          .eq('id', userId)
+          .single();
+
+      return ProfileEntity(
+        id: _parseInt(data['id']),
+        firstName: data['first_name'] as String?,
+        middleName: data['middle_name'] as String?,
+        lastName: data['last_name'] as String?,
+        bio: data['bio'] as String?,
+        email: data['email'] as String?,
+        age: _parseInt(data['age']),
+        trial: data['trial']?.toString(),
+        username: data['username'] as String?,
+        role: data['role'] as String?,
+        university: data['university'] as String?,
+        purpose: data['purpose'] as String?,
+        dateOfExamination: _parseDate(data['date_of_examination']),
+        createdAt: _parseDate(data['created_at']),
+        updatedAt: _parseDate(data['updated_at']),
+        status: data['status'] as String?,
+        profileImage: data['profile_image'] as String?,
+        courseId: _parseInt(data['course_id']),
       );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data']['data'];
-        return ProfileEntity(
-          id: data['id'],
-          firstName: data['first_name'],
-          middleName: data['middle_name'],
-          lastName: data['last_name'],
-          bio: data['bio'],
-          email: data['email'],
-          age: data['age'],
-          trial: data['trial'],
-          username: data['username'],
-          role: data['role'],
-          university: data['university'],
-          purpose: data['purpose'],
-          dateOfExamination: _parseDate(
-            data['date_of_examination'] ?? data['dateOfExamination'],
-          ),
-          createdAt: _parseDate(data['createdAt'] ?? data['created_at']),
-          updatedAt: _parseDate(data['updatedAt'] ?? data['updated_at']),
-          status: data['status'],
-          profileImage: data['profile_image'],
-          courseId: data['courseId'],
-        );
-      }
-
-      throw Exception('Failed to fetch profile');
     } catch (e, st) {
-      print('Error fetching profile: $e');
-      print('Stack trace: $st');
+      debugPrint('Error fetching profile: $e');
+      debugPrint('Stack trace: $st');
       rethrow;
     }
   }

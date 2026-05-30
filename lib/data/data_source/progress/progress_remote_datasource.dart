@@ -1,8 +1,7 @@
-import 'package:achievia/core/di/injection.dart';
-import 'package:achievia/core/di/local_storage_service.dart';
+import 'package:achievia/data/data_source/supabase_user_context.dart';
 import 'package:achievia/data/models/progress/progress_day_dto.dart';
-import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class ProgressDataSource {
   Future<void> markTodayActive();
@@ -12,44 +11,41 @@ abstract class ProgressDataSource {
 @lazySingleton
 @injectable
 class ProgressRemoteDatasource implements ProgressDataSource {
-  final Dio dio;
+  final SupabaseUserContext userContext;
 
-  ProgressRemoteDatasource(this.dio);
+  ProgressRemoteDatasource({this.userContext = const SupabaseUserContext()});
+
+  SupabaseClient get _supabase => Supabase.instance.client;
+
+  String _todayDate() {
+    final now = DateTime.now();
+    final normalized = DateTime(now.year, now.month, now.day);
+    return normalized.toIso8601String().split('T').first;
+  }
 
   @override
   Future<void> markTodayActive() async {
-    final LocalStorageService storageService = sl<LocalStorageService>();
-    final token = storageService.token;
+    final userId = await userContext.currentUserId();
 
-    await dio.post(
-      '/progress/active',
-      options: Options(
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      ),
-    );
+    await _supabase.from('progress_days').upsert({
+      'user_id': userId,
+      'activity_date': _todayDate(),
+      'is_active': true,
+    }, onConflict: 'user_id,activity_date');
   }
 
   @override
   Future<List<ProgressDayDto>> getActiveDays() async {
-    final LocalStorageService storageService = sl<LocalStorageService>();
-    final token = storageService.token;
+    final userId = await userContext.currentUserId();
+    final rows = await _supabase
+        .from('progress_days')
+        .select('id, user_id, activity_date, is_active')
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .order('activity_date');
 
-    final response = await dio.get(
-      '/progress/read',
-      options: Options(
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      ),
-    );
-
-    final data = response.data['data']['data'] as List<dynamic>;
-    return data
-        .map((item) => ProgressDayDto.fromJson(item as Map<String, dynamic>))
+    return rows
+        .map((item) => ProgressDayDto.fromJson(Map<String, dynamic>.from(item)))
         .toList();
   }
 }

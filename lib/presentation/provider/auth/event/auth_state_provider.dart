@@ -1,9 +1,9 @@
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/domain/entities/api/auth/user_entity.dart';
-import 'package:dio/dio.dart';
+import 'package:achievia/domain/use_cases/auth/user_use_case.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:achievia/domain/use_cases/auth/user_use_case.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthNotifier extends Notifier<bool> {
   @override
@@ -57,12 +57,8 @@ class LoginNotifier extends Notifier<LoginFormState> {
       usernameController.clear();
       passwordController.clear();
       state = state.copyWith(isLoading: false);
-    } on DioException catch (e) {
-      final message =
-          e.response?.data['error']['message'] ??
-          e.message ??
-          'An error occurred';
-      state = state.copyWith(isLoading: false, errorMessage: message);
+    } on AuthException catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.message);
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }

@@ -27,19 +27,6 @@ class ExamAppBar extends StatelessWidget implements PreferredSizeWidget {
       toolbarHeight: toolbarheight,
       centerTitle: true,
       leading: IconButton(onPressed: callBackQuit, icon: Icon(Icons.arrow_back_ios)),
-      actions: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              padding: const EdgeInsets.all(0),
-              constraints: const BoxConstraints(),
-              icon: const Icon(Icons.arrow_forward_ios),
-              onPressed: callback,
-            ),
-          ],
-        ),
-      ],
       title: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

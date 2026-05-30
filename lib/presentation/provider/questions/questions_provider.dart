@@ -115,23 +115,31 @@ class OuterPageControllerProvider extends Notifier<PageController> {
     return PageController();
   }
 
+  bool get _isAttached => state.hasClients;
+
   Future<void> nextAsOuter(BuildContext context, String debugValue) async {
+    if (!_isAttached) return;
     debugPrint("${state.page}");
     debugPrint(debugValue);
-    state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+    await state.nextPage(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.ease,
+    );
   }
 
   Future<void> prev() async {
-    state.previousPage(
-      duration: Duration(milliseconds: 500),
+    if (!_isAttached) return;
+    await state.previousPage(
+      duration: const Duration(milliseconds: 500),
       curve: Curves.ease,
     );
   }
 
   Future<void> navigateToPage(int index) async {
-    state.animateToPage(
+    if (!_isAttached) return;
+    await state.animateToPage(
       index,
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
       curve: Curves.ease,
     );
   }
@@ -145,6 +153,8 @@ class PageControllerProvider extends Notifier<PageController> {
     return PageController();
   }
 
+  bool get _isAttached => state.hasClients;
+
   Future<void> next(BuildContext context, int length, int currentIndex) async {
     if (currentIndex >= length - 1) {
       final attemptId = await useCases.submitQuiz();
@@ -154,20 +164,26 @@ class PageControllerProvider extends Notifier<PageController> {
       Navigator.pushNamed(context, '/attempt-screen', arguments: attemptId);
       return;
     }
-    state.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+    if (!_isAttached) return;
+    await state.nextPage(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.ease,
+    );
   }
 
   Future<void> prev() async {
-    state.previousPage(
-      duration: Duration(milliseconds: 500),
+    if (!_isAttached) return;
+    await state.previousPage(
+      duration: const Duration(milliseconds: 500),
       curve: Curves.ease,
     );
   }
 
   Future<void> navigateToPage(int index) async {
-    state.animateToPage(
+    if (!_isAttached) return;
+    await state.animateToPage(
       index,
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
       curve: Curves.ease,
     );
   }
@@ -179,13 +195,14 @@ class ShowUnansweredQuestionsProvider extends Notifier<List<int>> {
   List<int> build() => [];
 
   Future<void> isAnswered(int index) async {
-    state.add(index);
-    print(state);
+    if (state.contains(index)) return;
+    state = [...state, index];
+    debugPrint(state.toString());
   }
 
   Future<void> resetState() async {
-    state.clear();
-    print(state);
+    state = [];
+    debugPrint(state.toString());
   }
 }
 

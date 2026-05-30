@@ -1,1 +1,2 @@
-const BASE_URL = 'https://farrah-energetistic-thersa.ngrok-free.dev';
+const supabaseUrl = 'https://bcxvjfxrdfzqzmoseegx.supabase.co';
+const supabaseAnon = 'sb_publishable_iTWqjSVYMe4DHeRIszMuDQ_4C_joMhd';

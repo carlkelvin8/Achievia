@@ -1,8 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:achievia/const.dart';
+import 'package:achievia/data/data_source/supabase_user_context.dart';
 import 'package:achievia/data/models/reviewer/module_dto.dart';
-import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class ModuleRepositoryDataSource {
   Future<PaginatedModulesDto> getModules(
@@ -15,11 +16,21 @@ abstract class ModuleRepositoryDataSource {
 @injectable
 @lazySingleton
 class ModuleRemoteDatasource implements ModuleRepositoryDataSource {
-  final Dio dio;
+  final SupabaseUserContext userContext;
 
-  ModuleRemoteDatasource({
-    required this.dio,
-  });
+  ModuleRemoteDatasource({this.userContext = const SupabaseUserContext()});
+
+  SupabaseClient get _supabase => Supabase.instance.client;
+
+  Map<String, dynamic> _normalizeModule(Map<String, dynamic> row) {
+    return {
+      ...row,
+      'description': row['description'] ?? '',
+      'userId': row['user_id'] ?? row['userId'] ?? 0,
+      'createdAt': row['created_at'] ?? row['createdAt'] ?? '',
+      'subjectId': row['subject_id'] ?? row['subjectId'] ?? 0,
+    };
+  }
 
   @override
   Future<PaginatedModulesDto> getModules(
@@ -28,56 +39,41 @@ class ModuleRemoteDatasource implements ModuleRepositoryDataSource {
     int limit = 20,
   }) async {
     try {
-      print('[ModuleRemoteDatasource] GET /reviewer/modules?page=$page&limit=$limit');
-      final response = await dio.get(
-        '$BASE_URL/reviewer/modules',
-        queryParameters: {
-          'page': page,
-          'limit': limit,
-        },
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
-        ),
+      final userId = await userContext.currentUserId();
+      final resolvedPage = page < 1 ? 1 : page;
+      final resolvedLimit = limit < 1 ? 20 : (limit > 50 ? 50 : limit);
+      final from = (resolvedPage - 1) * resolvedLimit;
+      final to = from + resolvedLimit;
+
+      final rows = await _supabase
+          .from('modules')
+          .select(
+            'id, title, description, user_id, created_at, file, image, status, subject_id',
+          )
+          .eq('user_id', userId)
+          .order('created_at', ascending: false)
+          .order('id', ascending: false)
+          .range(from, to);
+
+      final totalRows = await _supabase
+          .from('modules')
+          .select('id')
+          .eq('user_id', userId);
+      final hasMore = rows.length > resolvedLimit;
+      final visibleRows = rows.take(resolvedLimit);
+
+      return PaginatedModulesDto(
+        items: visibleRows
+            .map((module) => ModuleDto.fromJson(_normalizeModule(module)))
+            .toList(),
+        page: resolvedPage,
+        limit: resolvedLimit,
+        total: totalRows.length,
+        hasMore: hasMore,
       );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final payload = response.data['data'] as Map<String, dynamic>;
-        final data = payload['data'] as List;
-        final hasPagination = payload['pagination'] is Map<String, dynamic>;
-        final pagination = hasPagination
-            ? payload['pagination'] as Map<String, dynamic>
-            : <String, dynamic>{};
-
-        final resolvedPage = (pagination['page'] as num?)?.toInt() ?? page;
-        final resolvedLimit = (pagination['limit'] as num?)?.toInt() ?? limit;
-        final resolvedTotal = (pagination['total'] as num?)?.toInt() ?? data.length;
-        final resolvedHasMore = hasPagination
-            ? (pagination['hasMore'] as bool? ?? data.length >= resolvedLimit)
-            : false;
-
-        print(
-          '[ModuleRemoteDatasource] SUCCESS page=$resolvedPage '
-          'limit=$resolvedLimit total=$resolvedTotal hasMore=$resolvedHasMore '
-          'items=${data.length} hasPagination=$hasPagination',
-        );
-
-        return PaginatedModulesDto(
-          items: data.map((module) => ModuleDto.fromJson(module)).toList(),
-          page: resolvedPage,
-          limit: resolvedLimit,
-          total: resolvedTotal,
-          hasMore: resolvedHasMore,
-        );
-      } else {
-        print('[ModuleRemoteDatasource] FAILED status=${response.statusCode} page=$page');
-        throw Exception('Failed to load modules: ${response.statusCode}');
-      }
     } catch (e, st) {
-      print('ModuleRemoteDatasource error: $e');
-      print('Stack trace: $st');
+      debugPrint('ModuleRemoteDatasource error: $e');
+      debugPrint('Stack trace: $st');
       rethrow;
     }
   }

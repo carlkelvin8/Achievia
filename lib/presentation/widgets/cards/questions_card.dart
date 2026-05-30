@@ -7,7 +7,7 @@ class QuestionsCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String sub_label;
-  final VoidCallback? callback;
+  final void Function(BuildContext context)? callback;
   const QuestionsCard({
     super.key,
     required this.icon,
@@ -18,7 +18,7 @@ class QuestionsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: callback,
+      onTap: callback == null ? null : () => callback!.call(context),
       child: Container(
       width: MediaQuery.of(context).size.width,
       padding: level1_widget,

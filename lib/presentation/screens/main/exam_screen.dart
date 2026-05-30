@@ -61,12 +61,16 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
         currentBatch == null || currentBatch.questions.isEmpty
         ? null
         : currentBatch.questions[safeOuterIndex];
+    final currentBatchAnsweredCount = currentBatch == null
+        ? 0
+        : currentBatch.questions
+              .where((question) => isAnsweredWatch.contains(question.id))
+              .length;
     final isCurrentQuestionAnswered =
         currentQuestion != null && selectedAnswers[currentQuestion.id] != null;
-
     return Scaffold(
       appBar: ExamAppBar(
-        callBackQuit: (){
+        callBackQuit: () {
           showDialog(
             context: context,
             builder: (_) => AlertDialog(
@@ -90,9 +94,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
             ),
           );
         },
-        callback: () {
-          
-        },
+        callback: () {},
         title: asyncQuestions.when(
           data: (_) {
             if (quizBatches.isEmpty) return 'No questions';
@@ -126,6 +128,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
               indexNotider.changeIndex(batchIndex);
               _resetQuestionPage(pageControllerOuterState, indexOuter);
               timerNotifier.reset();
+              timerNotifier.start();
             },
             itemBuilder: (context, batchIndex) {
               final batch = quizBatches[batchIndex];
@@ -174,16 +177,18 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                       itemCount: currentBatch?.questions.length ?? 0,
                       itemBuilder: (context, indx) => UnansweredQuestionsBadge(
                         callback: () {
-                          pageControllerNotifier.navigateToPage(indx);
+                          pageControllerOuterNotifier.navigateToPage(indx);
                           showModal.showModal();
                         },
                         content: '${indx + 1}',
-                        answered: currentBatch?.questions.every(
-                          (question) => isAnsweredWatch.contains(question.id),
-                        ) ?? false,
+                        answered: currentBatch == null
+                            ? false
+                            : isAnsweredWatch.contains(
+                                currentBatch.questions[indx].id,
+                              ),
                         index: indx,
                       ),
-                      totalItems: isAnsweredWatch.length,
+                      totalItems: currentBatchAnsweredCount,
                       currentItems: currentBatch?.questions.length ?? 0,
                     );
             },
@@ -254,6 +259,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                             indexOuter,
                           );
                           timerNotifier.reset();
+                          timerNotifier.start();
                           return;
                         }
 
@@ -262,6 +268,7 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                           indexOuter,
                         );
                         timerNotifier.reset();
+                        timerNotifier.start();
                       },
                 icon: Icon(
                   Icons.arrow_forward_ios,

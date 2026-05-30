@@ -12,7 +12,6 @@
 import 'package:achievia/core/di/local_storage_service.dart' as _i982;
 import 'package:achievia/core/di/shared_pref.dart' as _i644;
 import 'package:achievia/core/network/conntectivity.dart' as _i790;
-import 'package:achievia/core/network/dio_client.dart' as _i344;
 import 'package:achievia/core/network/offline_caching.dart' as _i64;
 import 'package:achievia/core/registration/register_modules.dart' as _i790;
 import 'package:achievia/data/data_source/auth/user_remote_datasource.dart'
@@ -55,7 +54,6 @@ import 'package:achievia/domain/use_cases/reviewer/module_use_case.dart'
     as _i533;
 import 'package:achievia/domain/use_cases/task/task_use_case.dart' as _i981;
 import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
-import 'package:dio/dio.dart' as _i361;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
@@ -73,9 +71,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.prefs,
       preResolve: true,
     );
-    gh.lazySingleton<_i344.DioClient>(() => _i344.DioClient());
     gh.lazySingleton<_i64.OfflineCaching>(() => _i64.OfflineCaching());
-    gh.lazySingleton<_i361.Dio>(() => registerModules.dio);
     gh.lazySingleton<_i895.Connectivity>(() => registerModules.connectivity);
     gh.lazySingleton<_i982.LocalStorageService>(
       () => _i982.LocalStorageService(gh<_i460.SharedPreferences>()),
@@ -84,16 +80,13 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i790.NetworkInfoImpl(gh<_i895.Connectivity>()),
     );
     gh.lazySingleton<_i557.QuestionsRemoteDatasource>(
-      () => _i557.QuestionsRemoteDatasource(
-        gh<_i361.Dio>(),
-        gh<_i64.OfflineCaching>(),
-      ),
+      () => _i557.QuestionsRemoteDatasource(gh<_i64.OfflineCaching>()),
     );
     gh.lazySingleton<_i781.ProgressRemoteDatasource>(
-      () => _i781.ProgressRemoteDatasource(gh<_i361.Dio>()),
+      () => _i781.ProgressRemoteDatasource(),
     );
     gh.lazySingleton<_i1006.TaskRemoteDatasource>(
-      () => _i1006.TaskRemoteDatasource(gh<_i361.Dio>()),
+      () => _i1006.TaskRemoteDatasource(),
     );
     gh.lazySingleton<_i1000.QuestionsRepositoryImpl>(
       () => _i1000.QuestionsRepositoryImpl(
@@ -102,14 +95,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i64.OfflineCaching>(),
       ),
     );
-    gh.factory<_i528.UserRemoteDatasource>(
-      () => _i528.UserRemoteDatasource(dio: gh<_i361.Dio>()),
-    );
+    gh.factory<_i528.UserRemoteDatasource>(() => _i528.UserRemoteDatasource());
     gh.factory<_i655.ProfileRemoteDatasource>(
-      () => _i655.ProfileRemoteDatasource(dio: gh<_i361.Dio>()),
+      () => _i655.ProfileRemoteDatasource(),
     );
     gh.factory<_i536.ModuleRemoteDatasource>(
-      () => _i536.ModuleRemoteDatasource(dio: gh<_i361.Dio>()),
+      () => _i536.ModuleRemoteDatasource(),
     );
     gh.lazySingleton<_i754.ProgressRepositoryImpl>(
       () => _i754.ProgressRepositoryImpl(gh<_i781.ProgressRemoteDatasource>()),
