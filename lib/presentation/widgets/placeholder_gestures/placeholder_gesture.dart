@@ -1,33 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class PlaceholderGesture extends StatelessWidget {
-  const PlaceholderGesture({super.key});
+class Placeholdergesture extends StatefulWidget {
+  final VoidCallback onTap;
+  final String text;
+  final String gesture;
+  const Placeholdergesture({
+    super.key,
+    required this.onTap,
+    required this.text,
+    required this.gesture,
+  });
 
   @override
+  State<Placeholdergesture> createState() => _PlaceholdergestureState();
+}
+
+class _PlaceholdergestureState extends State<Placeholdergesture> {
+  @override
   Widget build(BuildContext context) {
-    return Center(
-      child: RichText(
-        textAlign: TextAlign.center,
-        text: TextSpan(
-          style: TextStyle(
-            fontSize: 12,
-            color: Theme.of(context).colorScheme.onSurface,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          widget.text,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w400,
+            fontSize: 14,
+            color: Colors.black,
           ),
-          children: [
-            TextSpan(
-              text: 'Terms and conditions\n',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-              // recognizer: TapGestureRecognizer()..onTap = () {
-              //   // Navigate to Terms page
-              // },
-            ),
-            const TextSpan(
-              text: 'Privacy Policy',
-              style: TextStyle(fontWeight: FontWeight.normal),
-            ),
-          ],
         ),
-      ),
+        GestureDetector(
+          onTap: widget.onTap,
+          child: Text(
+            widget.gesture,
+            style: GoogleFonts.poppins(
+              decoration: TextDecoration.underline,
+              decorationThickness: 4,
+              decorationColor: Colors.black,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: Color.fromRGBO(34, 41, 168, 1),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

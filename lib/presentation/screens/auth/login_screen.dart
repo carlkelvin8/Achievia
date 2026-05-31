@@ -66,22 +66,6 @@ class _LoginScreenState extends State<LoginScreen>
               const SizedBox(height: 30),
               LoginForm(),
               const SizedBox(height: 10),
-              PlaceholderGesture(),
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    FaIcon(FontAwesomeIcons.facebook, size: 30),
-                    SizedBox(width: 16),
-                    FaIcon(FontAwesomeIcons.xTwitter, size: 30),
-                    SizedBox(width: 16),
-                    FaIcon(FontAwesomeIcons.instagram, size: 30),
-                    SizedBox(width: 16),
-                    FaIcon(FontAwesomeIcons.tiktok, size: 30),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
