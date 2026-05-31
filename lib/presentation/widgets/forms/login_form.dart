@@ -1,5 +1,3 @@
-import 'package:achievia/core/constants/app_paddings.dart';
-import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/presentation/provider/auth/event/auth_state_provider.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/checkboxes/checkboxes.dart';
@@ -23,31 +21,17 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     final visibilityNotifier = ref.read(toggleProvider.notifier);
     final loginNotifier = ref.read(loginFormProvider.notifier);
 
-    // Listen for error messages
-    // Listen for error messages
-    ref.listen(loginFormProvider, (previous, next) {
-      if (next.errorMessage != null &&
-          next.errorMessage != previous?.errorMessage) {
-        SnackBarUtils.showError(context, next.errorMessage!);
-      }
-    });
-
-    return Container(
-      padding: level1,
-      color: const Color.fromARGB(255, 192, 210, 218),
-      child: Form(
-        child: ListView(
-          shrinkWrap: true,
-          padding: EdgeInsets.zero,
-          physics: const ClampingScrollPhysics(),
-          children: [
-            ReusableField(
+    return Form(
+        key: loginNotifier.key,
+        child: Column(children: [
+          ReusableField(
               hintText: 'Username',
               controller: loginNotifier.usernameController,
-              errorText: ref.watch(loginFormProvider).errorMessage,
+              validator: (val) => loginNotifier.validate("Username", val),
             ),
             const SizedBox(height: 10),
             ReusableField(
+              validator: (val)=>loginNotifier.validate('Password', val),
               hintText: 'Password',
               suffixIcon: IconButton(
                 onPressed: () => visibilityNotifier.toggle(),
@@ -64,12 +48,8 @@ class _LoginFormState extends ConsumerState<LoginForm> {
               title: 'Log in',
               isLoading: ref.watch(loginFormProvider).isLoading,
               onPressed: () async {
-                final username = loginNotifier.usernameController.text;
-                final password = loginNotifier.passwordController.text;
-                if (username.isNotEmpty && password.isNotEmpty) {
-                  await loginNotifier.submit();
-                } else {
-                  SnackBarUtils.showError(context, 'Please enter username and password');
+                if (loginNotifier.key.currentState!.validate()) {
+                      await loginNotifier.submit();
                 }
               },
               width: MediaQuery.of(context).size.width,
@@ -94,13 +74,12 @@ class _LoginFormState extends ConsumerState<LoginForm> {
                     },
                   ),
                 ),
-                const SizedBox(width: 30),
-                const Expanded(child: Text('Forgot Password?')),
+                const SizedBox(width: 80,),
+                const Align(alignment: Alignment.centerRight, child: Text('Forgot Password?')),
               ],
             ),
           ],
         ),
-      ),
     );
   }
 }

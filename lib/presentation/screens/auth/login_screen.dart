@@ -64,37 +64,7 @@ class _LoginScreenState extends State<LoginScreen>
                     "The Philippines' premier e-learning platform for board exam preparation.",
               ),
               const SizedBox(height: 30),
-
-              TabBar(
-                controller: _tabController,
-                labelColor: Theme.of(context).colorScheme.primary,
-                indicator: const BoxDecoration(),
-                splashFactory: NoSplash.splashFactory,
-                unselectedLabelColor: Theme.of(
-                  context,
-                ).colorScheme.onSurfaceVariant,
-                tabs: const [
-                  Tab(text: "LOG IN"),
-                  Tab(text: "SIGN UP"),
-                ],
-              ),
-              SizedBox(
-                height: 290,
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    LoginForm(),
-                    Center(
-                      child: Text(
-                        'Upcoming...',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              LoginForm(),
               const SizedBox(height: 10),
               PlaceholderGesture(),
               Padding(

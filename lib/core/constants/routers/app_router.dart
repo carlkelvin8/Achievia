@@ -134,7 +134,8 @@ String? _redirectForAuth(BuildContext context, GoRouterState state) {
   final isLoggedIn = Supabase.instance.client.auth.currentSession != null;
   final location = state.uri.path;
   final isAuthRoute = location == RouteConstants.login || location == RouteConstants.onboarding;
-
+  
+  
   if (!isLoggedIn && !isAuthRoute) return RouteConstants.login;
   if (isLoggedIn && isAuthRoute) return RouteConstants.main;
 

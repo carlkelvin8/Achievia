@@ -17,6 +17,7 @@ final toggleProvider = NotifierProvider<AuthNotifier, bool>(AuthNotifier.new);
 class LoginNotifier extends Notifier<LoginFormState> {
   late final TextEditingController usernameController;
   late final TextEditingController passwordController;
+  late final GlobalKey<FormState> key;
 
   late final UserUseCase useCase;
 
@@ -25,6 +26,7 @@ class LoginNotifier extends Notifier<LoginFormState> {
     useCase = ref.read(userUseCaseProvider);
 
     usernameController = TextEditingController();
+    key = GlobalKey<FormState>();
     passwordController = TextEditingController();
 
     ref.onDispose(() {
@@ -33,6 +35,13 @@ class LoginNotifier extends Notifier<LoginFormState> {
     });
 
     return const LoginFormState(email: '', password: '');
+  }
+
+  String? validate(String controller, String value) {
+    if (value.isEmpty) {
+      return '$controller is required';
+    }
+    return null;
   }
 
   Future<void> submit() async {
