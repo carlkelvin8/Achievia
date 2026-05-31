@@ -23,9 +23,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     final isPasswordVisible = ref.watch(toggleProvider);
     final visibilityNotifier = ref.read(toggleProvider.notifier);
     final loginNotifier = ref.read(loginFormProvider.notifier);
-
+    final key = GlobalKey<FormState>();
     return Form(
-      key: loginNotifier.key,
+      key: key,
       child: Column(
         children: [
           ReusableField(
@@ -45,14 +45,13 @@ class _LoginFormState extends ConsumerState<LoginForm> {
             ),
             isObscure: !isPasswordVisible,
             controller: loginNotifier.passwordController,
-            errorText: ref.watch(loginFormProvider).errorMessage,
           ),
           const SizedBox(height: 10),
           ReusableButton(
             title: 'Log in',
             isLoading: ref.watch(loginFormProvider).isLoading,
             onPressed: () async {
-              if (loginNotifier.key.currentState!.validate()) {
+              if (key.currentState!.validate()) {
                 await loginNotifier.submit();
               }
             },
@@ -65,7 +64,8 @@ class _LoginFormState extends ConsumerState<LoginForm> {
           const Align(
             alignment: Alignment.center,
             child: Text('Forgot Password?'),
-          ),          const SizedBox(height: 12),
+          ),
+          const SizedBox(height: 12),
           const _AuthDivider(),
           const SizedBox(height: 16),
           _GoogleSignInButton(
@@ -77,7 +77,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
               );
             },
           ),
-          const SizedBox(height: 20,),
+          const SizedBox(height: 20),
           Placeholdergesture(
             onTap: () {
               context.push(RouteConstants.signUp);

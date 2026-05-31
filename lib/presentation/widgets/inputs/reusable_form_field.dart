@@ -33,6 +33,7 @@ class ReusableField extends StatelessWidget {
       maxLines: maxLines,
       minLines: minLines,
       decoration: InputDecoration(
+        
         fillColor: Colors.white,
         filled: true,
         suffixIcon: suffixIcon,

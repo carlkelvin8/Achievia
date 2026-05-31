@@ -40,7 +40,7 @@ class _PlaceholdergestureState extends State<Placeholdergesture> {
               decorationColor: Colors.black,
               fontWeight: FontWeight.w600,
               fontSize: 14,
-              color: Color.fromRGBO(34, 41, 168, 1),
+              color: Color.fromRGBO(8, 199, 247, 1),
             ),
           ),
         ),

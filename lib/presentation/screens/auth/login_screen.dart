@@ -3,9 +3,7 @@ import 'package:achievia/presentation/widgets/forms/login_form.dart';
 import 'package:achievia/presentation/widgets/headers/header1.dart';
 import 'package:achievia/presentation/widgets/headers/header2.dart';
 import 'package:achievia/presentation/widgets/headers/sub_header.dart';
-import 'package:achievia/presentation/widgets/placeholder_gestures/placeholder_gesture.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

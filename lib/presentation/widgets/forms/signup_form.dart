@@ -1,6 +1,5 @@
 import 'package:achievia/presentation/provider/auth/event/auth_state_provider.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
-import 'package:achievia/presentation/widgets/checkboxes/checkboxes.dart';
 import 'package:achievia/presentation/widgets/inputs/reusable_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,15 +19,73 @@ class _SignupFormState extends ConsumerState<SignupForm> {
     final isPasswordVisible = ref.watch(toggleProvider);
     final visibilityNotifier = ref.read(toggleProvider.notifier);
     final loginNotifier = ref.read(loginFormProvider.notifier);
-
+    final key = GlobalKey<FormState>();
     return Form(
-      key: loginNotifier.key,
+      key: key,
       child: Column(
         children: [
           ReusableField(
-            hintText: 'Username',
-            controller: loginNotifier.usernameController,
+            hintText: 'First Name',
+            controller: loginNotifier.userNameControllerSignup,
             validator: (val) => loginNotifier.validate("Username", val),
+          ),
+          const SizedBox(height: 10),
+          ReusableField(
+            validator: (val) => loginNotifier.validate('Middle Name', val),
+            hintText: 'Middle Name',
+            suffixIcon: IconButton(
+              onPressed: () => visibilityNotifier.toggle(),
+              icon: Icon(
+                isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+              ),
+            ),
+            isObscure: !isPasswordVisible,
+            controller: loginNotifier.passwordControllerSignup,
+            errorText: ref.watch(loginFormProvider).errorMessage,
+          ),
+          const SizedBox(height: 10),
+
+          ReusableField(
+            validator: (val) => loginNotifier.validate('Password', val),
+            hintText: 'Surname',
+            suffixIcon: IconButton(
+              onPressed: () => visibilityNotifier.toggle(),
+              icon: Icon(
+                isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+              ),
+            ),
+            isObscure: !isPasswordVisible,
+            controller: loginNotifier.passwordControllerSignup,
+            errorText: ref.watch(loginFormProvider).errorMessage,
+          ),
+          const SizedBox(height: 10),
+            ReusableField(
+            
+            validator: (val) => loginNotifier.validate('Password', val),
+            hintText: 'Username',
+            suffixIcon: IconButton(
+              onPressed: () => visibilityNotifier.toggle(),
+              icon: Icon(
+                isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+              ),
+            ),
+            isObscure: !isPasswordVisible,
+            controller: loginNotifier.passwordControllerSignup,
+            errorText: ref.watch(loginFormProvider).errorMessage,
+          ),
+          const SizedBox(height: 10),
+          ReusableField(
+            validator: (val) => loginNotifier.validate('Password', val),
+            hintText: 'Email',
+            suffixIcon: IconButton(
+              onPressed: () => visibilityNotifier.toggle(),
+              icon: Icon(
+                isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+              ),
+            ),
+            isObscure: !isPasswordVisible,
+            controller: loginNotifier.passwordControllerSignup,
+            errorText: ref.watch(loginFormProvider).errorMessage,
           ),
           const SizedBox(height: 10),
           ReusableField(
@@ -41,15 +98,29 @@ class _SignupFormState extends ConsumerState<SignupForm> {
               ),
             ),
             isObscure: !isPasswordVisible,
-            controller: loginNotifier.passwordController,
+            controller: loginNotifier.passwordControllerSignup,
+            errorText: ref.watch(loginFormProvider).errorMessage,
+          ),
+          const SizedBox(height: 10),
+          ReusableField(
+            validator: (val) => loginNotifier.validate('Password', val),
+            hintText: 'Confirm Password',
+            suffixIcon: IconButton(
+              onPressed: () => visibilityNotifier.toggle(),
+              icon: Icon(
+                isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+              ),
+            ),
+            isObscure: !isPasswordVisible,
+            controller: loginNotifier.passwordControllerSignup,
             errorText: ref.watch(loginFormProvider).errorMessage,
           ),
           const SizedBox(height: 10),
           ReusableButton(
-            title: 'Log in',
+            title: 'Sign up',
             isLoading: ref.watch(loginFormProvider).isLoading,
             onPressed: () async {
-              if (loginNotifier.key.currentState!.validate()) {
+              if (key.currentState!.validate()) {
                 await loginNotifier.submit();
               }
             },
@@ -57,30 +128,6 @@ class _SignupFormState extends ConsumerState<SignupForm> {
             height: 50,
             backgroundColor: const Color.fromARGB(255, 0, 219, 248),
             textColor: Colors.white,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: StatefulBuilder(
-                  builder: (context, setState) {
-                    return Checkboxes(
-                      onChanged: (value) {
-                        setState(() {
-                          agreedToTerms = value!;
-                        });
-                      },
-                      isChecked: agreedToTerms,
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 80),
-              const Align(
-                alignment: Alignment.centerRight,
-                child: Text('Forgot Password?'),
-              ),
-            ],
           ),
         ],
       ),

@@ -17,7 +17,14 @@ final toggleProvider = NotifierProvider<AuthNotifier, bool>(AuthNotifier.new);
 class LoginNotifier extends Notifier<LoginFormState> {
   late final TextEditingController usernameController;
   late final TextEditingController passwordController;
-  late final GlobalKey<FormState> key;
+  late final TextEditingController firstNameController;
+  late final TextEditingController middleNameController;
+  late final TextEditingController lastNameController;
+  late final TextEditingController schoolController;
+  late final TextEditingController emailController;
+  late final TextEditingController passwordControllerSignup;
+  late final TextEditingController confirmPasswordControllerSignup;
+  late final TextEditingController userNameControllerSignup;
 
   late final UserUseCase useCase;
 
@@ -26,12 +33,28 @@ class LoginNotifier extends Notifier<LoginFormState> {
     useCase = ref.read(userUseCaseProvider);
 
     usernameController = TextEditingController();
-    key = GlobalKey<FormState>();
     passwordController = TextEditingController();
+    firstNameController = TextEditingController();
+    middleNameController = TextEditingController();
+    lastNameController = TextEditingController();
+    schoolController = TextEditingController();
+    emailController = TextEditingController();
+    passwordControllerSignup = TextEditingController();
+    confirmPasswordControllerSignup = TextEditingController();
+    userNameControllerSignup = TextEditingController();
 
     ref.onDispose(() {
       usernameController.dispose();
       passwordController.dispose();
+      firstNameController.dispose();
+      middleNameController.dispose();
+      lastNameController.dispose();
+      schoolController.dispose();
+      emailController.dispose();
+      passwordControllerSignup.dispose();
+      confirmPasswordControllerSignup.dispose();
+      userNameControllerSignup.dispose();
+
     });
 
     return const LoginFormState(email: '', password: '');

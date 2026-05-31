@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/presentation/screens/auth/login_screen.dart';
 import 'package:achievia/presentation/screens/auth/onboarding_screen.dart';
+import 'package:achievia/presentation/screens/auth/signup_screen.dart';
 import 'package:achievia/presentation/screens/main/about_screen.dart';
 import 'package:achievia/presentation/screens/main/attempt_screen.dart';
 import 'package:achievia/presentation/screens/main/exam_screen.dart';
@@ -67,6 +68,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteConstants.profile,
         builder: (_, _) => const ProfileScreen(),
       ),
+      GoRoute(path: RouteConstants.signUp, builder: (_, _) => SignupScreen()),
       GoRoute(
         path: RouteConstants.about,
         builder: (_, _) => const AboutScreen(),
@@ -133,10 +135,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 String? _redirectForAuth(BuildContext context, GoRouterState state) {
   final isLoggedIn = Supabase.instance.client.auth.currentSession != null;
   final location = state.uri.path;
-  final isAuthRoute = location == RouteConstants.login || location == RouteConstants.onboarding;
-  
-  
-  if (!isLoggedIn && !isAuthRoute) return RouteConstants.login;
+  final publicRoute = [
+    RouteConstants.login,
+    RouteConstants.signUp,
+    RouteConstants.forgotPassword,
+    RouteConstants.onboarding
+  ];
+  final isAuthRoute = publicRoute.contains(location);
+
+  if (!isLoggedIn && !isAuthRoute) return publicRoute[0];
   if (isLoggedIn && isAuthRoute) return RouteConstants.main;
 
   return null;
