@@ -1,4 +1,5 @@
 import 'package:achievia/core/constants/routers/route_constants.dart';
+import 'package:achievia/core/utils/helpers.dart';
 import 'package:achievia/presentation/provider/auth/event/auth_state_provider.dart';
 import 'package:achievia/presentation/widgets/buttons/google_sign_in_button.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
@@ -32,42 +33,57 @@ class _SignupFormState extends ConsumerState<SignupForm> {
         children: [
           ReusableField(
             hintText: 'First Name',
-            controller: loginNotifier.userNameControllerSignup,
-            validator: (val) => loginNotifier.validate('First Name', val),
+            controller: loginNotifier.firstNameController,
+            validator: (val) =>
+                validate('First Name', val, loginNotifier.firstNameController),
           ),
           const SizedBox(height: 10),
 
           ReusableField(
             hintText: 'Middle Name',
             controller: loginNotifier.middleNameController,
-            validator: (val) => loginNotifier.validate('Middle Name', val),
+            validator: (val) => validate(
+              'Middle Name',
+              val,
+              loginNotifier.middleNameController,
+            ),
           ),
           const SizedBox(height: 10),
 
           ReusableField(
             hintText: 'Surname',
             controller: loginNotifier.lastNameController,
-            validator: (val) => loginNotifier.validate('Surname', val),
+            validator: (val) =>
+                validate('Surname', val, loginNotifier.lastNameController),
           ),
           const SizedBox(height: 10),
 
           ReusableField(
             hintText: 'Username',
             controller: loginNotifier.userNameControllerSignup,
-            validator: (val) => loginNotifier.validate('Username', val),
+            validator: (val) => validate(
+              'Username',
+              val,
+              loginNotifier.userNameControllerSignup,
+            ),
           ),
           const SizedBox(height: 10),
 
           ReusableField(
             hintText: 'Email',
             controller: loginNotifier.emailController,
-            validator: (val) => loginNotifier.validate('Email', val),
+            validator: (val) =>
+                validate('Email', val, loginNotifier.emailController),
             errorText: ref.watch(loginFormProvider).errorMessage,
           ),
           const SizedBox(height: 10),
 
           ReusableField(
-            validator: (val) => loginNotifier.validate('Password', val),
+            validator: (val) => validate(
+              'Password',
+              val,
+              loginNotifier.passwordControllerSignup,
+            ),
             hintText: 'Password',
             controller: loginNotifier.passwordControllerSignup,
             isObscure: true,
@@ -76,8 +92,17 @@ class _SignupFormState extends ConsumerState<SignupForm> {
           const SizedBox(height: 10),
 
           ReusableField(
-            validator: (val) => loginNotifier.validate('Password', val),
-            suffixIcon: IconButton(onPressed: loginNotifier.toggleEye, icon: Icon(loginState.isToggled ? Icons.visibility_off : Icons.visibility)  ),
+            validator: (val) => validate(
+              'Confirm Password',
+              val,
+              loginNotifier.confirmPasswordControllerSignup,
+            ),
+            suffixIcon: IconButton(
+              onPressed: loginNotifier.toggleEye,
+              icon: Icon(
+                loginState.isToggled ? Icons.visibility_off : Icons.visibility,
+              ),
+            ),
             hintText: 'Confirm Password',
             controller: loginNotifier.confirmPasswordControllerSignup,
             isObscure: loginState.isToggled,
@@ -89,7 +114,7 @@ class _SignupFormState extends ConsumerState<SignupForm> {
             isLoading: ref.watch(loginFormProvider).isLoading,
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
-                await loginNotifier.submit();
+                await loginNotifier.submitSignup();
               }
             },
             width: MediaQuery.of(context).size.width,
@@ -97,7 +122,7 @@ class _SignupFormState extends ConsumerState<SignupForm> {
             backgroundColor: const Color.fromARGB(255, 0, 219, 248),
             textColor: Colors.white,
           ),
-          const SizedBox(height: 20,),
+          const SizedBox(height: 20),
           const AuthDivider(),
           const SizedBox(height: 16),
           GoogleSignInButton(

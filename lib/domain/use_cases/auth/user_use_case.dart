@@ -12,6 +12,9 @@ class UserUseCase {
   Future<UserEntity> getLogin(UserEntity entity) async =>
       await impl.loginRepository(entity);
 
+  Future<UserEntity> getSignup(UserEntity entity) async =>
+      await impl.signUpRepository(entity);
+
   Future<UserEntity> getProfile(String token) async =>
       await impl.getProfile(token);
 }

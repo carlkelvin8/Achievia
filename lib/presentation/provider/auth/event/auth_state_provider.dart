@@ -59,13 +59,6 @@ class LoginNotifier extends Notifier<LoginFormState> {
     return const LoginFormState(email: '', password: '', isToggled: false);
   }
 
-  String? validate(String controller, String value) {
-    if (value.isEmpty) {
-      return '$controller is required';
-    }
-    return null;
-  }
-
   void toggleEye() {
     state = state.copyWith(isToggled: !state.isToggled);
   }
@@ -91,6 +84,40 @@ class LoginNotifier extends Notifier<LoginFormState> {
       await useCase.getLogin(entity);
       usernameController.clear();
       passwordController.clear();
+      state = state.copyWith(isLoading: false);
+    } on AuthException catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.message);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
+
+  Future<void> submitSignup() async {
+    final entity = UserEntity(
+      firstName: firstNameController.text,
+      middleName: middleNameController.text,
+      lastName: lastNameController.text,
+      bio: '',
+      age: 0,
+      username: userNameControllerSignup.text,
+      email: emailController.text,
+      password: passwordControllerSignup.text,
+      role: 'USER',
+      status: '',
+      profileImage: '',
+      university: schoolController.text,
+    );
+
+    try {
+      state = state.copyWith(isLoading: true, errorMessage: null);
+      await useCase.getSignup(entity);
+      firstNameController.clear();
+      middleNameController.clear();
+      lastNameController.clear();
+      userNameControllerSignup.clear();
+      emailController.clear();
+      passwordControllerSignup.clear();
+      confirmPasswordControllerSignup.clear();
       state = state.copyWith(isLoading: false);
     } on AuthException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.message);

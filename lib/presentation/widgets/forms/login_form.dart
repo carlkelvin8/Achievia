@@ -1,4 +1,5 @@
 import 'package:achievia/core/constants/routers/route_constants.dart';
+import 'package:achievia/core/utils/helpers.dart';
 import 'package:achievia/presentation/provider/auth/event/auth_state_provider.dart';
 import 'package:achievia/presentation/widgets/buttons/google_sign_in_button.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
@@ -32,11 +33,11 @@ class _LoginFormState extends ConsumerState<LoginForm> {
           ReusableField(
             hintText: 'Username',
             controller: loginNotifier.usernameController,
-            validator: (val) => loginNotifier.validate("Username", val),
+            validator: (val) => validate("Username", val, loginNotifier.usernameController),
           ),
           const SizedBox(height: 10),
           ReusableField(
-            validator: (val) => loginNotifier.validate('Password', val),
+            validator: (val) => validate('Password', val, loginNotifier.passwordController),
             hintText: 'Password',
             suffixIcon: IconButton(
               onPressed: () => visibilityNotifier.toggle(),

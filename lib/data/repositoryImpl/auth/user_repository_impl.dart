@@ -24,4 +24,11 @@ class UserRepositoryImpl implements UserRepository {
     final data = await datasource.getProfile(token);
     return data.toEntity();
   }
+
+  @override
+  Future<UserEntity> signUpRepository(UserEntity dto) async {
+    final entity = UserDto.fromEntity(dto);
+    final data = await datasource.signUp(entity);
+    return data.toEntity();
+  }
 }

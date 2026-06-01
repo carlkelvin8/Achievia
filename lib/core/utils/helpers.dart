@@ -479,3 +479,48 @@ final List<UserEntity> mockTopAchievians = [
 
 // Mock data for Top Streak Achievians (can be same or different)
 final List<UserEntity> mockTopStreakAchievians = List.from(mockTopAchievians);
+String? validate(String field, String? value, TextEditingController? controller) {
+  final input = value?.trim() ?? '';
+
+  if (input.isEmpty) {
+    return '$field is required';
+  }
+
+  switch (field.toLowerCase()) {
+    case 'first name':
+    case 'middle name':
+    case 'surname':
+      final nameRegex = RegExp(r"^[a-zA-Z]+(?:[ '-][a-zA-Z]+)*$");
+      if (!nameRegex.hasMatch(input)) {
+        return '$field can only contain letters, spaces, hyphens, and apostrophes';
+      }
+      break;
+    case 'username':
+      final usernameRegex = RegExp(r'^[a-zA-Z0-9._]{3,20}$');
+      if (!usernameRegex.hasMatch(input)) {
+        return 'Username must be 3-20 characters and use only letters, numbers, dots, or underscores';
+      }
+      break;
+    case 'email':
+      final emailRegex = RegExp(r'^[\w.-]+@([\w-]+\.)+[\w-]{2,}$');
+      if (!emailRegex.hasMatch(input)) {
+        return 'Enter a valid email address';
+      }
+      break;
+    case 'password':
+      final passwordRegex = RegExp(
+        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$',
+      );
+      if (!passwordRegex.hasMatch(input)) {
+        return 'Password must be 8+ characters with uppercase, lowercase, number, and symbol';
+      }
+      break;
+    case 'confirm password':
+      if (input != controller?.text) {
+        return 'Passwords do not match';
+      }
+      break;
+  }
+
+  return null;
+}
