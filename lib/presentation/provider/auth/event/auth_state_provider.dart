@@ -54,10 +54,9 @@ class LoginNotifier extends Notifier<LoginFormState> {
       passwordControllerSignup.dispose();
       confirmPasswordControllerSignup.dispose();
       userNameControllerSignup.dispose();
-
     });
 
-    return const LoginFormState(email: '', password: '');
+    return const LoginFormState(email: '', password: '', isToggled: false);
   }
 
   String? validate(String controller, String value) {
@@ -65,6 +64,10 @@ class LoginNotifier extends Notifier<LoginFormState> {
       return '$controller is required';
     }
     return null;
+  }
+
+  void toggleEye() {
+    state = state.copyWith(isToggled: !state.isToggled);
   }
 
   Future<void> submit() async {
@@ -106,12 +109,14 @@ class LoginFormState {
   final String email;
   final String password;
   final bool isLoading;
+  final bool isToggled;
   final String? errorMessage;
 
   const LoginFormState({
     required this.email,
     required this.password,
     this.isLoading = false,
+    this.isToggled = true,
     this.errorMessage,
   });
 
@@ -120,12 +125,14 @@ class LoginFormState {
     String? password,
     bool? isLoading,
     String? errorMessage,
+    bool? isToggled,
   }) {
     return LoginFormState(
       email: email ?? this.email,
       password: password ?? this.password,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
+      isToggled: isToggled ?? this.isToggled,
     );
   }
 }

@@ -24,6 +24,7 @@ class _SignupFormState extends ConsumerState<SignupForm> {
   @override
   Widget build(BuildContext context) {
     final loginNotifier = ref.read(loginFormProvider.notifier);
+    final loginState = ref.watch(loginFormProvider);
 
     return Form(
       key: _formKey,
@@ -76,9 +77,10 @@ class _SignupFormState extends ConsumerState<SignupForm> {
 
           ReusableField(
             validator: (val) => loginNotifier.validate('Password', val),
+            suffixIcon: IconButton(onPressed: loginNotifier.toggleEye, icon: Icon(loginState.isToggled ? Icons.visibility_off : Icons.visibility)  ),
             hintText: 'Confirm Password',
             controller: loginNotifier.confirmPasswordControllerSignup,
-            isObscure: true,
+            isObscure: loginState.isToggled,
             errorText: ref.watch(loginFormProvider).errorMessage,
           ),
           const SizedBox(height: 50),
