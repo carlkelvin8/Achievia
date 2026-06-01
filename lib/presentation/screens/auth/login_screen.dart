@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen>
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SingleChildScrollView(
         child: Padding(
-          padding: level1,
+          padding: level2,
           child: Column(
             children: <Widget>[
               const SizedBox(height: 60),
