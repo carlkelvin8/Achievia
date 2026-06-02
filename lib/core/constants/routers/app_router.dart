@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:achievia/core/constants/routers/route_constants.dart';
+import 'package:achievia/presentation/screens/auth/forgot_password_screen.dart';
 import 'package:achievia/presentation/screens/auth/login_screen.dart';
 import 'package:achievia/presentation/screens/auth/signup_screen.dart';
 import 'package:achievia/presentation/screens/auth/onboarding_screen.dart';
@@ -73,6 +74,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteConstants.profile,
         builder: (_, _) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.forgotPassword,
+        builder: (_, _) => const ForgotPasswordScreen(),
       ),
       GoRoute(
         path: RouteConstants.reviewers,
@@ -156,6 +161,7 @@ String? _redirectForAuth(BuildContext context, GoRouterState state) {
     RouteConstants.login,
     RouteConstants.signUp,
     RouteConstants.onboarding,
+    RouteConstants.forgotPassword
   ];
 
   final isAuthRoute = authRoutes.contains(location);
@@ -163,6 +169,9 @@ String? _redirectForAuth(BuildContext context, GoRouterState state) {
   if (!isLoggedIn && !isAuthRoute) {
     return RouteConstants.login;
   }
+
+
+
   if (isLoggedIn && isAuthRoute) {
     return RouteConstants.main;
   }

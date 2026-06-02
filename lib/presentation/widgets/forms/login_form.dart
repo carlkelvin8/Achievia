@@ -33,11 +33,13 @@ class _LoginFormState extends ConsumerState<LoginForm> {
           ReusableField(
             hintText: 'Email',
             controller: loginNotifier.emailControllerLogin,
-            validator: (val) => validate("Email", val, loginNotifier.emailControllerLogin),
+            validator: (val) =>
+                validate("Email", val, loginNotifier.emailControllerLogin),
           ),
           const SizedBox(height: 10),
           ReusableField(
-            validator: (val) => validate('Password', val, loginNotifier.passwordController),
+            validator: (val) =>
+                validate('Password', val, loginNotifier.passwordController),
             hintText: 'Password',
             suffixIcon: IconButton(
               onPressed: () => visibilityNotifier.toggle(),
@@ -63,9 +65,20 @@ class _LoginFormState extends ConsumerState<LoginForm> {
             textColor: Colors.white,
           ),
           const SizedBox(height: 16),
-          const Align(
+          Align(
             alignment: Alignment.center,
-            child: Text('Forgot Password?'),
+            child: GestureDetector(
+              child: Text(
+                'Forgot Password?',
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  decorationThickness: 2,
+                ),
+              ),
+              onTap: () {
+                context.push(RouteConstants.forgotPassword);
+              },
+            ),
           ),
           const SizedBox(height: 12),
           const AuthDivider(),
@@ -92,4 +105,3 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     );
   }
 }
-
