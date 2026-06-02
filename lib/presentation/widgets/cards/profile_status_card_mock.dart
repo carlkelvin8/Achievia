@@ -104,7 +104,6 @@ class ProfileStatusCardMock extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset('assets/images/logo.png', width: 36, height: 36),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(

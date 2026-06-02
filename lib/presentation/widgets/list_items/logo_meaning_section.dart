@@ -73,7 +73,6 @@ class LogoMeaningSection extends ConsumerWidget {
           onExpandedChanged: (expanded) {
             ref.read(expandableItemsProvider.notifier).setExpanded(4, expanded);
           },
-          imagePath: 'assets/images/logo.png',
         ),
       ],
     );

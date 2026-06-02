@@ -15,7 +15,7 @@ class AuthNotifier extends Notifier<bool> {
 final toggleProvider = NotifierProvider<AuthNotifier, bool>(AuthNotifier.new);
 
 class LoginNotifier extends Notifier<LoginFormState> {
-  late final TextEditingController usernameController;
+  late final TextEditingController emailControllerLogin;
   late final TextEditingController passwordController;
   late final TextEditingController firstNameController;
   late final TextEditingController middleNameController;
@@ -32,7 +32,7 @@ class LoginNotifier extends Notifier<LoginFormState> {
   LoginFormState build() {
     useCase = ref.read(userUseCaseProvider);
 
-    usernameController = TextEditingController();
+    emailControllerLogin = TextEditingController();
     passwordController = TextEditingController();
     firstNameController = TextEditingController();
     middleNameController = TextEditingController();
@@ -44,7 +44,7 @@ class LoginNotifier extends Notifier<LoginFormState> {
     userNameControllerSignup = TextEditingController();
 
     ref.onDispose(() {
-      usernameController.dispose();
+      emailControllerLogin.dispose();
       passwordController.dispose();
       firstNameController.dispose();
       middleNameController.dispose();
@@ -71,7 +71,7 @@ class LoginNotifier extends Notifier<LoginFormState> {
       lastName: '',
       bio: '',
       age: 0,
-      username: usernameController.text,
+      username: emailControllerLogin.text,
       email: '',
       password: passwordController.text,
       role: '',
@@ -82,7 +82,7 @@ class LoginNotifier extends Notifier<LoginFormState> {
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
       await useCase.getLogin(entity);
-      usernameController.clear();
+      emailControllerLogin.clear();
       passwordController.clear();
       state = state.copyWith(isLoading: false);
     } on AuthException catch (e) {

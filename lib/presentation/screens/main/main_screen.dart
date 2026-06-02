@@ -1,3 +1,4 @@
+import 'package:achievia/const.dart';
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/presentation/provider/tabs/event/tab_event.dart';
 import 'package:achievia/presentation/screens/main/about_screen.dart';
@@ -82,7 +83,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           onSettingsTap: () => context.push(RouteConstants.settings),
           onNotificationTap: () => _onNotificationTap(context),
           notificationCount: notificationCount,
-          username: 'Charles Joven',
+          username: supabaseAuth.currentUser?.userMetadata?['first_name'],
           profileImageUrl: '',
         ),
         body: IndexedStack(

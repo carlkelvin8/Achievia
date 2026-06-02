@@ -1,4 +1,4 @@
-import 'package:achievia/domain/entities/api/auth/user_entity.dart';
+import 'package:achievia/domain/entities/api/profile/profile_entity.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'profile_dto.g.dart';
@@ -31,7 +31,7 @@ class ProfileDataDto {
 
 @JsonSerializable()
 class ProfileDto {
-  final int? id;
+  final String? id;
   @JsonKey(name: 'first_name')
   final String? firstName;
   @JsonKey(name: 'middle_name')
@@ -41,7 +41,7 @@ class ProfileDto {
   final String? bio;
   final String? email;
   final int? age;
-  final String? trial;
+  final int? trial;
   final String? username;
   final String? password;
   final String? role;
@@ -49,11 +49,14 @@ class ProfileDto {
   final String? purpose;
   @JsonKey(name: 'date_of_examination')
   final DateTime? dateOfExamination;
+  @JsonKey(name: 'created_at')
   final DateTime? createdAt;
+  @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
   final String? status;
   @JsonKey(name: 'profile_image')
   final String? profileImage;
+  @JsonKey(name: 'course_id')
   final int? courseId;
 
   ProfileDto({
@@ -83,19 +86,47 @@ class ProfileDto {
 
   Map<String, dynamic> toJson() => _$ProfileDtoToJson(this);
 
-  UserEntity toEntity() => UserEntity(
-        id: id,
-        firstName: firstName,
-        middleName: middleName,
-        lastName: lastName,
-        bio: bio,
-        age: age,
-        username: username,
-        email: email,
-        password: password,
-        role: role,
-        status: status,
-        profileImage: profileImage,
-        courseId: courseId,
-      );
+  ProfileEntity toEntity() => ProfileEntity(
+    id: id,
+    firstName: firstName,
+    middleName: middleName,
+    lastName: lastName,
+    bio: bio,
+    email: email,
+    age: age,
+    trial: trial,
+    username: username,
+    role: role,
+    university: university,
+    purpose: purpose,
+    dateOfExamination: dateOfExamination,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+    status: status,
+    profileImage: profileImage,
+    courseId: courseId,
+  );
+
+  static ProfileDto fromEntity(ProfileEntity entity) {
+    return ProfileDto(
+      id: entity.id,
+      firstName: entity.firstName,
+      middleName: entity.middleName,
+      lastName: entity.lastName,
+      bio: entity.bio,
+      email: entity.email,
+      age: entity.age,
+      trial: entity.trial,
+      username: entity.username,
+      role: entity.role,
+      university: entity.university,
+      purpose: entity.purpose,
+      dateOfExamination: entity.dateOfExamination,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+      status: entity.status,
+      profileImage: entity.profileImage,
+      courseId: entity.courseId,
+    );
+  }
 }

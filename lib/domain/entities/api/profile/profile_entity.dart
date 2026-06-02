@@ -1,12 +1,12 @@
 class ProfileEntity {
-  final int? id;
+  final String? id;
   final String? firstName;
   final String? middleName;
   final String? lastName;
   final String? bio;
   final String? email;
   final int? age;
-  final String? trial;
+  final int? trial;
   final String? username;
   final String? role;
   final String? university;
@@ -47,14 +47,14 @@ class ProfileEntity {
   }
 
   ProfileEntity copyWith({
-    int? id,
+    String? id,
     String? firstName,
     String? middleName,
     String? lastName,
     String? bio,
     String? email,
     int? age,
-    String? trial,
+    int? trial,
     String? username,
     String? role,
     String? university,

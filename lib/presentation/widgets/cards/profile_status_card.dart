@@ -87,7 +87,6 @@ class ProfileStatusCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Image.asset('assets/images/logo.png', width: 40, height: 40),
                 Center(
                   child: Column(
                     children: [

@@ -17,15 +17,6 @@ import 'package:achievia/core/constants/routers/route_constants.dart';
   class UserRemoteDatasource implements UserRepositoryDataSource {
     UserRemoteDatasource();
 
-    String _requiredEmail(UserDto dto) {
-      final email = dto.email?.trim();
-      if (email != null && email.isNotEmpty) return email;
-
-      final username = dto.username?.trim();
-      if (username != null && username.isNotEmpty) return username;
-
-      throw Exception('Email is required');
-    }
 
     UserDto _fromUserMetadata(User? user, UserDto fallback) {
       final metadata = user?.userMetadata;
@@ -43,7 +34,7 @@ import 'package:achievia/core/constants/routers/route_constants.dart';
     Future<UserDto> login(UserDto dto) async {
       try {
         final res = await supabaseAuth.signInWithPassword(
-          email: _requiredEmail(dto),
+          email: dto.username?.trim(),
           password: dto.password!.trim(),
         );
         final session = res.session;
@@ -60,6 +51,7 @@ import 'package:achievia/core/constants/routers/route_constants.dart';
         debugPrint(e.toString());
         rethrow;
       } catch (e) {
+        debugPrint(e.toString());
         rethrow;
       }
     }

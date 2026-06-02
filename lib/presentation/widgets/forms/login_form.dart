@@ -31,9 +31,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
       child: Column(
         children: [
           ReusableField(
-            hintText: 'Username',
-            controller: loginNotifier.usernameController,
-            validator: (val) => validate("Username", val, loginNotifier.usernameController),
+            hintText: 'Email',
+            controller: loginNotifier.emailControllerLogin,
+            validator: (val) => validate("Email", val, loginNotifier.emailControllerLogin),
           ),
           const SizedBox(height: 10),
           ReusableField(
