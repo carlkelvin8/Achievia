@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 // Primary Brand Colors
 const primary = Color(0xFF2196F3); // Blue
-const primaryVariant = Color(0xFF1976D2);
+const primaryVariant = Color(0xFF2E5A88);
 const secondary = Color(0xFF03DAC6); // Teal
 const secondaryVariant = Color(0xFF018786);
 

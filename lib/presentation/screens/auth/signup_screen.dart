@@ -1,6 +1,6 @@
 import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/presentation/widgets/forms/signup_form.dart';
-import 'package:achievia/presentation/widgets/headers/header1.dart';
+import 'package:achievia/presentation/widgets/headers/core/header1.dart';
 import 'package:flutter/material.dart';
 
 class SignupScreen extends StatefulWidget {

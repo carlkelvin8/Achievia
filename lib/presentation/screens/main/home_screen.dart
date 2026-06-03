@@ -5,7 +5,7 @@ import 'package:achievia/presentation/widgets/cards/question_of_the_day_card.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/presentation/provider/home/home_provider.dart';
-import 'package:achievia/presentation/widgets/headers/section_label.dart';
+import 'package:achievia/presentation/widgets/headers/core/section_label.dart';
 import 'package:achievia/presentation/widgets/cards/goal_card.dart';
 import 'package:achievia/presentation/widgets/cards/ranked_profile_card.dart';
 import 'package:achievia/presentation/widgets/list_items/horizontal_card_list.dart';

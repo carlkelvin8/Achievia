@@ -1,8 +1,8 @@
 import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
-import 'package:achievia/presentation/widgets/headers/header1.dart';
-import 'package:achievia/presentation/widgets/headers/header2.dart';
-import 'package:achievia/presentation/widgets/headers/sub_header.dart';
+import 'package:achievia/presentation/widgets/headers/core/header1.dart';
+import 'package:achievia/presentation/widgets/headers/core/header2.dart';
+import 'package:achievia/presentation/widgets/headers/core/sub_header.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingScreen extends StatelessWidget {
