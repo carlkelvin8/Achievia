@@ -1,52 +1,59 @@
 import 'package:achievia/core/constants/app_paddings.dart';
+import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
-import 'package:achievia/presentation/widgets/headers/core/header1.dart';
-import 'package:achievia/presentation/widgets/headers/core/header2.dart';
-import 'package:achievia/presentation/widgets/headers/core/sub_header.dart';
+import 'package:achievia/presentation/widgets/headers/auth/auth_h1.dart';
+import 'package:achievia/presentation/widgets/labels/auth/auth_label.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SingleChildScrollView(
         child: Padding(
-          padding: level1,
+          padding: level3,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const SizedBox(height: 60),
-              Center(
-                child: SizedBox(
-                  width: 130,
-                  height: 130,
-                  child: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    child: Icon(
-                      Icons.school,
-                      size: 60,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                  ),
-                ),
+              const SizedBox(height: 40),
+              const AuthH1(
+                fontSize: 24,
+                text: 'Achievia',
+                fontWeight: FontWeight.w700,
               ),
-              Center(
-                child: Header1(title1: 'Achie', title2: 'via'),
+              const SizedBox(height: 18),
+              const AuthH1(
+                fontSize: 20,
+                text: 'Awaken academic ambition',
+                fontWeight: FontWeight.w600,
               ),
-              Center(child: Header2(title: 'AWAKEN ACADEMIC AMBITION')),
               const SizedBox(height: 20),
-              SubHeader(
-                title:
+              const AuthLabel(
+                text:
                     "The Philippines' premier e-learning platform for board exam preparation.",
               ),
-              const SizedBox(height: 30),
-              Spacer(),
+              const SizedBox(height: 40),
               ReusableButton(
-                title: 'Log In', 
-                onPressed: (){}, 
-                width: MediaQuery.of(context).size.width, 
-                height: 50)
+                title: 'Log In',
+                onPressed: () => context.go(RouteConstants.login),
+                width: width,
+                height: 50,
+              ),
+              const SizedBox(height: 12),
+              ReusableButton(
+                title: 'Create Account',
+                onPressed: () => context.go(RouteConstants.signUp),
+                width: width,
+                height: 50,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                textColor: Theme.of(context).colorScheme.primary,
+              ),
             ],
           ),
         ),

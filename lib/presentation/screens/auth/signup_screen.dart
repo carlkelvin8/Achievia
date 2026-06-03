@@ -1,7 +1,11 @@
 import 'package:achievia/core/constants/app_paddings.dart';
+import 'package:achievia/core/constants/routers/route_constants.dart';
+import 'package:achievia/presentation/widgets/appbar/auth_app_bar.dart';
 import 'package:achievia/presentation/widgets/forms/signup_form.dart';
-import 'package:achievia/presentation/widgets/headers/core/header1.dart';
+import 'package:achievia/presentation/widgets/headers/auth/auth_h1.dart';
+import 'package:achievia/presentation/widgets/labels/auth/auth_label.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -10,38 +14,33 @@ class SignupScreen extends StatefulWidget {
   State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen>{
+class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AuthAppBar(
+        onTap: () => context.go(RouteConstants.login),
+        hasCenteredTitle: true,
+      ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: level2,
+          padding: level3,
           child: Column(
-            children: <Widget>[
-              const SizedBox(height: 60),
-              Wrap(
-                alignment: WrapAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 80,
-                    height: 80,
-                    child: CircleAvatar(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      child: Icon(
-                        Icons.school,
-                        size: 60,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                    ),
-                  ),
-                  Header1(title1: 'Achie', title2: 'via'),
-                ],
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const <Widget>[
+              AuthH1(
+                fontSize: 20,
+                text: 'Create your account',
+                fontWeight: FontWeight.w600,
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: 20),
+              AuthLabel(
+                text:
+                    'Set up your Achievia profile so your study progress, reminders, and reviewer activity stay connected.',
+              ),
+              SizedBox(height: 30),
               SignupForm(),
-              const SizedBox(height: 10),
             ],
           ),
         ),

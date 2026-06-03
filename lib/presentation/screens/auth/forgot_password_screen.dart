@@ -4,7 +4,7 @@ import 'package:achievia/presentation/widgets/forms/password_reset_form.dart';
 import 'package:achievia/presentation/widgets/headers/auth/auth_h1.dart';
 import 'package:achievia/presentation/widgets/labels/auth/auth_label.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -17,7 +17,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AuthAppBar(onTap: (){}, hasCenteredTitle: true,),
+      appBar: AuthAppBar(
+        onTap: context.pop,
+        hasCenteredTitle: true,
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: level3,
@@ -35,7 +38,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     'Please enter your email and we will send an OTP code in the next step to reset your password.',
               ),
               const SizedBox(height: 30),
-              PasswordResetForm()
+              PasswordResetForm(),
             ],
           ),
         ),

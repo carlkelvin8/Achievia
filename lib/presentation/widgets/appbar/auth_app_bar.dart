@@ -11,7 +11,7 @@ class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       leading: IconButton(
-        onPressed: () {},
+        onPressed: onTap,
         icon: Icon(Icons.arrow_back, color: primaryVariant),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
