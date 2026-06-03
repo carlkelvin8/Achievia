@@ -4,32 +4,6 @@ import 'package:json_annotation/json_annotation.dart';
 part 'profile_dto.g.dart';
 
 @JsonSerializable()
-class ProfileResponseDto {
-  final bool? success;
-  final ProfileDataDto? data;
-
-  ProfileResponseDto({this.success, this.data});
-
-  factory ProfileResponseDto.fromJson(Map<String, dynamic> json) =>
-      _$ProfileResponseDtoFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ProfileResponseDtoToJson(this);
-}
-
-@JsonSerializable()
-class ProfileDataDto {
-  final String? message;
-  final ProfileDto? data;
-
-  ProfileDataDto({this.message, this.data});
-
-  factory ProfileDataDto.fromJson(Map<String, dynamic> json) =>
-      _$ProfileDataDtoFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ProfileDataDtoToJson(this);
-}
-
-@JsonSerializable()
 class ProfileDto {
   final String? id;
   @JsonKey(name: 'first_name')
@@ -47,6 +21,7 @@ class ProfileDto {
   final String? role;
   final String? university;
   final String? purpose;
+  final String? mantra;
   @JsonKey(name: 'date_of_examination')
   final DateTime? dateOfExamination;
   @JsonKey(name: 'created_at')
@@ -73,6 +48,7 @@ class ProfileDto {
     this.role,
     this.university,
     this.purpose,
+    this.mantra,
     this.dateOfExamination,
     this.createdAt,
     this.updatedAt,
@@ -99,6 +75,7 @@ class ProfileDto {
     role: role,
     university: university,
     purpose: purpose,
+    mantra: mantra,
     dateOfExamination: dateOfExamination,
     createdAt: createdAt,
     updatedAt: updatedAt,
@@ -121,6 +98,7 @@ class ProfileDto {
       role: entity.role,
       university: entity.university,
       purpose: entity.purpose,
+      mantra: entity.mantra,
       dateOfExamination: entity.dateOfExamination,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,

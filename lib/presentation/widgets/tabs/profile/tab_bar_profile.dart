@@ -1,4 +1,3 @@
-import 'package:achievia/presentation/screens/screen_contents/contents/notes_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/profile_screen_content.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/task_screen_content.dart';
 import 'package:achievia/presentation/screens/screen_contents/progress_screen_content.dart';
@@ -17,7 +16,6 @@ class _TabBarProfileState extends State<TabBarProfile>
     Tab(text: 'Profile'),
     Tab(text: 'Progress'),
     Tab(text: 'Tasks'),
-    Tab(text: 'Notes'),
   ];
 
   late TabController _controller;
@@ -25,7 +23,7 @@ class _TabBarProfileState extends State<TabBarProfile>
   @override
   void initState() {
     super.initState();
-    _controller = TabController(length: 4, vsync: this);
+    _controller = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -56,7 +54,6 @@ class _TabBarProfileState extends State<TabBarProfile>
               const ProfileScreenContent(),
               const ProgressScreenContent(),
               TaskScreenContent(),
-              NotesScreen()
             ],
           ),
         ),

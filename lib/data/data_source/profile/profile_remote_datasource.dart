@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class ProfileDataSource {
   Future<ProfileDto> getProfile();
+  Future<String> updateMantra(String mantra);
 }
 
 @injectable
@@ -31,6 +32,28 @@ class ProfileRemoteDatasource implements ProfileDataSource {
       return ProfileDto.fromJson(data);
     } catch (e, st) {
       debugPrint('Error fetching profile: $e');
+      debugPrint('Stack trace: $st');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> updateMantra(String mantra) async {
+    try {
+      final userId = await supabaseAuth.getUser();
+      final profileId = userId.user?.id;
+      if (profileId == null || profileId.isEmpty) {
+        throw Exception('Authenticated user profile was not found');
+      }
+
+      await _supabase
+          .from('profiles')
+          .update({'mantra': mantra.trim()})
+          .eq('id', profileId);
+
+      return 'Mantra has been updated successfully';
+    } catch (e, st) {
+      debugPrint('Error updating mantra: $e');
       debugPrint('Stack trace: $st');
       rethrow;
     }

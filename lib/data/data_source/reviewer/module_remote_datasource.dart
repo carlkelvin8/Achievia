@@ -6,11 +6,7 @@ import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class ModuleRepositoryDataSource {
-  Future<PaginatedModulesDto> getModules(
-    String token, {
-    int page = 1,
-    int limit = 20,
-  });
+  Future<PaginatedModulesDto> getModules({int page = 1, int limit = 20});
 }
 
 @injectable
@@ -33,11 +29,7 @@ class ModuleRemoteDatasource implements ModuleRepositoryDataSource {
   }
 
   @override
-  Future<PaginatedModulesDto> getModules(
-    String token, {
-    int page = 1,
-    int limit = 20,
-  }) async {
+  Future<PaginatedModulesDto> getModules({int page = 1, int limit = 20}) async {
     try {
       final userId = await userContext.currentUserId();
       final resolvedPage = page < 1 ? 1 : page;

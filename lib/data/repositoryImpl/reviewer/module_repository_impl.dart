@@ -11,14 +11,10 @@ class ModuleRepositoryImpl implements ModuleRepository {
   final ModuleRemoteDatasource remoteDatasource;
   final NetworkInfo network;
 
-  ModuleRepositoryImpl({
-    required this.remoteDatasource,
-    required this.network,
-  });
+  ModuleRepositoryImpl({required this.remoteDatasource, required this.network});
 
   @override
-  Future<PaginatedModulesEntity> getModules(
-    String token, {
+  Future<PaginatedModulesEntity> getModules({
     int page = 1,
     int limit = 20,
   }) async {
@@ -26,14 +22,14 @@ class ModuleRepositoryImpl implements ModuleRepository {
       final connectivity = await network.isConnected;
 
       if (connectivity) {
-        // Fetch from API and cache
         final remoteModules = await remoteDatasource.getModules(
-          token,
           page: page,
           limit: limit,
         );
         print('Repository - Remote modules received: $remoteModules');
-        final mapped = remoteModules.items.map((dto) => dto.toEntity()).toList();
+        final mapped = remoteModules.items
+            .map((dto) => dto.toEntity())
+            .toList();
         print('Repository - Mapped to entities: $mapped');
         return PaginatedModulesEntity(
           items: mapped,

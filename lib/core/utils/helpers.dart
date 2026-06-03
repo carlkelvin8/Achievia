@@ -76,27 +76,6 @@ const List<AuthorEntity> demoAuthorItems = [
   ),
 ];
 
-final List<NotesEntity> notes = [
-  NotesEntity(
-    image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf',
-    title: 'WBC anomalies',
-  ),
-  NotesEntity(
-    image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf',
-    title: 'Transfusion Reactions',
-  ),
-  NotesEntity(
-    image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf',
-    title: ' Protozoans',
-  ),
-];
-
-final List<NotesEntity> notes2 = [
-  NotesEntity(
-    image: 'https://christian18.sirv.com/employees/face_690f9182255ea.pdf',
-    title: ' Crystals in urine',
-  ),
-];
 // Demo data for Progress screen
 final ProgressEntity demoProgressData = ProgressEntity(
   currentScore: 90.0,

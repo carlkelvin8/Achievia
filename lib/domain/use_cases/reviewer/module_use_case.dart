@@ -7,13 +7,10 @@ import 'package:injectable/injectable.dart';
 class ModuleUseCase {
   final ModuleRepositoryImpl impl;
 
-  ModuleUseCase({
-    required this.impl,
-  });
+  ModuleUseCase({required this.impl});
 
-  Future<PaginatedModulesEntity> getModules(
-    String token, {
+  Future<PaginatedModulesEntity> getModules({
     int page = 1,
     int limit = 20,
-  }) async => await impl.getModules(token, page: page, limit: limit);
+  }) async => await impl.getModules(page: page, limit: limit);
 }

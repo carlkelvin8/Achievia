@@ -16,14 +16,11 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
 
   QuestionsRepositoryImpl(this.remoteDatasource, this.network, this.local);
   @override
-  Future<List<QuestionsEntity>> getAllQuestions(String token, String id) async {
+  Future<List<QuestionsEntity>> getAllQuestions() async {
     try {
       final connectivity = await network.isConnected;
       if (connectivity) {
-        final remoteQuestions = await remoteDatasource.getAllQuestions(
-          token,
-          id,
-        );
+        final remoteQuestions = await remoteDatasource.getAllQuestions();
         print('Repository - Remote questions received: $remoteQuestions');
         await local.insertQuestionsToCache(remoteQuestions);
         final mapped = remoteQuestions.map((e) => e.toEntity()).toList();
@@ -45,13 +42,13 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
     final isConnected = await network.isConnected;
     try {
       if (isConnected) {
-      final response = await remoteDatasource.randomizeQuestion(index);
-      await local.insertQuestionsToCache(response);
-      print('REPO${response.map((e)=>e.toEntity()).toList()}');
-      final mapped =  response.map((e)=>e.toEntity()).toList();
-      return mapped;
-    }
-    return [];
+        final response = await remoteDatasource.randomizeQuestion(index);
+        await local.insertQuestionsToCache(response);
+        print('REPO${response.map((e) => e.toEntity()).toList()}');
+        final mapped = response.map((e) => e.toEntity()).toList();
+        return mapped;
+      }
+      return [];
     } catch (e) {
       print('repo q: $e');
       return [];

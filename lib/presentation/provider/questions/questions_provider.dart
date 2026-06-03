@@ -22,19 +22,17 @@ final getOfflineCache = Provider<OfflineCaching>((ref) {
   return sl.get<OfflineCaching>();
 });
 
-final getQuestionsProviderState =
-    FutureProvider.family<List<QuestionsEntity>, ({String token, String id})>((
-      ref,
-      params,
-    ) async {
-      final gtQuestions = ref.read(getQuestions);
-      try {
-        final result = await gtQuestions.getQuestions(params.token, params.id);
-        return result;
-      } catch (e) {
-        rethrow;
-      }
-    });
+final getQuestionsProviderState = FutureProvider<List<QuestionsEntity>>((
+  ref,
+) async {
+  final gtQuestions = ref.read(getQuestions);
+  try {
+    final result = await gtQuestions.getQuestions();
+    return result;
+  } catch (e) {
+    rethrow;
+  }
+});
 
 final getResultsProviderState = FutureProvider.family<QuizScoreEntity?, int>((
   ref,

@@ -16,14 +16,15 @@ void _logPagination(String message) {
   debugPrint('[ModulesPagination] $message');
 }
 
-final paginatedModulesProvider = StateNotifierProvider.family<ModulePaginationNotifier, ModulePaginationState, String>(
-  (ref, token) {
-    final moduleUseCase = ref.read(getModules);
-    return ModulePaginationNotifier(moduleUseCase, token);
-  },
-);
+final paginatedModulesProvider =
+    StateNotifierProvider<ModulePaginationNotifier, ModulePaginationState>((
+      ref,
+    ) {
+      final moduleUseCase = ref.read(getModules);
+      return ModulePaginationNotifier(moduleUseCase);
+    });
 
-final Map<String, _SharedModulePageCache> _sharedModuleCacheByToken = {};
+final _sharedModuleCache = _SharedModulePageCache();
 
 class _SharedModulePageCache {
   final Map<int, List<ModuleEntity>> pageCache = {};
@@ -51,14 +52,14 @@ class ModulePaginationState {
   });
 
   factory ModulePaginationState.initial() => const ModulePaginationState(
-        items: [],
-        isInitialLoading: true,
-        isLoadingMore: false,
-        hasMore: true,
-        currentPage: 0,
-        total: 0,
-        errorMessage: null,
-      );
+    items: [],
+    isInitialLoading: true,
+    isLoadingMore: false,
+    hasMore: true,
+    currentPage: 0,
+    total: 0,
+    errorMessage: null,
+  );
 
   ModulePaginationState copyWith({
     List<ModuleEntity>? items,
@@ -85,24 +86,25 @@ class ModulePaginationNotifier extends StateNotifier<ModulePaginationState> {
   static const int _perPage = 20;
 
   final ModuleUseCase _moduleUseCase;
-  final String _token;
   late final _SharedModulePageCache _sharedCache;
   late final Map<int, List<ModuleEntity>> _pageCache;
   late final Map<int, bool> _pageHasMoreCache;
   final Set<int> _inFlightPages = {};
 
-  ModulePaginationNotifier(this._moduleUseCase, this._token) : super(ModulePaginationState.initial()) {
-    _sharedCache = _sharedModuleCacheByToken.putIfAbsent(_token, () => _SharedModulePageCache());
+  ModulePaginationNotifier(this._moduleUseCase)
+    : super(ModulePaginationState.initial()) {
+    _sharedCache = _sharedModuleCache;
     _pageCache = _sharedCache.pageCache;
     _pageHasMoreCache = _sharedCache.pageHasMoreCache;
 
     if (_pageCache.isNotEmpty) {
       final maxCachedPage = _pageCache.keys.reduce(max);
       final cachedItems = _buildItemsUntilPage(maxCachedPage);
-      final reachedTotal = _sharedCache.total > 0 && cachedItems.length >= _sharedCache.total;
+      final reachedTotal =
+          _sharedCache.total > 0 && cachedItems.length >= _sharedCache.total;
 
       _logPagination(
-        'Hydrate from cache token=$_token pages=${_pageCache.keys.toList()..sort()} '
+        'Hydrate from cache pages=${_pageCache.keys.toList()..sort()} '
         'cachedItems=${cachedItems.length} total=${_sharedCache.total} hasMore=${!reachedTotal && (_pageHasMoreCache[maxCachedPage] ?? false)}',
       );
 
@@ -118,12 +120,12 @@ class ModulePaginationNotifier extends StateNotifier<ModulePaginationState> {
       return;
     }
 
-    _logPagination('Initial fetch page=1 token=$_token');
+    _logPagination('Initial fetch page=1');
     _loadPage(1, reset: true);
   }
 
   Future<void> refresh() async {
-    _logPagination('Refresh requested. Clearing cache for token=$_token');
+    _logPagination('Refresh requested. Clearing module cache');
     _pageCache.clear();
     _pageHasMoreCache.clear();
     _sharedCache.total = 0;
@@ -144,7 +146,9 @@ class ModulePaginationNotifier extends StateNotifier<ModulePaginationState> {
 
     if (state.total > 0 && state.items.length >= state.total) {
       state = state.copyWith(hasMore: false);
-      _logPagination('LoadMore stopped: all items loaded items=${state.items.length} total=${state.total}');
+      _logPagination(
+        'LoadMore stopped: all items loaded items=${state.items.length} total=${state.total}',
+      );
       return;
     }
 
@@ -159,17 +163,6 @@ class ModulePaginationNotifier extends StateNotifier<ModulePaginationState> {
   }
 
   Future<void> _loadPage(int page, {required bool reset}) async {
-    if (_token.isEmpty) {
-      _logPagination('Abort fetch: missing token');
-      state = state.copyWith(
-        isInitialLoading: false,
-        isLoadingMore: false,
-        hasMore: false,
-        errorMessage: 'Missing auth token',
-      );
-      return;
-    }
-
     try {
       _inFlightPages.add(page);
 
@@ -191,7 +184,6 @@ class ModulePaginationNotifier extends StateNotifier<ModulePaginationState> {
       _logPagination('API fetch start page=$page limit=$_perPage reset=$reset');
 
       final result = await _moduleUseCase.getModules(
-        _token,
         page: page,
         limit: _perPage,
       );

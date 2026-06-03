@@ -15,4 +15,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
     final data = await datasource.getProfile();
     return data.toEntity();
   }
+
+  @override
+  Future<String> updateMantra(String mantra) async {
+    return await datasource.updateMantra(mantra);
+  }
 }

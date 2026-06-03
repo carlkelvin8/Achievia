@@ -1,6 +1,4 @@
 import 'package:achievia/core/constants/app_paddings.dart';
-import 'package:achievia/core/di/injection.dart';
-import 'package:achievia/core/di/local_storage_service.dart';
 import 'package:achievia/presentation/provider/reviewer/module_provider.dart';
 import 'package:achievia/presentation/provider/tabs/event/tab_event.dart';
 import 'package:achievia/presentation/widgets/badges/pdf_badge.dart';
@@ -16,12 +14,10 @@ class MotherNotesContent extends ConsumerStatefulWidget {
 
 class _MotherNotesContentState extends ConsumerState<MotherNotesContent> {
   late final ScrollController _scrollController;
-  late final String _token;
 
   @override
   void initState() {
     super.initState();
-    _token = sl<LocalStorageService>().token ?? '';
     _scrollController = ScrollController()..addListener(_onScroll);
   }
 
@@ -38,7 +34,7 @@ class _MotherNotesContentState extends ConsumerState<MotherNotesContent> {
     }
 
     final position = _scrollController.position;
-    final modulesState = ref.read(paginatedModulesProvider(_token));
+    final modulesState = ref.read(paginatedModulesProvider);
 
     if (!modulesState.hasMore ||
         modulesState.isInitialLoading ||
@@ -48,7 +44,7 @@ class _MotherNotesContentState extends ConsumerState<MotherNotesContent> {
     }
 
     if (position.pixels >= position.maxScrollExtent - 250) {
-      ref.read(paginatedModulesProvider(_token).notifier).loadMore();
+      ref.read(paginatedModulesProvider.notifier).loadMore();
     }
   }
 
@@ -60,8 +56,8 @@ class _MotherNotesContentState extends ConsumerState<MotherNotesContent> {
       return const SizedBox.shrink();
     }
 
-    final modulesState = ref.watch(paginatedModulesProvider(_token));
-    final modulesNotifier = ref.read(paginatedModulesProvider(_token).notifier);
+    final modulesState = ref.watch(paginatedModulesProvider);
+    final modulesNotifier = ref.read(paginatedModulesProvider.notifier);
 
     return Scaffold(
       body: Padding(
@@ -69,12 +65,11 @@ class _MotherNotesContentState extends ConsumerState<MotherNotesContent> {
         child: Builder(
           builder: (context) {
             if (modulesState.isInitialLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const Center(child: CircularProgressIndicator());
             }
 
-            if (modulesState.items.isEmpty && modulesState.errorMessage != null) {
+            if (modulesState.items.isEmpty &&
+                modulesState.errorMessage != null) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -102,12 +97,12 @@ class _MotherNotesContentState extends ConsumerState<MotherNotesContent> {
             }
 
             if (modulesState.items.isEmpty) {
-              return const Center(
-                child: Text('No modules found'),
-              );
+              return const Center(child: Text('No modules found'));
             }
 
-            final totalCount = modulesState.items.length + (modulesState.isLoadingMore ? 1 : 0);
+            final totalCount =
+                modulesState.items.length +
+                (modulesState.isLoadingMore ? 1 : 0);
 
             return Column(
               children: [
@@ -118,12 +113,13 @@ class _MotherNotesContentState extends ConsumerState<MotherNotesContent> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     itemCount: totalCount,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 1,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 1,
+                        ),
                     itemBuilder: (context, index) {
                       if (index >= modulesState.items.length) {
                         return const Center(
@@ -144,7 +140,8 @@ class _MotherNotesContentState extends ConsumerState<MotherNotesContent> {
                     },
                   ),
                 ),
-                if (modulesState.errorMessage != null && modulesState.items.isNotEmpty)
+                if (modulesState.errorMessage != null &&
+                    modulesState.items.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: TextButton.icon(

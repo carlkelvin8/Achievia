@@ -21,6 +21,7 @@ alter table public.profiles
   add column if not exists course_id integer,
   add column if not exists university varchar(255),
   add column if not exists purpose varchar(255),
+  add column if not exists mantra text,
   add column if not exists date_of_examination timestamptz,
   add column if not exists updated_at timestamptz not null default now();
 
@@ -163,6 +164,7 @@ begin
     course_id,
     university,
     purpose,
+    mantra,
     date_of_examination
   )
   values (
@@ -181,6 +183,7 @@ begin
     nullif(new.raw_user_meta_data ->> 'courseId', '')::integer,
     new.raw_user_meta_data ->> 'university',
     new.raw_user_meta_data ->> 'purpose',
+    new.raw_user_meta_data ->> 'mantra',
     nullif(new.raw_user_meta_data ->> 'date_of_examination', '')::timestamptz
   )
   on conflict (id) do update set
@@ -198,6 +201,7 @@ begin
     course_id = excluded.course_id,
     university = excluded.university,
     purpose = excluded.purpose,
+    mantra = excluded.mantra,
     date_of_examination = excluded.date_of_examination;
 
   return new;

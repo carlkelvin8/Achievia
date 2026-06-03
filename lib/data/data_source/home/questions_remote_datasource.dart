@@ -13,9 +13,9 @@ import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class QuestionRepoDataSource {
-  Future<List<QuestionsDto>> getAllQuestions(String token, String id);
+  Future<List<QuestionsDto>> getAllQuestions();
   Future<QotdDto> getQotd();
-  Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token);
+  Future<QotdDtoPost> answerQuestion(QotdDtoPost dto);
   Future<List<QuizDtoItems>> getTheGeneratedQuiz();
   Future<List<QuestionsDto>> randomizeQuestion(int index);
   Future<QuizScoreResponse> getResults(int noOfAttempt);
@@ -37,7 +37,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
   SupabaseClient get _supabase => Supabase.instance.client;
 
   @override
-  Future<List<QuestionsDto>> getAllQuestions(String token, String id) async {
+  Future<List<QuestionsDto>> getAllQuestions() async {
     try {
       final session = _supabase.auth.currentSession;
       if (session == null || session.isExpired) {
@@ -91,7 +91,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
   }
 
   @override
-  Future<QotdDtoPost> answerQuestion(QotdDtoPost dto, String token) async {
+  Future<QotdDtoPost> answerQuestion(QotdDtoPost dto) async {
     try {
       final choice = await _supabase
           .from('choices')

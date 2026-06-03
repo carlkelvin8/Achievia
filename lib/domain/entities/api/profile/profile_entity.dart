@@ -11,6 +11,7 @@ class ProfileEntity {
   final String? role;
   final String? university;
   final String? purpose;
+  final String? mantra;
   final DateTime? dateOfExamination;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -31,6 +32,7 @@ class ProfileEntity {
     this.role,
     this.university,
     this.purpose,
+    this.mantra,
     this.dateOfExamination,
     this.createdAt,
     this.updatedAt,
@@ -59,6 +61,7 @@ class ProfileEntity {
     String? role,
     String? university,
     String? purpose,
+    String? mantra,
     DateTime? dateOfExamination,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -79,6 +82,7 @@ class ProfileEntity {
       role: role ?? this.role,
       university: university ?? this.university,
       purpose: purpose ?? this.purpose,
+      mantra: mantra ?? this.mantra,
       dateOfExamination: dateOfExamination ?? this.dateOfExamination,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

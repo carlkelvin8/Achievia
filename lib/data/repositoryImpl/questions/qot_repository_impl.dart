@@ -11,11 +11,8 @@ import 'package:achievia/domain/repository/questions/qotd_repository.dart';
 @injectable
 class QotRepositoryImpl implements QotdRepository {
   final QuestionsRemoteDatasource remoteDatasource;
-  final NetworkInfo network; 
-  QotRepositoryImpl({
-    required this.remoteDatasource,
-    required this.network,
-  });
+  final NetworkInfo network;
+  QotRepositoryImpl({required this.remoteDatasource, required this.network});
   @override
   Future<QotyEntity> getQuestionOfTheDay() async {
     final connectivity = await network.isConnected;
@@ -25,7 +22,13 @@ class QotRepositoryImpl implements QotdRepository {
         final entity = remoteQuestion.toEntity();
         return entity;
       }
-      return QotyEntity(quizId: 0, id: 0, questionText: '', choices: [], title: '');
+      return QotyEntity(
+        quizId: 0,
+        id: 0,
+        questionText: '',
+        choices: [],
+        title: '',
+      );
     } catch (e) {
       print('repo: $e');
       rethrow;
@@ -38,7 +41,7 @@ class QotRepositoryImpl implements QotdRepository {
     try {
       if (connectivity) {
         final dto = QotdDtoPost.fromEntity(entity);
-        final remoteAnswer = await remoteDatasource.answerQuestion(dto, '');
+        final remoteAnswer = await remoteDatasource.answerQuestion(dto);
         print(remoteAnswer.chosen_answer);
         return remoteAnswer.toEntity();
       }

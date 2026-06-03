@@ -9,4 +9,7 @@ class ProfileUseCase {
   ProfileUseCase({required this.impl});
 
   Future<ProfileEntity> getProfile() async => await impl.getProfile();
+
+  Future<String> updateMantra(String mantra) async =>
+      await impl.updateMantra(mantra);
 }

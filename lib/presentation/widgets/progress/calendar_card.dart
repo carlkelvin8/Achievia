@@ -62,7 +62,19 @@ class _CalendarCardState extends State<CalendarCard> {
     final firstWeekday = firstDay.weekday;
     final prevMonthLastDay = DateTime(month.year, month.month, 0);
 
-    // Previous month padding
+    // determine account range from provided calendar data
+    DateTime? firstRecordedDate;
+    DateTime? lastRecordedDate;
+    if (widget.calendarData.days.isNotEmpty) {
+      firstRecordedDate = widget.calendarData.days
+          .map((d) => d.date)
+          .reduce((a, b) => a.isBefore(b) ? a : b);
+      lastRecordedDate = widget.calendarData.days
+          .map((d) => d.date)
+          .reduce((a, b) => a.isAfter(b) ? a : b);
+    }
+
+    // Previous month padding (out-of-account range -> blank)
     for (int i = firstWeekday - 1; i > 0; i--) {
       days.add(
         CalendarDay(
@@ -71,7 +83,7 @@ class _CalendarCardState extends State<CalendarCard> {
             prevMonthLastDay.month,
             prevMonthLastDay.day - i + 1,
           ),
-          status: DayStatus.inactive,
+          status: DayStatus.blank,
         ),
       );
     }
@@ -79,6 +91,14 @@ class _CalendarCardState extends State<CalendarCard> {
     // Current month days
     for (int day = 1; day <= lastDay.day; day++) {
       final date = DateTime(month.year, month.month, day);
+
+      // If outside recorded account range, mark as blank
+      if ((firstRecordedDate != null && date.isBefore(firstRecordedDate)) ||
+          (lastRecordedDate != null && date.isAfter(lastRecordedDate))) {
+        days.add(CalendarDay(date: date, status: DayStatus.blank));
+        continue;
+      }
+
       final status = widget.calendarData.days
           .firstWhere(
             (d) =>
@@ -88,6 +108,7 @@ class _CalendarCardState extends State<CalendarCard> {
             orElse: () => CalendarDay(date: date, status: DayStatus.inactive),
           )
           .status;
+
       days.add(CalendarDay(date: date, status: status));
     }
 
@@ -104,7 +125,7 @@ class _CalendarCardState extends State<CalendarCard> {
       days.add(
         CalendarDay(
           date: DateTime(month.year, month.month + 1, day),
-          status: DayStatus.inactive,
+          status: DayStatus.blank,
         ),
       );
     }
@@ -265,7 +286,7 @@ class _CalendarCardState extends State<CalendarCard> {
   Widget _buildDayCell(BuildContext context, CalendarDay day) {
     final theme = Theme.of(context);
     final (backgroundColor, textColor, svgPath) = _getDayStyle(day.status);
-    final showDayNumber = day.status == DayStatus.inactive;
+    final showDayNumber = day.status == DayStatus.inactive || day.status == DayStatus.blank;
     final hasSvg = svgPath != null;
 
     return Container(
@@ -321,14 +342,21 @@ class _CalendarCardState extends State<CalendarCard> {
         );
       case DayStatus.current:
       case DayStatus.upcoming:
-        // No-login activity day
+        // Active/current-like days without SVG
         return (
           Colors.transparent,
           const Color(0xFF455267),
-          'assets/images/LOGO/2.svg',
+          null,
         );
       case DayStatus.inactive:
-        // Padding/future day
+        // In-account but not active -> show small inactive SVG
+        return (
+          Colors.transparent,
+          Colors.white,
+          'assets/images/LOGO/2.svg',
+        );
+      case DayStatus.blank:
+        // Padding/out-of-account-range
         return (
           const Color(0xFFE6E8EE),
           const Color(0xFF8F96A3),
