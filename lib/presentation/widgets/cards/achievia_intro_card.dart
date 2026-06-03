@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/services.dart' as services;
 
 /// Achievia branding introduction card with logo and description
 class AchieviaIntroCard extends StatelessWidget {
@@ -19,11 +21,10 @@ class AchieviaIntroCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/images/logo.png',
+              const _InlineStyleSvg(
+                assetPath: 'assets/images/LOGO/1.svg',
                 width: 100,
                 height: 100,
-                fit: BoxFit.contain,
               ),
               const SizedBox(width: 20),
               Flexible(
@@ -45,8 +46,9 @@ class AchieviaIntroCard extends StatelessWidget {
                             text: 'via',
                             style: theme.textTheme.headlineMedium?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary
-                                  .withValues(alpha: 0.7),
+                              color: theme.colorScheme.primary.withValues(
+                                alpha: 0.7,
+                              ),
                             ),
                           ),
                         ],
@@ -79,5 +81,67 @@ class AchieviaIntroCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _InlineStyleSvg extends StatelessWidget {
+  final String assetPath;
+  final double width;
+  final double height;
+
+  const _InlineStyleSvg({
+    required this.assetPath,
+    required this.width,
+    required this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String>(
+      future: services.rootBundle.loadString(assetPath),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return SizedBox(width: width, height: height);
+        }
+
+        return SvgPicture.string(
+          _inlineSimpleFillStyles(snapshot.data!),
+          width: width,
+          height: height,
+          fit: BoxFit.contain,
+        );
+      },
+    );
+  }
+
+  String _inlineSimpleFillStyles(String svgString) {
+    final styleReg = RegExp(
+      r'<style[^>]*>([\s\S]*?)<\/style>',
+      caseSensitive: false,
+    );
+    final styleMatch = styleReg.firstMatch(svgString);
+    if (styleMatch == null) return svgString;
+
+    final styleBody = styleMatch.group(1)!;
+    final classReg = RegExp(
+      r'\.([\w-]+)\s*\{[^}]*fill:\s*([^;\s}]+)[^}]*\}',
+      caseSensitive: false,
+    );
+
+    var normalizedSvg = svgString;
+    for (final match in classReg.allMatches(styleBody)) {
+      final className = match.group(1)!;
+      final fill = match.group(2)!;
+      normalizedSvg = normalizedSvg.replaceAll(
+        RegExp('class="$className"'),
+        'fill="$fill"',
+      );
+      normalizedSvg = normalizedSvg.replaceAll(
+        RegExp("class='$className'"),
+        "fill='$fill'",
+      );
+    }
+
+    return normalizedSvg.replaceFirst(styleReg, '');
   }
 }
