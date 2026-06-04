@@ -17,4 +17,7 @@ class UserUseCase {
 
   Future<UserEntity> getProfile(String token) async =>
       await impl.getProfile(token);
+
+  Future<void> sendResetPasswordToEmail(String email) async =>
+      await impl.sendResetEmail(email);
 }

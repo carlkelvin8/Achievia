@@ -4,4 +4,5 @@ abstract class UserRepository {
   Future<UserEntity> loginRepository(UserEntity dto);
   Future<UserEntity> signUpRepository(UserEntity dto);
   Future<UserEntity> getProfile(String token);
+  Future<void> sendResetEmail(String email);
 }

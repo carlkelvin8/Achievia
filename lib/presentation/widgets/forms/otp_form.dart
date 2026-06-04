@@ -1,33 +1,26 @@
+import 'package:achievia/presentation/provider/auth/password_reset/event/reset_password_event.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/placeholder_gestures/placeholder_gesture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class OtpFormForgot extends StatefulWidget {
+class OtpFormForgot extends ConsumerStatefulWidget {
   final GlobalKey<FormState> state;
-  final List<TextEditingController> controller;
-  final List<Color> borderColor;
-  final PageController? controllerPage;
-  final Widget? screen;
-  const OtpFormForgot({
-    super.key,
-    required this.state,
-    this.controllerPage,
-    required this.controller,
-    required this.borderColor,
-    this.screen,
-  });
+
+  const OtpFormForgot({super.key, required this.state});
 
   @override
-  State<OtpFormForgot> createState() => _OtpFormForgotState();
+  ConsumerState<OtpFormForgot> createState() => _OtpFormForgotState();
 }
 
-class _OtpFormForgotState extends State<OtpFormForgot> {
+class _OtpFormForgotState extends ConsumerState<OtpFormForgot> {
   @override
   Widget build(BuildContext context) {
-    final key = GlobalKey<FormState>();
+    final event = ref.read(resetPasswordNotifier.notifier);
+
     return Form(
-      key: key,
+      key: widget.state,
       child: Padding(
         padding: const EdgeInsets.only(left: 0, right: 0),
         child: Column(
@@ -45,19 +38,21 @@ class _OtpFormForgotState extends State<OtpFormForgot> {
                       }
                       return null;
                     },
-                    controller: widget.controller[index],
+                    controller: event.otpControllers[index],
                     onChanged: (value) {
                       if (value.length == 1) {
                         FocusScope.of(context).nextFocus();
                         setState(() {
-                          widget.borderColor[index] = value.isNotEmpty
+                          event.otpBorderColors[index] = value.isNotEmpty
                               ? Theme.of(context).primaryColor
                               : const Color(0xE3E3E3E7);
                         });
                       } else if (value.isEmpty) {
                         FocusScope.of(context).previousFocus();
                         setState(() {
-                          widget.borderColor[index] = const Color(0xE3E3E3E7);
+                          event.otpBorderColors[index] = const Color(
+                            0xE3E3E3E7,
+                          );
                         });
                       }
                     },
@@ -72,27 +67,27 @@ class _OtpFormForgotState extends State<OtpFormForgot> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                         borderSide: BorderSide(
-                          color: widget.borderColor[index],
+                          color: event.otpBorderColors[index],
                           width: 2.0,
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                         borderSide: BorderSide(
-                          color: widget.borderColor[index],
+                          color: event.otpBorderColors[index],
                           width: 2.0,
                         ),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                         borderSide: BorderSide(
-                          color: widget.borderColor[index],
+                          color: event.otpBorderColors[index],
                           width: 2.0,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
-                        borderSide:  BorderSide(
+                        borderSide: BorderSide(
                           color: Theme.of(context).primaryColor,
                           width: 2.0,
                         ),
@@ -106,8 +101,7 @@ class _OtpFormForgotState extends State<OtpFormForgot> {
             const SizedBox(height: 278),
             Placeholdergesture(
               onTap: () {
-                // ignore: avoid_print
-                print('Resend code');
+                debugPrint('Resend code');
               },
               text: 'Did not received the code?',
               gesture: ' Resend',
@@ -117,21 +111,15 @@ class _OtpFormForgotState extends State<OtpFormForgot> {
               title: 'CONFIRM',
               onPressed: () async {
                 if (widget.state.currentState!.validate()) {
-                  final otpValue = widget.controller
-                      .map((controller) => controller.text)
-                      .join();
-                  
-                  widget.controllerPage?.nextPage(
-                    duration: Duration(milliseconds: 500),
+                  debugPrint(event.otpCode);
+
+                  event.pageController.nextPage(
+                    duration: const Duration(milliseconds: 500),
                     curve: Curves.ease,
                   );
-                  for (var index in widget.controller) {
-                    index.clear();
-                  }
+                  event.clearOtp();
                 } else {
-                  for (var index in widget.controller) {
-                    index.clear();
-                  }
+                  event.clearOtp();
                 }
               },
               backgroundColor: Theme.of(context).primaryColor,

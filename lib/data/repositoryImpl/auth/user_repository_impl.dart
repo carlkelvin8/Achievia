@@ -31,4 +31,9 @@ class UserRepositoryImpl implements UserRepository {
     final data = await datasource.signUp(entity);
     return data.toEntity();
   }
+
+  @override
+  Future<void> sendResetEmail(String email) async {
+    await datasource.resetPasswordSend(email);
+  }
 }
