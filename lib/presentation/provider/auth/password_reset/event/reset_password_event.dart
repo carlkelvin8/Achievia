@@ -13,6 +13,8 @@ final userUseCaseProvider = Provider<UserUseCase>((ref) => sl<UserUseCase>());
 
 class ResetPasswordEvent extends Notifier<ResetPasswordState> {
   late final TextEditingController emailAddressController;
+  late final TextEditingController passwordController;
+  late final TextEditingController confirmPasswordController;
   late final PageController pageController;
   late final TextEditingController otpControllers;
   late final List<Color> otpBorderColors;
@@ -22,6 +24,8 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
     emailAddressController = TextEditingController();
     pageController = PageController();
     otpControllers = TextEditingController();
+    confirmPasswordController = TextEditingController();
+    passwordController = TextEditingController();
     otpBorderColors = List.generate(6, (_) => const Color(0xE3E3E3E7));
     useCase = ref.read(userUseCaseProvider);
     ref.onDispose(() {
@@ -66,6 +70,27 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
     try {
       state = state.copyWith(isLoading: true);
       await useCase.sendResetPasswordToEmail(
+        emailAddressController.text.trim(),
+      );
+      if (pageController.hasClients) {
+        nextPage();
+      }
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$e')));
+        state = state.copyWith(isLoading: false);
+      }
+    }
+  }
+
+  Future<void> submitOtp(BuildContext context) async {
+    try {
+      state = state.copyWith(isLoading: true);
+      await useCase.validateOtp(
+        otpControllers.text.trim(),
         emailAddressController.text.trim(),
       );
       if (pageController.hasClients) {

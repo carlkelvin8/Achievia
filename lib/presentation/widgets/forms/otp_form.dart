@@ -89,6 +89,7 @@ class _OtpFormForgotState extends ConsumerState<OtpFormForgot> {
               title: 'CONFIRM',
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
+                  await event.submitOtp(context);
                   event.nextPage();
                   event.clearOtp();
                 }

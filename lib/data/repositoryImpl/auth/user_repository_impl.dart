@@ -36,4 +36,9 @@ class UserRepositoryImpl implements UserRepository {
   Future<void> sendResetEmail(String email) async {
     await datasource.resetPasswordSend(email);
   }
+
+  @override
+  Future<void> validateOtp(String code, String email) async {
+    await datasource.validateOtp(code, email);
+  }
 }

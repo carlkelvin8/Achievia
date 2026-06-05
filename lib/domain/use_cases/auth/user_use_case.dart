@@ -20,4 +20,7 @@ class UserUseCase {
 
   Future<void> sendResetPasswordToEmail(String email) async =>
       await impl.sendResetEmail(email);
+
+  Future<void> validateOtp(String code, String email) async =>
+      await impl.validateOtp(code, email);
 }

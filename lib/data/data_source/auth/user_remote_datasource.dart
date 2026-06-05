@@ -11,6 +11,8 @@ abstract class UserRepositoryDataSource {
   Future<UserDto> getProfile(String token);
   Future<UserDto> signUp(UserDto dto);
   Future<void> resetPasswordSend(String email);
+  Future<void> validateOtp(String code, String email);
+  Future<void> changePassword(String password);
 }
 
 @injectable
@@ -99,5 +101,35 @@ class UserRemoteDatasource implements UserRepositoryDataSource {
       debugPrint(e.toString());
       rethrow;
     }
+  }
+
+  @override
+  Future<void> validateOtp(String code, String email) async {
+    try {
+      await supabaseAuth.verifyOTP(
+        type: OtpType.recovery,
+        email: email,
+        token: code,
+      );
+    } on AuthException catch (e) {
+      debugPrint(e.toString());
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> changePassword(String password) async {
+    try {
+      await supabaseAuth.updateUser(UserAttributes(
+        password: password.trim()
+      ));
+    } on AuthException catch (e) {
+      debugPrint(e.toString());
+      rethrow;
+    } catch (e) {
+      debugPrint(e.toString());
+      rethrow;
+    }
+
   }
 }
