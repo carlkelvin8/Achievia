@@ -172,7 +172,7 @@ String? _redirectForAuth(BuildContext context, GoRouterState state) {
 
 
 
-  if (isLoggedIn && isAuthRoute) {
+  if (isLoggedIn && isAuthRoute && location != RouteConstants.forgotPassword) {
     return RouteConstants.main;
   }
 

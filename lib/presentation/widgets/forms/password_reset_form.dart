@@ -36,7 +36,7 @@ class _PasswordResetFormState extends ConsumerState<PasswordResetForm> {
           ),
           const SizedBox(height: 8),
           const Text(
-            "We'll send a 6-digit verification code to this address.",
+            "We'll send a 8-digit verification code to this address.",
             style: TextStyle(
               fontSize: 14,
               fontStyle: FontStyle.italic,

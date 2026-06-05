@@ -2,12 +2,24 @@
 class ResetPasswordState {
   final bool isLoading;
   final int index;
-  ResetPasswordState({required this.isLoading, required this.index});
+  final int otpSecondsRemaining;
+  ResetPasswordState({
+    required this.isLoading,
+    required this.index,
+    this.otpSecondsRemaining = 0,
+  });
 
-  ResetPasswordState copyWith({bool? isLoading, int? index}) {
+  bool get canResendOtp => otpSecondsRemaining == 0;
+
+  ResetPasswordState copyWith({
+    bool? isLoading,
+    int? index,
+    int? otpSecondsRemaining,
+  }) {
     return ResetPasswordState(
       isLoading: isLoading ?? this.isLoading,
       index: index ?? this.index,
+      otpSecondsRemaining: otpSecondsRemaining ?? this.otpSecondsRemaining,
     );
   }
 }

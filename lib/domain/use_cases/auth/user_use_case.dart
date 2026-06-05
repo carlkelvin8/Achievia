@@ -23,4 +23,7 @@ class UserUseCase {
 
   Future<void> validateOtp(String code, String email) async =>
       await impl.validateOtp(code, email);
+
+  Future<void> changePassword(String password) async =>
+      await impl.changePassword(password);
 }

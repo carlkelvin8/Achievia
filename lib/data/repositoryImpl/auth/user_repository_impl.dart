@@ -41,4 +41,9 @@ class UserRepositoryImpl implements UserRepository {
   Future<void> validateOtp(String code, String email) async {
     await datasource.validateOtp(code, email);
   }
+
+  @override
+  Future<void> changePassword(String password) async {
+    await datasource.changePassword(password);
+  }
 }

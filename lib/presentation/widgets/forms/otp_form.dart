@@ -52,23 +52,7 @@ class _OtpFormForgotState extends ConsumerState<OtpFormForgot> {
               focusedPinTheme: focusedOtpTheme,
               submittedPinTheme: defaultOtpTheme,
               errorPinTheme: errorOtpTheme,
-              validator: (value) {
-                final pin = value?.trim() ?? '';
-
-                if (pin.isEmpty) {
-                  return 'Enter the OTP code';
-                }
-
-                if (pin.length != 8) {
-                  return 'Enter the 8-digit OTP code';
-                }
-
-                if (!RegExp(r'^\d{8}$').hasMatch(pin)) {
-                  return 'OTP code must contain digits only';
-                }
-
-                return null;
-              },
+              validator: event.validateOtpCode,
               inputFormatters: [
                 LengthLimitingTextInputFormatter(8),
                 FilteringTextInputFormatter.digitsOnly,
@@ -76,13 +60,21 @@ class _OtpFormForgotState extends ConsumerState<OtpFormForgot> {
               pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
             ),
             const SizedBox(height: 278),
-            Placeholdergesture(
-              onTap: () {
-                debugPrint('Resend code');
-              },
-              text: 'Did not received the code?',
-              gesture: ' Resend',
-            ),
+            if (state.canResendOtp)
+              Placeholdergesture(
+                onTap: () async {
+                  await event.resendOtp(context);
+                },
+                text: 'Did not received the code?',
+                gesture: ' Resend',
+              )
+            else
+              Text(
+                'Resend code in ${event.otpCountdownLabel}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFF6B7280),
+                ),
+              ),
             const SizedBox(height: 30),
             ReusableButton(
               isLoading: state.isLoading,
@@ -90,7 +82,6 @@ class _OtpFormForgotState extends ConsumerState<OtpFormForgot> {
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   await event.submitOtp(context);
-                  event.nextPage();
                   event.clearOtp();
                 }
               },
