@@ -53,3 +53,6 @@ app.*.map.json
 
 # Local context/memory docs — not for version control
 /context/
+
+# Local implementation worktrees
+.worktrees/
