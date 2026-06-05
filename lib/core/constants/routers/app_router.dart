@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:achievia/core/constants/routers/route_constants.dart';
-import 'package:achievia/presentation/screens/auth/forgot_password_screen.dart';
+import 'package:achievia/presentation/screens/auth/forgot_password_screen_handler.dart';
 import 'package:achievia/presentation/screens/auth/login_screen.dart';
 import 'package:achievia/presentation/screens/auth/signup_screen.dart';
 import 'package:achievia/presentation/screens/auth/onboarding_screen.dart';
@@ -77,7 +77,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: RouteConstants.forgotPassword,
-        builder: (_, _) => const ForgotPasswordScreen(),
+        builder: (_, _) => const ForgotPasswordScreenHandler(),
       ),
       GoRoute(
         path: RouteConstants.reviewers,

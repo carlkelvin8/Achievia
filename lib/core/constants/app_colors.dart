@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pinput/pinput.dart';
 
 // Primary Brand Colors
 const primary = Color(0xFF2196F3); // Blue
@@ -10,6 +11,30 @@ const secondaryVariant = Color(0xFF018786);
 const headerColor = Color.fromARGB(255, 3, 19, 107);
 const headerColor2 = Colors.blueAccent;
 const headerColor3 = Color.fromARGB(255, 7, 201, 226);
+final defaultPinTheme = PinTheme(
+  width: 56,
+  height: 56,
+  textStyle: TextStyle(
+    fontSize: 20,
+    color: primaryVariant,
+    fontWeight: FontWeight.w600,
+  ),
+  decoration: BoxDecoration(
+    border: Border.all(color: const Color.fromARGB(255, 0, 0, 0)),
+    borderRadius: BorderRadius.circular(20),
+  ),
+);
+
+final focusedPinTheme = defaultPinTheme.copyDecorationWith(
+  border: Border.all(color: Color.fromRGBO(114, 178, 238, 1)),
+  borderRadius: BorderRadius.circular(8),
+);
+
+final submittedPinTheme = defaultPinTheme.copyWith(
+  decoration: defaultPinTheme.decoration!.copyWith(
+    color: primaryVariant,
+  ),
+);
 
 // Light Theme Colors
 class LightColors {

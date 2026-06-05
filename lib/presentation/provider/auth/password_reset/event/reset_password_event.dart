@@ -14,28 +14,22 @@ final userUseCaseProvider = Provider<UserUseCase>((ref) => sl<UserUseCase>());
 class ResetPasswordEvent extends Notifier<ResetPasswordState> {
   late final TextEditingController emailAddressController;
   late final PageController pageController;
-  late final List<TextEditingController> otpControllers;
+  late final TextEditingController otpControllers;
   late final List<Color> otpBorderColors;
   late final UserUseCase useCase;
   @override
   ResetPasswordState build() {
     emailAddressController = TextEditingController();
     pageController = PageController();
-    otpControllers = List.generate(6, (_) => TextEditingController());
+    otpControllers = TextEditingController();
     otpBorderColors = List.generate(6, (_) => const Color(0xE3E3E3E7));
     useCase = ref.read(userUseCaseProvider);
     ref.onDispose(() {
       emailAddressController.dispose();
       pageController.dispose();
-      for (final controller in otpControllers) {
-        controller.dispose();
-      }
+      otpControllers.dispose();
     });
     return ResetPasswordState(isLoading: false, index: 0);
-  }
-
-  String get otpCode {
-    return otpControllers.map((controller) => controller.text).join();
   }
 
   void setPageIndex(int index) {
@@ -65,9 +59,7 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
   }
 
   void clearOtp() {
-    for (final controller in otpControllers) {
-      controller.clear();
-    }
+    otpControllers.clear();
   }
 
   Future<void> submitResetPassword(BuildContext context) async {

@@ -8,15 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class ForgotPasswordScreen extends ConsumerStatefulWidget {
-  const ForgotPasswordScreen({super.key});
+class ForgotPasswordScreenHandler extends ConsumerStatefulWidget {
+  const ForgotPasswordScreenHandler({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() =>
-      _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreenHandler> createState() =>
+      _ForgotPasswordScreenHandlerState();
 }
 
-class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
+class _ForgotPasswordScreenHandlerState extends ConsumerState<ForgotPasswordScreenHandler> {
   @override
   Widget build(BuildContext context) {
     final notifier = ref.read(resetPasswordNotifier.notifier);
@@ -35,7 +35,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 child: PasswordResetForm(),),
               ForgotPasswordStep(
                 headerText: 'OTP code verification',
-                labelText:'We have an OTP code to your email and bololam119@javnoi.com Enter the OTP code below to verify',
+                labelText:'We have an OTP code to your email in ${notifier.emailAddressController.text} Enter the OTP code below to verify',
                 child: OtpFormForgot(),
               ),
             ],

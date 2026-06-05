@@ -14,18 +14,67 @@ class OtpFormForgot extends ConsumerStatefulWidget {
 }
 
 class _OtpFormForgotState extends ConsumerState<OtpFormForgot> {
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     final event = ref.read(resetPasswordNotifier.notifier);
-    final state = ref.read(resetPasswordNotifier);
-    final key = GlobalKey<FormState>();
+    final state = ref.watch(resetPasswordNotifier);
+    final defaultOtpTheme = PinTheme(
+      width: 56,
+      height: 56,
+      textStyle: Theme.of(context).textTheme.titleLarge,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFDBDEE4)),
+        borderRadius: BorderRadius.circular(10),
+      ),
+    );
+    final focusedOtpTheme = defaultOtpTheme.copyDecorationWith(
+      border: Border.all(color: Colors.black),
+      borderRadius: BorderRadius.circular(10),
+    );
+    final errorOtpTheme = defaultOtpTheme.copyDecorationWith(
+      border: Border.all(color: Colors.redAccent),
+      borderRadius: BorderRadius.circular(10),
+    );
+
     return Form(
-      key: key,
+      key: _formKey,
       child: Padding(
         padding: const EdgeInsets.only(left: 0, right: 0),
         child: Column(
           children: [
-            Pinput(length: 8),
+            Pinput(
+              length: 8,
+              controller: event.otpControllers,
+              defaultPinTheme: defaultOtpTheme,
+              focusedPinTheme: focusedOtpTheme,
+              submittedPinTheme: defaultOtpTheme,
+              errorPinTheme: errorOtpTheme,
+              validator: (value) {
+                final pin = value?.trim() ?? '';
+
+                if (pin.isEmpty) {
+                  return 'Enter the OTP code';
+                }
+
+                if (pin.length != 8) {
+                  return 'Enter the 8-digit OTP code';
+                }
+
+                if (!RegExp(r'^\d{8}$').hasMatch(pin)) {
+                  return 'OTP code must contain digits only';
+                }
+
+                return null;
+              },
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(8),
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
+            ),
             const SizedBox(height: 278),
             Placeholdergesture(
               onTap: () {
@@ -39,15 +88,8 @@ class _OtpFormForgotState extends ConsumerState<OtpFormForgot> {
               isLoading: state.isLoading,
               title: 'CONFIRM',
               onPressed: () async {
-                if (key.currentState!.validate()) {
-                  debugPrint(event.otpCode);
-
-                  event.pageController.nextPage(
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.ease,
-                  );
-                  event.clearOtp();
-                } else {
+                if (_formKey.currentState!.validate()) {
+                  event.nextPage();
                   event.clearOtp();
                 }
               },
