@@ -4,7 +4,6 @@ import 'package:achievia/presentation/provider/auth/password_reset/event/reset_p
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/inputs/reusable_form_field.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PasswordResetForm extends ConsumerStatefulWidget {
@@ -19,6 +18,7 @@ class _PasswordResetFormState extends ConsumerState<PasswordResetForm> {
   Widget build(BuildContext context) {
     final key = GlobalKey<FormState>();
     final event = ref.read(resetPasswordNotifier.notifier);
+    final state = ref.watch(resetPasswordNotifier);
     return Form(
       key: key,
       child: Column(
@@ -98,6 +98,7 @@ class _PasswordResetFormState extends ConsumerState<PasswordResetForm> {
           ),
           const SizedBox(height: 50),
           ReusableButton(
+            isLoading: state.isLoading,
             backgroundColor: primaryVariant,
             title: 'Continue >',
             onPressed: () async {

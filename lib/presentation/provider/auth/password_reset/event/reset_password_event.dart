@@ -38,6 +38,32 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
     return otpControllers.map((controller) => controller.text).join();
   }
 
+  void setPageIndex(int index) {
+    state = state.copyWith(index: index);
+  }
+
+  void previousPage() {
+    if (!pageController.hasClients) {
+      return;
+    }
+
+    pageController.previousPage(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.ease,
+    );
+  }
+
+  void nextPage() {
+    if (!pageController.hasClients) {
+      return;
+    }
+
+    pageController.nextPage(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.ease,
+    );
+  }
+
   void clearOtp() {
     for (final controller in otpControllers) {
       controller.clear();
@@ -46,12 +72,20 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
 
   Future<void> submitResetPassword(BuildContext context) async {
     try {
-      await useCase.sendResetPasswordToEmail(emailAddressController.text.trim());
+      state = state.copyWith(isLoading: true);
+      await useCase.sendResetPasswordToEmail(
+        emailAddressController.text.trim(),
+      );
+      if (pageController.hasClients) {
+        nextPage();
+      }
+      state = state.copyWith(isLoading: false);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('$e')));
+        state = state.copyWith(isLoading: false);
       }
     }
   }
