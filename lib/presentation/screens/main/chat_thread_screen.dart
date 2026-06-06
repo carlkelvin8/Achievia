@@ -40,7 +40,7 @@ class ChatThreadScreen extends ConsumerWidget {
               currentUserId: currentUserId,
             ),
           ),
-          if (state.isAnyoneTyping) const _TypingIndicator(),
+          if (state.isAnyoneTyping)  _TypingIndicator(conversation.title),
           ChatComposer(
             controller: notifier.composerController,
             isSending: state.isSending,
@@ -53,7 +53,8 @@ class ChatThreadScreen extends ConsumerWidget {
 }
 
 class _TypingIndicator extends StatelessWidget {
-  const _TypingIndicator();
+  final String name;
+  const _TypingIndicator(this.name);
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +65,7 @@ class _TypingIndicator extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
         child: Text(
-          'Someone is typing...',
+          '$name is typing...',
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
             fontStyle: FontStyle.italic,
