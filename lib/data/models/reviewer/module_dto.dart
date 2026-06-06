@@ -18,7 +18,7 @@ class ModuleDto {
   final String description;
 
   @HiveField(3)
-  final int userId;
+  final String userId;
 
   @HiveField(4)
   final String createdAt;

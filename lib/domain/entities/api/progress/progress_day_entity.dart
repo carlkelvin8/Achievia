@@ -1,6 +1,6 @@
 class ProgressDayEntity {
   final int id;
-  final int userId;
+  final String userId;
   final DateTime activityDate;
   final bool isActive;
 

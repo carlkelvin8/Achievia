@@ -3,7 +3,7 @@ class ModuleEntity {
   final int id;
   final String title;
   final String description;
-  final int userId;
+  final String userId;
   final String createdAt;
   final String? file;
   final String? image;

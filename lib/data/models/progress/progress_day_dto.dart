@@ -7,7 +7,7 @@ part 'progress_day_dto.g.dart';
 class ProgressDayDto {
   final int id;
   @JsonKey(name: 'user_id')
-  final int userId;
+  final String userId;
   @JsonKey(name: 'activity_date')
   final DateTime activityDate;
   @JsonKey(name: 'is_active')

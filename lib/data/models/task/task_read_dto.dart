@@ -4,7 +4,7 @@ class TaskReadDto {
   final int id;
   final String taskName;
   final String description;
-  final int userId;
+  final String userId;
   final bool isDone;
   final DateTime deadline;
   final DateTime createdAt;
@@ -23,7 +23,7 @@ class TaskReadDto {
         id: json['id'] as int,
         taskName: json['task_name'] as String,
         description: json['description'] as String,
-        userId: json['user_id'] as int,
+        userId: json['user_id'] as String,
         isDone: json['isDone'] as bool,
         deadline: DateTime.parse(json['deadline'] as String),
         createdAt: DateTime.parse(json['createdAt'] as String),

@@ -2,7 +2,7 @@ class TaskApiEntity {
   final int id;
   final String taskName;
   final String description;
-  final int userId;
+  final String userId;
   final bool isDone;
   final DateTime deadline;
   final DateTime createdAt;
