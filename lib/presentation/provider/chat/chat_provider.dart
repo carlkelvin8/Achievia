@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:achievia/domain/entities/api/chat/chat_conversation_entity.dart';
 import 'package:achievia/domain/entities/api/chat/chat_message_entity.dart';
+import 'package:achievia/domain/entities/api/chat/chat_person_entity.dart';
 import 'package:achievia/domain/use_cases/chat/chat_use_case.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +17,15 @@ final chatConversationsProvider = FutureProvider<List<ChatConversationEntity>>((
 ) {
   return ref.read(chatUseCaseProvider).getConversations();
 });
+
+final chatPeopleSearchProvider = FutureProvider.autoDispose
+    .family<List<ChatPersonEntity>, String>((ref, query) {
+      final trimmedQuery = query.trim();
+      if (trimmedQuery.length < 2) {
+        return Future.value([]);
+      }
+      return ref.read(chatUseCaseProvider).searchPeople(trimmedQuery);
+    });
 
 class ChatThreadState {
   final bool isLoading;

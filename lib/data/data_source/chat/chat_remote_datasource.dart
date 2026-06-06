@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:achievia/data/models/chat/chat_conversation_dto.dart';
 import 'package:achievia/data/models/chat/chat_message_dto.dart';
+import 'package:achievia/data/models/chat/chat_person_dto.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class ChatDataSource {
   Future<List<ChatConversationDto>> getConversations();
   Future<List<ChatMessageDto>> getMessages(String conversationId);
+  Future<List<ChatPersonDto>> searchPeople(String query);
+  Future<ChatConversationDto> startDirectConversation(String profileId);
   Future<ChatMessageDto> sendMessage(String conversationId, String body);
   Stream<ChatMessageDto> subscribeToMessages(String conversationId);
 }
@@ -37,9 +40,74 @@ class ChatRemoteDatasource implements ChatDataSource {
         .inFilter('id', conversationIds)
         .order('last_message_at', ascending: false, nullsFirst: false);
 
+    final directTitles = await _directConversationTitles(
+      currentUserId: userId,
+      conversationRows: conversationRows,
+    );
+
     return conversationRows.map((row) {
-      return ChatConversationDto.fromJson(row);
+      final json = Map<String, dynamic>.from(row);
+      json['title'] = directTitles[json['id']] ?? json['title'];
+      return ChatConversationDto.fromJson(json);
     }).toList();
+  }
+
+  Future<Map<String, String>> _directConversationTitles({
+    required String currentUserId,
+    required List<dynamic> conversationRows,
+  }) async {
+    final directConversationIds = conversationRows
+        .where((row) => row['type'] == 'direct')
+        .where((row) {
+          final title = row['title'] as String?;
+          return title == null || title.trim().isEmpty;
+        })
+        .map((row) => row['id'] as String)
+        .toList();
+
+    if (directConversationIds.isEmpty) {
+      return {};
+    }
+
+    final memberRows = await _supabase
+        .from('chat_members')
+        .select('conversation_id, profile_id')
+        .inFilter('conversation_id', directConversationIds);
+
+    final targetProfileByConversation = <String, String>{};
+    final targetProfileIds = <String>{};
+    for (final row in memberRows) {
+      final profileId = row['profile_id'] as String;
+      if (profileId == currentUserId) {
+        continue;
+      }
+
+      final conversationId = row['conversation_id'] as String;
+      targetProfileByConversation[conversationId] = profileId;
+      targetProfileIds.add(profileId);
+    }
+
+    if (targetProfileIds.isEmpty) {
+      return {};
+    }
+
+    final profileRows = await _supabase.rpc<List<dynamic>>(
+      'chat_profile_summaries',
+      params: {'profile_ids': targetProfileIds.toList()},
+    );
+
+    final peopleById = {
+      for (final row in profileRows)
+        row['id'] as String: ChatPersonDto.fromJson(
+          Map<String, dynamic>.from(row),
+        ).toEntity(),
+    };
+
+    return {
+      for (final entry in targetProfileByConversation.entries)
+        if (peopleById[entry.value] != null)
+          entry.key: peopleById[entry.value]!.displayName,
+    };
   }
 
   @override
@@ -52,6 +120,44 @@ class ChatRemoteDatasource implements ChatDataSource {
         .limit(100);
 
     return rows.map((row) => ChatMessageDto.fromJson(row)).toList();
+  }
+
+  @override
+  Future<List<ChatPersonDto>> searchPeople(String query) async {
+    final trimmedQuery = query.trim();
+    if (trimmedQuery.length < 2) {
+      return [];
+    }
+
+    _currentAuthUserId();
+    final rows = await _supabase.rpc<List<dynamic>>(
+      'search_profiles_for_chat',
+      params: {'search_query': trimmedQuery},
+    );
+
+    return rows
+        .map((row) => ChatPersonDto.fromJson(Map<String, dynamic>.from(row)))
+        .toList();
+  }
+
+  @override
+  Future<ChatConversationDto> startDirectConversation(String profileId) async {
+    final trimmedProfileId = profileId.trim();
+    if (trimmedProfileId.isEmpty) {
+      throw ArgumentError.value(
+        profileId,
+        'profileId',
+        'Profile ID is required',
+      );
+    }
+
+    _currentAuthUserId();
+    final row = await _supabase.rpc<Map<String, dynamic>>(
+      'get_or_create_direct_chat',
+      params: {'target_profile_id': trimmedProfileId},
+    );
+
+    return ChatConversationDto.fromJson(row);
   }
 
   @override

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:achievia/domain/entities/api/chat/chat_conversation_entity.dart';
 import 'package:achievia/domain/entities/api/chat/chat_message_entity.dart';
+import 'package:achievia/domain/entities/api/chat/chat_person_entity.dart';
 import 'package:achievia/domain/repository/chat/chat_repository.dart';
 import 'package:injectable/injectable.dart';
 
@@ -17,6 +18,14 @@ class ChatUseCase {
 
   Future<List<ChatMessageEntity>> getMessages(String conversationId) {
     return repository.getMessages(conversationId);
+  }
+
+  Future<List<ChatPersonEntity>> searchPeople(String query) {
+    return repository.searchPeople(query);
+  }
+
+  Future<ChatConversationEntity> startDirectConversation(String profileId) {
+    return repository.startDirectConversation(profileId);
   }
 
   Future<ChatMessageEntity> sendMessage(String conversationId, String body) {
