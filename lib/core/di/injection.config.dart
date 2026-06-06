@@ -48,7 +48,6 @@ import 'package:achievia/data/repositoryImpl/task/task_repository_impl.dart'
     as _i724;
 import 'package:achievia/domain/entities/api/home/questions_entity.dart'
     as _i416;
-import 'package:achievia/domain/repository/chat/chat_repository.dart' as _i879;
 import 'package:achievia/domain/use_cases/auth/user_use_case.dart' as _i879;
 import 'package:achievia/domain/use_cases/chat/chat_use_case.dart' as _i181;
 import 'package:achievia/domain/use_cases/profile/profile_use_case.dart'
@@ -193,7 +192,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i501.ProfileUseCase>(
       () => _i501.ProfileUseCase(impl: gh<_i662.ProfileRepositoryImpl>()),
     );
-    gh.lazySingleton<_i879.ChatRepository>(
+    gh.lazySingleton<_i439.ChatRepositoryImpl>(
       () => _i439.ChatRepositoryImpl(gh<_i739.ChatDataSource>()),
     );
     gh.factory<_i803.QuestionsUseCase>(
@@ -212,7 +211,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i981.TaskUseCase(gh<_i724.TaskRepositoryImpl>()),
     );
     gh.factory<_i181.ChatUseCase>(
-      () => _i181.ChatUseCase(gh<_i879.ChatRepository>()),
+      () => _i181.ChatUseCase(gh<_i439.ChatRepositoryImpl>()),
     );
     return this;
   }

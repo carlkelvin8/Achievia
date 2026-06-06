@@ -7,7 +7,8 @@ import 'package:achievia/domain/entities/api/chat/chat_person_entity.dart';
 import 'package:achievia/domain/repository/chat/chat_repository.dart';
 import 'package:injectable/injectable.dart';
 
-@LazySingleton(as: ChatRepository)
+@lazySingleton
+@injectable
 class ChatRepositoryImpl implements ChatRepository {
   final ChatDataSource datasource;
 

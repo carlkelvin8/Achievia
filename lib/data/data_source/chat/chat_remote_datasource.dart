@@ -152,12 +152,16 @@ class ChatRemoteDatasource implements ChatDataSource {
     }
 
     _currentAuthUserId();
-    final row = await _supabase.rpc<Map<String, dynamic>>(
+    final rows = await _supabase.rpc<List<dynamic>>(
       'get_or_create_direct_chat',
       params: {'target_profile_id': trimmedProfileId},
     );
 
-    return ChatConversationDto.fromJson(row);
+    if (rows.isEmpty) {
+      throw Exception('Unable to start direct chat');
+    }
+
+    return ChatConversationDto.fromJson(Map<String, dynamic>.from(rows.first));
   }
 
   @override

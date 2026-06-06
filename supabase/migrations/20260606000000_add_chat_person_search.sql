@@ -91,17 +91,10 @@ $$;
 revoke all on function public.chat_profile_summaries(uuid[]) from public;
 grant execute on function public.chat_profile_summaries(uuid[]) to authenticated;
 
+drop function if exists public.get_or_create_direct_chat(uuid);
+
 create or replace function public.get_or_create_direct_chat(target_profile_id uuid)
-returns table (
-  id uuid,
-  type text,
-  title text,
-  created_by uuid,
-  created_at timestamptz,
-  updated_at timestamptz,
-  last_message_at timestamptz,
-  latest_message text
-)
+returns jsonb
 language plpgsql
 security definer
 set search_path = public
@@ -110,6 +103,8 @@ declare
   current_profile_id uuid := (select auth.uid());
   existing_conversation_id uuid;
   new_conversation_id uuid;
+  conversation_row public.chat_conversations%rowtype;
+  target_title text;
 begin
   if current_profile_id is null then
     raise exception 'User is not authenticated';
@@ -157,26 +152,32 @@ begin
     existing_conversation_id := new_conversation_id;
   end if;
 
-  return query
-  select
-    cc.id,
-    cc.type,
-    coalesce(
-      nullif(cc.title, ''),
-      nullif(trim(concat_ws(' ', target_profile.first_name, target_profile.last_name)), ''),
-      nullif(target_profile.username, ''),
-      target_profile.email,
-      'Direct message'
-    ) as title,
-    cc.created_by,
-    cc.created_at,
-    cc.updated_at,
-    cc.last_message_at,
-    cc.latest_message
-  from public.chat_conversations cc
-  left join public.profiles target_profile
-    on target_profile.id = target_profile_id
-  where cc.id = existing_conversation_id;
+  select *
+  into conversation_row
+  from public.chat_conversations
+  where id = existing_conversation_id;
+
+  select coalesce(
+    nullif(conversation_row.title, ''),
+    nullif(trim(concat_ws(' ', p.first_name, p.last_name)), ''),
+    nullif(p.username, ''),
+    p.email,
+    'Direct message'
+  )
+  into target_title
+  from public.profiles p
+  where p.id = target_profile_id;
+
+  return jsonb_build_object(
+    'id', conversation_row.id,
+    'type', conversation_row.type,
+    'title', target_title,
+    'created_by', conversation_row.created_by,
+    'created_at', conversation_row.created_at,
+    'updated_at', conversation_row.updated_at,
+    'last_message_at', conversation_row.last_message_at,
+    'latest_message', conversation_row.latest_message
+  );
 end;
 $$;
 
