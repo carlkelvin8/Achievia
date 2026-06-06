@@ -1,4 +1,5 @@
-import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/domain/entities/api/chat/chat_conversation_entity.dart';
+import 'package:achievia/presentation/provider/chat/chat_provider.dart';
 import 'package:achievia/presentation/provider/tabs/event/tab_event.dart';
 import 'package:achievia/presentation/widgets/list_items/message_list_item.dart';
 import 'package:flutter/material.dart';
@@ -11,13 +12,23 @@ class MessagesScreen extends ConsumerStatefulWidget {
   ConsumerState<MessagesScreen> createState() => _MessagesScreenState();
 }
 
-class _MessagesScreenState extends ConsumerState<MessagesScreen> with SingleTickerProviderStateMixin {
+class _MessagesScreenState extends ConsumerState<MessagesScreen>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final tabNotifier = ref.read(tabProvider.notifier);
     final controller = ref.watch(tabProvider);
+    final conversationsAsync = ref.watch(chatConversationsProvider);
+
     if (controller == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         tabNotifier.createController(this, 3);
@@ -25,14 +36,11 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> with SingleTick
       return const SizedBox();
     }
 
-
-
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
-            // Search bar
             Padding(
               padding: const EdgeInsets.all(16),
               child: TextField(
@@ -47,7 +55,8 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> with SingleTick
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                   filled: true,
-                  fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  fillColor: theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.3),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
@@ -56,8 +65,6 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> with SingleTick
                 ),
               ),
             ),
-
-            // Tabs
             TabBar(
               controller: controller,
               labelColor: theme.colorScheme.primary,
@@ -69,19 +76,36 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> with SingleTick
                 Tab(text: 'Personal Message'),
               ],
             ),
-
-            // Messages list
             Expanded(
-              child: TabBarView(
-                controller: controller,
-                children: [
-                  // All messages
-                  MessageListItem(messages: messages),
-                  // Groups only
-                  MessageListItem(messages: messages.where((m) => m['isGroup']).toList()),
-                  // Personal messages only
-                  MessageListItem(messages: messages.where((m) => !m['isGroup']).toList()),
-                ],
+              child: conversationsAsync.when(
+                data: (conversations) {
+                  final groupConversations = conversations
+                      .where(
+                        (conversation) =>
+                            conversation.type == ChatConversationType.group,
+                      )
+                      .toList();
+                  final directConversations = conversations
+                      .where(
+                        (conversation) =>
+                            conversation.type == ChatConversationType.direct,
+                      )
+                      .toList();
+
+                  return TabBarView(
+                    controller: controller,
+                    children: [
+                      MessageListItem(conversations: conversations),
+                      MessageListItem(conversations: groupConversations),
+                      MessageListItem(conversations: directConversations),
+                    ],
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stackTrace) => _MessagesErrorState(
+                  message: error.toString(),
+                  onRetry: () => ref.invalidate(chatConversationsProvider),
+                ),
               ),
             ),
           ],
@@ -89,5 +113,44 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> with SingleTick
       ),
     );
   }
+}
 
+class _MessagesErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _MessagesErrorState({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Unable to load conversations',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            FilledButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
+        ),
+      ),
+    );
+  }
 }

@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:achievia/core/constants/routers/route_constants.dart';
+import 'package:achievia/domain/entities/api/chat/chat_conversation_entity.dart';
 import 'package:achievia/presentation/screens/auth/forgot_password_screen_handler.dart';
 import 'package:achievia/presentation/screens/auth/login_screen.dart';
 import 'package:achievia/presentation/screens/auth/signup_screen.dart';
 import 'package:achievia/presentation/screens/auth/onboarding_screen.dart';
 import 'package:achievia/presentation/screens/main/about_screen.dart';
 import 'package:achievia/presentation/screens/main/attempt_screen.dart';
+import 'package:achievia/presentation/screens/main/chat_thread_screen.dart';
 import 'package:achievia/presentation/screens/main/exam_screen.dart';
 import 'package:achievia/presentation/screens/main/home_screen.dart';
 import 'package:achievia/presentation/screens/main/main_screen.dart';
@@ -88,6 +90,33 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const MessagesScreen(),
       ),
       GoRoute(
+        path: RouteConstants.chatThread,
+        builder: (context, state) {
+          final extra = state.extra;
+
+          if (extra is! ChatConversationEntity) {
+            return Scaffold(
+              appBar: AppBar(title: const Text('Chat')),
+              body: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('Conversation not found'),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () => context.go(RouteConstants.messages),
+                      child: const Text('Back to messages'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          return ChatThreadScreen(conversation: extra);
+        },
+      ),
+      GoRoute(
         path: RouteConstants.about,
         builder: (_, _) => const AboutScreen(),
       ),
@@ -150,7 +179,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return router;
 });
 
-
 String? _redirectForAuth(BuildContext context, GoRouterState state) {
   final session = Supabase.instance.client.auth.currentSession;
   final isLoggedIn = session != null;
@@ -161,7 +189,7 @@ String? _redirectForAuth(BuildContext context, GoRouterState state) {
     RouteConstants.login,
     RouteConstants.signUp,
     RouteConstants.onboarding,
-    RouteConstants.forgotPassword
+    RouteConstants.forgotPassword,
   ];
 
   final isAuthRoute = authRoutes.contains(location);
@@ -170,15 +198,12 @@ String? _redirectForAuth(BuildContext context, GoRouterState state) {
     return RouteConstants.login;
   }
 
-
-
   if (isLoggedIn && isAuthRoute && location != RouteConstants.forgotPassword) {
     return RouteConstants.main;
   }
 
   return null;
 }
-
 
 class _GoRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription _subscription;

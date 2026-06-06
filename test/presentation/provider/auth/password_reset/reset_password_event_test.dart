@@ -12,8 +12,7 @@ void main() {
 
     expect(event.emailAddressController, isA<TextEditingController>());
     expect(event.pageController, isA<PageController>());
-    expect(event.otpControllers, hasLength(6));
-    expect(event.otpControllers, everyElement(isA<TextEditingController>()));
+    expect(event.otpControllers, isA<TextEditingController>());
     expect(event.otpBorderColors, hasLength(6));
     expect(event.otpBorderColors, everyElement(const Color(0xE3E3E3E7)));
   });

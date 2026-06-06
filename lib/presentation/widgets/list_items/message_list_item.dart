@@ -1,21 +1,41 @@
+import 'package:achievia/core/constants/routers/route_constants.dart';
+import 'package:achievia/core/utils/time_ago_formatter.dart';
+import 'package:achievia/domain/entities/api/chat/chat_conversation_entity.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MessageListItem extends StatelessWidget {
-  final List<Map<String, dynamic>> messages;
-  const MessageListItem({super.key, required this.messages});
+  final List<ChatConversationEntity> conversations;
+
+  const MessageListItem({super.key, required this.conversations});
 
   @override
   Widget build(BuildContext context) {
+    if (conversations.isEmpty) {
+      return Center(
+        child: Text(
+          'No conversations yet',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+      );
+    }
+
     return ListView.separated(
-      itemCount: messages.length,
+      itemCount: conversations.length,
       separatorBuilder: (context, index) => const Divider(height: 1),
       itemBuilder: (context, index) {
-        final message = messages[index];
+        final conversation = conversations[index];
+        final latestMessage = conversation.latestMessage?.trim();
+
         return ListTile(
           leading: CircleAvatar(
-            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.1),
             child: Text(
-              message['name'][0],
+              _avatarInitial(conversation.title),
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.w500,
@@ -23,24 +43,45 @@ class MessageListItem extends StatelessWidget {
             ),
           ),
           title: Text(
-            message['name'],
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+            conversation.title,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           subtitle: Text(
-            message['message'],
+            latestMessage == null || latestMessage.isEmpty
+                ? 'No messages yet'
+                : latestMessage,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
+          trailing: conversation.lastMessageAt == null
+              ? null
+              : Text(
+                  TimeAgoFormatter.format(conversation.lastMessageAt!),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
           onTap: () {
-            // Handle message tap
+            context.push(RouteConstants.chatThread, extra: conversation);
           },
         );
       },
     );
+  }
+
+  String _avatarInitial(String title) {
+    final trimmedTitle = title.trim();
+    if (trimmedTitle.isEmpty) {
+      return '?';
+    }
+
+    return trimmedTitle.characters.first.toUpperCase();
   }
 }

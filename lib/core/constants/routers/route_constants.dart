@@ -10,6 +10,7 @@ class RouteConstants {
   static const String home = '/main/home';
   static const String profile = '/main/profile';
   static const String about = '/main/about';
+  static const String chatThread = '/chat-thread';
 
   // Additional routes (for future use)
   static const String settings = '/settings';

@@ -16,6 +16,8 @@ import 'package:achievia/core/network/offline_caching.dart' as _i64;
 import 'package:achievia/core/registration/register_modules.dart' as _i790;
 import 'package:achievia/data/data_source/auth/user_remote_datasource.dart'
     as _i528;
+import 'package:achievia/data/data_source/chat/chat_remote_datasource.dart'
+    as _i739;
 import 'package:achievia/data/data_source/home/questions_remote_datasource.dart'
     as _i557;
 import 'package:achievia/data/data_source/profile/profile_remote_datasource.dart'
@@ -30,6 +32,8 @@ import 'package:achievia/data/data_source/task/task_remote_datasource.dart'
 import 'package:achievia/data/models/auth/user_dto.dart' as _i235;
 import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart'
     as _i581;
+import 'package:achievia/data/repositoryImpl/chat/chat_repository_impl.dart'
+    as _i439;
 import 'package:achievia/data/repositoryImpl/profile/profile_repository_impl.dart'
     as _i662;
 import 'package:achievia/data/repositoryImpl/progress/progress_repository_impl.dart'
@@ -44,7 +48,9 @@ import 'package:achievia/data/repositoryImpl/task/task_repository_impl.dart'
     as _i724;
 import 'package:achievia/domain/entities/api/home/questions_entity.dart'
     as _i416;
+import 'package:achievia/domain/repository/chat/chat_repository.dart' as _i879;
 import 'package:achievia/domain/use_cases/auth/user_use_case.dart' as _i879;
+import 'package:achievia/domain/use_cases/chat/chat_use_case.dart' as _i181;
 import 'package:achievia/domain/use_cases/profile/profile_use_case.dart'
     as _i501;
 import 'package:achievia/domain/use_cases/progress/progress_use_case.dart'
@@ -110,6 +116,7 @@ extension GetItInjectableX on _i174.GetIt {
         userContext: gh<_i741.SupabaseUserContext>(),
       ),
     );
+    gh.lazySingleton<_i739.ChatDataSource>(() => _i739.ChatRemoteDatasource());
     gh.lazySingleton<_i1000.QuestionsRepositoryImpl>(
       () => _i1000.QuestionsRepositoryImpl(
         gh<_i557.QuestionsRemoteDatasource>(),
@@ -186,6 +193,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i501.ProfileUseCase>(
       () => _i501.ProfileUseCase(impl: gh<_i662.ProfileRepositoryImpl>()),
     );
+    gh.lazySingleton<_i879.ChatRepository>(
+      () => _i439.ChatRepositoryImpl(gh<_i739.ChatDataSource>()),
+    );
     gh.factory<_i803.QuestionsUseCase>(
       () => _i803.QuestionsUseCase(
         gh<_i1000.QuestionsRepositoryImpl>(),
@@ -200,6 +210,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i981.TaskUseCase>(
       () => _i981.TaskUseCase(gh<_i724.TaskRepositoryImpl>()),
+    );
+    gh.factory<_i181.ChatUseCase>(
+      () => _i181.ChatUseCase(gh<_i879.ChatRepository>()),
     );
     return this;
   }
