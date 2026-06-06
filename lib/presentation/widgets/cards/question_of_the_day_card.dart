@@ -41,7 +41,7 @@ class QuestionOfTheDayCard extends ConsumerWidget {
           const SizedBox(height: 8),
           ...List.generate(opt?.length ?? 0, (index) {
             final isSelected = selectedIndex == index;
-            final isCorrect = opt![index]['isCorrect'] as bool;
+            final isCorrect = opt![index]['is_correct'] as bool;
 
             Color? textColor;
             if (selectedIndex != null) {

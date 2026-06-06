@@ -160,7 +160,7 @@ class QuizDtoItems {
                       .map((c) => {
                             'id': c.id,
                             'choiceText': c.choiceText,
-                            'isCorrect': c.isCorrect,
+                            'is_correct': c.isCorrect,
                             'questionId': c.questionId,
                           })
                       .toList(),
@@ -216,7 +216,7 @@ class ChoicesDto {
     return ChoicesDto(
       id: json['id'] as int,
       choiceText: json['choiceText'] ?? "",
-      isCorrect: json['isCorrect'] as bool,
+      isCorrect: json['is_correct'] as bool,
       questionId: json['questionId'] as int,
     );
   }

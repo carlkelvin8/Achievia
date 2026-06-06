@@ -370,7 +370,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
     return {
       'id': _readInt(row['id']) ?? 0,
       'choiceText': row['choice_text'] ?? row['choiceText'] ?? '',
-      'isCorrect': row['is_correct'] ?? row['isCorrect'] ?? false,
+      'is_correct': row['is_correct'] ?? row['is_correct'] ?? false,
       'questionId': _readInt(row['question_id'] ?? row['questionId']) ?? 0,
     };
   }
@@ -389,7 +389,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
     return _subjectScores.entries.map((entry) {
       final score = entry.value;
       return {
-        'isCorrect': score.correct > 0,
+        'is_correct': score.correct > 0,
         'name': entry.key,
         'score': score.rating,
       };

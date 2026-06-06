@@ -131,14 +131,14 @@ class Answer {
 
   factory Answer.fromJson(Map<String, dynamic> json) {
     return Answer(
-      isCorrect: json['isCorrect'],
+      isCorrect: json['is_correct'],
       name: json['name'],
       score: (json['score'] as num).toDouble(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'isCorrect': isCorrect, 'name': name, 'score': score};
+    return {'is_correct': isCorrect, 'name': name, 'score': score};
   }
 
   factory Answer.fromEntity(AnswerEntity entity) {
