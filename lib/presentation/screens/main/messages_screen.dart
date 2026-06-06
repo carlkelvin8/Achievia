@@ -48,108 +48,110 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
           children: [
             Padding(
               padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _searchController,
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: 'Search people or conversations',
-                  hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Search people to chat',
+                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      suffixIcon: _searchQuery.isEmpty
+                          ? null
+                          : IconButton(
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {
+                                  _searchQuery = '';
+                                });
+                              },
+                              icon: const Icon(Icons.close),
+                            ),
+                      filled: true,
+                      fillColor: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.3),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+                    ),
                   ),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  suffixIcon: _searchQuery.isEmpty
-                      ? null
-                      : IconButton(
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() {
-                              _searchQuery = '';
-                            });
-                          },
-                          icon: const Icon(Icons.close),
-                        ),
-                  filled: true,
-                  fillColor: theme.colorScheme.surfaceContainerHighest
-                      .withValues(alpha: 0.3),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                ),
-              ),
-            ),
-            Expanded(
-              child: _isSearchingPeople
-                  ? _PeopleSearchResults(
+                  if (_isSearchingPeople) ...[
+                    const SizedBox(height: 8),
+                    _PeopleAutocompletePanel(
                       query: _searchQuery,
                       openingProfileId: _openingProfileId,
                       onOpenPerson: _openDirectChat,
-                    )
-                  : Column(
-                      children: [
-                        TabBar(
-                          controller: controller,
-                          labelColor: theme.colorScheme.primary,
-                          unselectedLabelColor:
-                              theme.colorScheme.onSurfaceVariant,
-                          indicatorColor: theme.colorScheme.primary,
-                          tabs: const [
-                            Tab(text: 'All'),
-                            Tab(text: 'Groups'),
-                            Tab(text: 'Personal Message'),
-                          ],
-                        ),
-                        Expanded(
-                          child: conversationsAsync.when(
-                            data: (conversations) {
-                              final groupConversations = conversations
-                                  .where(
-                                    (conversation) =>
-                                        conversation.type ==
-                                        ChatConversationType.group,
-                                  )
-                                  .toList();
-                              final directConversations = conversations
-                                  .where(
-                                    (conversation) =>
-                                        conversation.type ==
-                                        ChatConversationType.direct,
-                                  )
-                                  .toList();
-
-                              return TabBarView(
-                                controller: controller,
-                                children: [
-                                  MessageListItem(conversations: conversations),
-                                  MessageListItem(
-                                    conversations: groupConversations,
-                                  ),
-                                  MessageListItem(
-                                    conversations: directConversations,
-                                  ),
-                                ],
-                              );
-                            },
-                            loading: () => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                            error: (error, stackTrace) => _MessagesErrorState(
-                              message: error.toString(),
-                              onRetry: () =>
-                                  ref.invalidate(chatConversationsProvider),
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
+                  ],
+                ],
+              ),
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  TabBar(
+                    controller: controller,
+                    labelColor: theme.colorScheme.primary,
+                    unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+                    indicatorColor: theme.colorScheme.primary,
+                    tabs: const [
+                      Tab(text: 'All'),
+                      Tab(text: 'Groups'),
+                      Tab(text: 'Personal Message'),
+                    ],
+                  ),
+                  Expanded(
+                    child: conversationsAsync.when(
+                      data: (conversations) {
+                        final groupConversations = conversations
+                            .where(
+                              (conversation) =>
+                                  conversation.type ==
+                                  ChatConversationType.group,
+                            )
+                            .toList();
+                        final directConversations = conversations
+                            .where(
+                              (conversation) =>
+                                  conversation.type ==
+                                  ChatConversationType.direct,
+                            )
+                            .toList();
+
+                        return TabBarView(
+                          controller: controller,
+                          children: [
+                            MessageListItem(conversations: conversations),
+                            MessageListItem(conversations: groupConversations),
+                            MessageListItem(conversations: directConversations),
+                          ],
+                        );
+                      },
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (error, stackTrace) => _MessagesErrorState(
+                        message: error.toString(),
+                        onRetry: () =>
+                            ref.invalidate(chatConversationsProvider),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -157,7 +159,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
     );
   }
 
-  bool get _isSearchingPeople => _searchQuery.trim().length >= 2;
+  bool get _isSearchingPeople => isChatPeopleAutocompleteActive(_searchQuery);
 
   Future<void> _openDirectChat(ChatPersonEntity person) async {
     if (_openingProfileId != null) {
@@ -200,12 +202,12 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
   }
 }
 
-class _PeopleSearchResults extends ConsumerWidget {
+class _PeopleAutocompletePanel extends ConsumerWidget {
   final String query;
   final String? openingProfileId;
   final ValueChanged<ChatPersonEntity> onOpenPerson;
 
-  const _PeopleSearchResults({
+  const _PeopleAutocompletePanel({
     required this.query,
     required this.openingProfileId,
     required this.onOpenPerson,
@@ -213,48 +215,79 @@ class _PeopleSearchResults extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final resultsAsync = ref.watch(chatPeopleSearchProvider(query));
 
-    return resultsAsync.when(
-      data: (people) {
-        if (people.isEmpty) {
-          return const _PeopleSearchEmptyState();
-        }
+    return Material(
+      elevation: 3,
+      borderRadius: BorderRadius.circular(12),
+      clipBehavior: Clip.antiAlias,
+      color: theme.colorScheme.surface,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 260),
+        child: resultsAsync.when(
+          data: (people) {
+            if (people.isEmpty) {
+              return const _PeopleAutocompleteEmptyState();
+            }
 
-        return ListView.separated(
-          itemCount: people.length,
-          separatorBuilder: (context, index) => const Divider(height: 1),
-          itemBuilder: (context, index) {
-            final person = people[index];
-            final isOpening = person.id == openingProfileId;
+            return ListView.separated(
+              shrinkWrap: true,
+              itemCount: people.length,
+              separatorBuilder: (context, index) => const Divider(height: 1),
+              itemBuilder: (context, index) {
+                final person = people[index];
+                final isOpening = person.id == openingProfileId;
 
-            return ListTile(
-              leading: CircleAvatar(
-                backgroundImage: person.profileImage == null
-                    ? null
-                    : NetworkImage(person.profileImage!),
-                child: person.profileImage == null
-                    ? Text(_initialsFor(person.displayName))
-                    : null,
-              ),
-              title: Text(person.displayName),
-              subtitle: Text(_subtitleFor(person)),
-              trailing: isOpening
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.chat_bubble_outline),
-              onTap: isOpening ? null : () => onOpenPerson(person),
+                return ListTile(
+                  dense: true,
+                  leading: CircleAvatar(
+                    backgroundImage: person.profileImage == null
+                        ? null
+                        : NetworkImage(person.profileImage!),
+                    child: person.profileImage == null
+                        ? Text(_initialsFor(person.displayName))
+                        : null,
+                  ),
+                  title: Text(person.displayName),
+                  subtitle: Text(_subtitleFor(person)),
+                  trailing: isOpening
+                      ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.chat_bubble_outline),
+                  onTap: isOpening ? null : () => onOpenPerson(person),
+                );
+              },
             );
           },
-        );
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stackTrace) => _MessagesErrorState(
-        message: error.toString(),
-        onRetry: () => ref.invalidate(chatPeopleSearchProvider(query)),
+          loading: () => const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+          error: (error, stackTrace) => Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                const Icon(Icons.error_outline),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Unable to search people',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      ref.invalidate(chatPeopleSearchProvider(query)),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -279,41 +312,28 @@ class _PeopleSearchResults extends ConsumerWidget {
   }
 }
 
-class _PeopleSearchEmptyState extends StatelessWidget {
-  const _PeopleSearchEmptyState();
+class _PeopleAutocompleteEmptyState extends StatelessWidget {
+  const _PeopleAutocompleteEmptyState();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.person_search,
-              size: 40,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 12),
-            Text(
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Icon(Icons.person_search, color: theme.colorScheme.onSurfaceVariant),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
               'No people found',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Try searching by name, username, or email.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
-              textAlign: TextAlign.center,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -21,11 +21,13 @@ final chatConversationsProvider = FutureProvider<List<ChatConversationEntity>>((
 final chatPeopleSearchProvider = FutureProvider.autoDispose
     .family<List<ChatPersonEntity>, String>((ref, query) {
       final trimmedQuery = query.trim();
-      if (trimmedQuery.length < 2) {
+      if (!isChatPeopleAutocompleteActive(trimmedQuery)) {
         return Future.value([]);
       }
       return ref.read(chatUseCaseProvider).searchPeople(trimmedQuery);
     });
+
+bool isChatPeopleAutocompleteActive(String query) => query.trim().length >= 2;
 
 class ChatThreadState {
   final bool isLoading;

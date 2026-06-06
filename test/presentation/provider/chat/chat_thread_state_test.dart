@@ -3,6 +3,12 @@ import 'package:achievia/presentation/provider/chat/chat_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('people search autocomplete activates after two characters', () {
+    expect(isChatPeopleAutocompleteActive(''), isFalse);
+    expect(isChatPeopleAutocompleteActive(' a '), isFalse);
+    expect(isChatPeopleAutocompleteActive('jo'), isTrue);
+  });
+
   test('appendMessage ignores duplicate message ids', () {
     final state = ChatThreadState(
       messages: [
