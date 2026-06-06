@@ -58,4 +58,22 @@ void main() {
     expect(next.messages, hasLength(1));
     expect(next.messages.single.id, sentMessage.id);
   });
+
+  test('typing indicator tracks and removes remote typers', () {
+    final typing = const ChatThreadState().applyTypingIndicator(
+      profileId: 'user-2',
+      isTyping: true,
+    );
+
+    expect(typing.isAnyoneTyping, isTrue);
+    expect(typing.typingProfileIds, {'user-2'});
+
+    final stopped = typing.applyTypingIndicator(
+      profileId: 'user-2',
+      isTyping: false,
+    );
+
+    expect(stopped.isAnyoneTyping, isFalse);
+    expect(stopped.typingProfileIds, isEmpty);
+  });
 }

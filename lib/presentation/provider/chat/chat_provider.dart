@@ -34,19 +34,24 @@ class ChatThreadState {
   final bool isSending;
   final String? errorMessage;
   final List<ChatMessageEntity> messages;
+  final Set<String> typingProfileIds;
 
   const ChatThreadState({
     this.isLoading = false,
     this.isSending = false,
     this.errorMessage,
     this.messages = const [],
+    this.typingProfileIds = const {},
   });
+
+  bool get isAnyoneTyping => typingProfileIds.isNotEmpty;
 
   ChatThreadState copyWith({
     bool? isLoading,
     bool? isSending,
     Object? errorMessage = _unchanged,
     List<ChatMessageEntity>? messages,
+    Set<String>? typingProfileIds,
   }) {
     return ChatThreadState(
       isLoading: isLoading ?? this.isLoading,
@@ -55,6 +60,7 @@ class ChatThreadState {
           ? this.errorMessage
           : errorMessage as String?,
       messages: messages ?? this.messages,
+      typingProfileIds: typingProfileIds ?? this.typingProfileIds,
     );
   }
 
@@ -64,6 +70,20 @@ class ChatThreadState {
     }
 
     return copyWith(messages: _sortMessages([...messages, message]));
+  }
+
+  ChatThreadState applyTypingIndicator({
+    required String profileId,
+    required bool isTyping,
+  }) {
+    final nextTypingProfileIds = {...typingProfileIds};
+    if (isTyping) {
+      nextTypingProfileIds.add(profileId);
+    } else {
+      nextTypingProfileIds.remove(profileId);
+    }
+
+    return copyWith(typingProfileIds: nextTypingProfileIds);
   }
 }
 
@@ -81,19 +101,30 @@ class ChatThreadNotifier extends Notifier<ChatThreadState> {
 
   late final TextEditingController composerController;
   StreamSubscription<ChatMessageEntity>? _messagesSubscription;
+  StreamSubscription? _typingSubscription;
+  Timer? _typingIdleTimer;
+  var _lastTypingSent = false;
   var _isDisposed = false;
 
   @override
   ChatThreadState build() {
     composerController = TextEditingController();
+    composerController.addListener(_onComposerChanged);
     ref.onDispose(() {
       _isDisposed = true;
+      composerController.removeListener(_onComposerChanged);
+      _typingIdleTimer?.cancel();
       _messagesSubscription?.cancel();
+      _typingSubscription?.cancel();
+      if (_lastTypingSent) {
+        unawaited(_sendTypingIndicator(false));
+      }
       composerController.dispose();
     });
 
     Future<void>.microtask(load);
     _subscribe();
+    _subscribeToTyping();
 
     return const ChatThreadState(isLoading: true);
   }
@@ -146,6 +177,68 @@ class ChatThreadNotifier extends Notifier<ChatThreadState> {
         );
   }
 
+  void _subscribeToTyping() {
+    _typingSubscription?.cancel();
+    _typingSubscription = ref
+        .read(chatUseCaseProvider)
+        .subscribeToTypingIndicators(conversationId)
+        .listen(
+          (event) {
+            if (_isDisposed) {
+              return;
+            }
+            state = state.applyTypingIndicator(
+              profileId: event.profileId,
+              isTyping: event.isTyping,
+            );
+          },
+          onError: (Object error) {
+            if (_isDisposed) {
+              return;
+            }
+            state = state.copyWith(errorMessage: error.toString());
+          },
+        );
+  }
+
+  void _onComposerChanged() {
+    if (_isDisposed) {
+      return;
+    }
+
+    final isTyping = composerController.text.trim().isNotEmpty;
+    if (isTyping) {
+      if (!_lastTypingSent) {
+        unawaited(_sendTypingIndicator(true));
+      }
+      _typingIdleTimer?.cancel();
+      _typingIdleTimer = Timer(const Duration(seconds: 3), () {
+        unawaited(_sendTypingIndicator(false));
+      });
+      return;
+    }
+
+    _typingIdleTimer?.cancel();
+    if (_lastTypingSent) {
+      unawaited(_sendTypingIndicator(false));
+    }
+  }
+
+  Future<void> _sendTypingIndicator(bool isTyping) async {
+    if (_lastTypingSent == isTyping) {
+      return;
+    }
+    _lastTypingSent = isTyping;
+    try {
+      await ref
+          .read(chatUseCaseProvider)
+          .sendTypingIndicator(conversationId, isTyping);
+    } catch (_) {
+      // Typing indicators are ephemeral; message send/read should not fail
+      // because a transient presence broadcast failed.
+    }
+  }
+
   Future<void> send() async {
     if (_isDisposed) {
       return;
@@ -156,6 +249,7 @@ class ChatThreadNotifier extends Notifier<ChatThreadState> {
     }
 
     state = state.copyWith(isSending: true, errorMessage: null);
+    await _sendTypingIndicator(false);
 
     try {
       final message = await ref

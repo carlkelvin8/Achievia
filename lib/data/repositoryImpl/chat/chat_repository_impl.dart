@@ -4,6 +4,7 @@ import 'package:achievia/data/data_source/chat/chat_remote_datasource.dart';
 import 'package:achievia/domain/entities/api/chat/chat_conversation_entity.dart';
 import 'package:achievia/domain/entities/api/chat/chat_message_entity.dart';
 import 'package:achievia/domain/entities/api/chat/chat_person_entity.dart';
+import 'package:achievia/domain/entities/api/chat/chat_typing_event_entity.dart';
 import 'package:achievia/domain/repository/chat/chat_repository.dart';
 import 'package:injectable/injectable.dart';
 
@@ -54,5 +55,17 @@ class ChatRepositoryImpl implements ChatRepository {
     return datasource
         .subscribeToMessages(conversationId)
         .map((dto) => dto.toEntity());
+  }
+
+  @override
+  Future<void> sendTypingIndicator(String conversationId, bool isTyping) async {
+    await datasource.sendTypingIndicator(conversationId, isTyping);
+  }
+
+  @override
+  Stream<ChatTypingEventEntity> subscribeToTypingIndicators(
+    String conversationId,
+  ) {
+    return datasource.subscribeToTypingIndicators(conversationId);
   }
 }

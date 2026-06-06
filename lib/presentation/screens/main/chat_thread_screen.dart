@@ -40,12 +40,36 @@ class ChatThreadScreen extends ConsumerWidget {
               currentUserId: currentUserId,
             ),
           ),
+          if (state.isAnyoneTyping) const _TypingIndicator(),
           ChatComposer(
             controller: notifier.composerController,
             isSending: state.isSending,
             onSend: notifier.send,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _TypingIndicator extends StatelessWidget {
+  const _TypingIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+        child: Text(
+          'Someone is typing...',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
       ),
     );
   }

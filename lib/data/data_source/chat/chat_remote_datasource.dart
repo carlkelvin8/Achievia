@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:achievia/data/models/chat/chat_conversation_dto.dart';
 import 'package:achievia/data/models/chat/chat_message_dto.dart';
 import 'package:achievia/data/models/chat/chat_person_dto.dart';
+import 'package:achievia/domain/entities/api/chat/chat_typing_event_entity.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -13,6 +14,10 @@ abstract class ChatDataSource {
   Future<ChatConversationDto> startDirectConversation(String profileId);
   Future<ChatMessageDto> sendMessage(String conversationId, String body);
   Stream<ChatMessageDto> subscribeToMessages(String conversationId);
+  Future<void> sendTypingIndicator(String conversationId, bool isTyping);
+  Stream<ChatTypingEventEntity> subscribeToTypingIndicators(
+    String conversationId,
+  );
 }
 
 @LazySingleton(as: ChatDataSource)
@@ -228,6 +233,64 @@ class ChatRemoteDatasource implements ChatDataSource {
     return controller.stream;
   }
 
+  @override
+  Future<void> sendTypingIndicator(String conversationId, bool isTyping) async {
+    final profileId = _currentAuthUserId();
+    final channel = _supabase.channel('chat-typing:$conversationId');
+    await channel.sendBroadcastMessage(
+      event: 'typing.changed',
+      payload: {
+        'conversation_id': conversationId,
+        'profile_id': profileId,
+        'is_typing': isTyping,
+      },
+    );
+    await _supabase.removeChannel(channel);
+  }
+
+  @override
+  Stream<ChatTypingEventEntity> subscribeToTypingIndicators(
+    String conversationId,
+  ) {
+    final currentProfileId = _currentAuthUserId();
+    late final RealtimeChannel channel;
+    final controller = StreamController<ChatTypingEventEntity>();
+
+    channel = _supabase
+        .channel('chat-typing:$conversationId')
+        .onBroadcast(
+          event: 'typing.changed',
+          callback: (payload) {
+            final json = _typingPayload(payload);
+            if (json == null) {
+              return;
+            }
+
+            final profileId = json['profile_id'] as String?;
+            final isTyping = json['is_typing'] as bool?;
+            if (profileId == null ||
+                profileId == currentProfileId ||
+                isTyping == null) {
+              return;
+            }
+
+            controller.add(
+              ChatTypingEventEntity(profileId: profileId, isTyping: isTyping),
+            );
+          },
+        );
+
+    controller.onListen = () {
+      channel.subscribe();
+    };
+    controller.onCancel = () async {
+      await _supabase.removeChannel(channel);
+      await controller.close();
+    };
+
+    return controller.stream;
+  }
+
   String _currentAuthUserId() {
     final id = _supabase.auth.currentUser?.id;
     if (id == null || id.isEmpty) {
@@ -280,6 +343,20 @@ class ChatRemoteDatasource implements ChatDataSource {
   Map<String, dynamic>? _asJsonMap(Object? value) {
     if (value is Map<String, dynamic>) return value;
     if (value is Map) return Map<String, dynamic>.from(value);
+    return null;
+  }
+
+  Map<String, dynamic>? _typingPayload(Map<String, dynamic> payload) {
+    final direct = _asJsonMap(payload);
+    if (direct != null && direct.containsKey('profile_id')) {
+      return direct;
+    }
+
+    final nested = _asJsonMap(payload['payload']);
+    if (nested != null && nested.containsKey('profile_id')) {
+      return nested;
+    }
+
     return null;
   }
 
