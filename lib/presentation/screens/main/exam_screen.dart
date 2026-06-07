@@ -33,6 +33,34 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    ref.listenManual(timerProvider, (prev, next) async {
+      if (prev?.remaining != Duration.zero && next.remaining == Duration.zero) {
+        final quizBatches = ref.read(getGeneratedQuestions).value ?? [];
+        final safeIndex = ref.read(changeIndexProvider);
+        if (quizBatches.isEmpty) return;
+        ref.read(pageControllerOuter.notifier);
+
+        final pageControllerNotifier = ref.read(pageController.notifier);
+
+        final timerNotifier = ref.read(timerProvider.notifier);
+
+        await pageControllerNotifier.next(
+          // ignore: use_build_context_synchronously
+          context,
+          quizBatches.length,
+          safeIndex,
+        );
+
+        timerNotifier.reset();
+        timerNotifier.start();
+      }
+      return;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final asyncQuestions = ref.watch(getGeneratedQuestions);
     final pageControllerNotifier = ref.read(pageController.notifier);
@@ -112,7 +140,6 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
           loading: () => '0 / 0',
           error: (_, __) => '0 / 0',
         ),
-        subjects: '${safeIndex + 1} / ${quizBatches.length}',
       ),
       persistentFooterAlignment: AlignmentDirectional.center,
       body: asyncQuestions.when(
@@ -161,12 +188,12 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                                   onSelect: (v) async {
                                     if (v != null) {
                                       isAnswered.isAnswered(question.id);
-                                      await answerQuestion.answerQuestion(
-                                        question.choices[v].choiceText,
-                                      );
                                       setState(() {
                                         selectedAnswers[question.id] = v;
                                       });
+                                      await answerQuestion.answerQuestion(
+                                        question.choices[v].choiceText,
+                                      );
                                     }
                                   },
                                 );

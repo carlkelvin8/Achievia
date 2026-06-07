@@ -8,7 +8,7 @@ class ExamAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double toolbarheight;
   final String title;
   final String? page;
-  final String subjects;
+  final String? subjects;
   final VoidCallback callback;
   final VoidCallback callBackQuit;
   const ExamAppBar({
@@ -16,7 +16,7 @@ class ExamAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.toolbarheight,
     required this.title,
     this.page,
-    required this.subjects,
+    this.subjects,
     required this.callback,
     required this.callBackQuit,
   });
@@ -42,7 +42,6 @@ class ExamAppBar extends StatelessWidget implements PreferredSizeWidget {
           const SizedBox(height: 2),
           Text('Mockboards', style: GoogleFonts.poppins(fontSize: 12)),
           Text('$page', style: GoogleFonts.poppins(fontSize: 12)),
-          Text(subjects, style: GoogleFonts.poppins(fontSize: 12)),
         ],
       ),
     );

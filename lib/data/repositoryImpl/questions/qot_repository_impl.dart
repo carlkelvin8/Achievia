@@ -45,10 +45,10 @@ class QotRepositoryImpl implements QotdRepository {
         print(remoteAnswer.chosen_answer);
         return remoteAnswer.toEntity();
       }
-      return QotyEntityPost(chosen_ans: '', quiz_id: 0, student_id: 0);
+      return QotyEntityPost(chosen_ans: '', quiz_id: 0, student_id: '');
     } catch (e) {
       print('repos: $e');
-      return QotyEntityPost(chosen_ans: '', quiz_id: 0, student_id: 0);
+      return QotyEntityPost(chosen_ans: '', quiz_id: 0, student_id: '');
     }
   }
 }

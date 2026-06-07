@@ -43,7 +43,6 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
     try {
       if (isConnected) {
         final response = await remoteDatasource.randomizeQuestion(index);
-        await local.insertQuestionsToCache(response);
         print('REPO${response.map((e) => e.toEntity()).toList()}');
         final mapped = response.map((e) => e.toEntity()).toList();
         return mapped;

@@ -250,7 +250,7 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier> {
     final entity = QotyEntityPost(
       chosen_ans: chosenAnswer,
       quiz_id: 1,
-      student_id: 1,
+      student_id: state.student_id,
     );
     await useCase.answerQuestion(entity);
   }

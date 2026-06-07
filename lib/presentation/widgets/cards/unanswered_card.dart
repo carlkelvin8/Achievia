@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:achievia/core/constants/app_assets.dart';
@@ -40,43 +41,54 @@ class UnansweredCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Image.asset(logo, height: 40,),
-                  Text('Mock Boards',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  SvgPicture.asset(logo, height: 40),
+                  Text(
+                    'Mock Boards',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
-              IconButton(onPressed: isShown, icon: Icon(Icons.close, color: Colors.white, fontWeight: FontWeight.bold,))
+              IconButton(
+                onPressed: isShown,
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           Center(
-            child: Text('You have $total questions left to answer, Achievian. Stay focused, you got this!',
-            style: GoogleFonts.poppins(
-              color: LightColors.secondary,
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.center,
+            child: Text(
+              'You have $total questions left to answer, Achievian. Stay focused, you got this!',
+              style: GoogleFonts.poppins(
+                color: LightColors.secondary,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 12,),
+          const SizedBox(height: 12),
           Card(
             child: GridView.builder(
-                  padding: EdgeInsets.all(8.0),
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: itemCount,
-                  gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: MediaQuery.of(context).size.width == 360 ? 12 : 10,
-                    mainAxisSpacing: 2.0,
-                    crossAxisSpacing: 3.0,
-                    mainAxisExtent: 46.2,
-                  ),
-                  itemBuilder: itemBuilder,
-                ),
+              padding: EdgeInsets.all(8.0),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: itemCount,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: MediaQuery.of(context).size.width == 360
+                    ? 12
+                    : 10,
+                mainAxisSpacing: 2.0,
+                crossAxisSpacing: 3.0,
+                mainAxisExtent: 46.2,
+              ),
+              itemBuilder: itemBuilder,
+            ),
           ),
         ],
       ),

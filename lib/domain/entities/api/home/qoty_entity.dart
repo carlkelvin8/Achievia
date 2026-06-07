@@ -20,7 +20,7 @@ class QotyEntity {
 class QotyEntityPost {
   final String chosen_ans;
   final int quiz_id;
-  final int student_id;
+  final String student_id;
   QotyEntityPost({
     required this.chosen_ans,
     required this.quiz_id,

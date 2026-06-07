@@ -1,1 +1,1 @@
-final String logo = 'assets/images/logo.png';
+const String logo = 'assets/images/LOGO/1.svg';

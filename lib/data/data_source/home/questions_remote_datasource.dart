@@ -93,18 +93,25 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
   @override
   Future<QotdDtoPost> answerQuestion(QotdDtoPost dto) async {
     try {
+      final answerDto = dto.student_id.isEmpty
+          ? QotdDtoPost(
+              chosen_answer: dto.chosen_answer,
+              quiz_id: dto.quiz_id,
+              student_id: await userContext.currentUserId(),
+            )
+          : dto;
       final choice = await _supabase
           .from('choices')
           .select('id, choice_text, is_correct, question_id')
-          .eq('choice_text', dto.chosen_answer)
+          .eq('choice_text', answerDto.chosen_answer)
           .order('id')
           .limit(1)
           .maybeSingle();
 
-      if (choice == null) return dto;
+      if (choice == null) return answerDto;
 
       final questionId = _readInt(choice['question_id']);
-      if (questionId == null) return dto;
+      if (questionId == null) return answerDto;
 
       final question = await _supabase
           .from('questions')
@@ -115,10 +122,10 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
       final subjectName = quizId == null ? '' : await _getQuizTitle(quizId);
       _recordAnswer(subjectName, choice['is_correct'] == true);
 
-      return dto;
+      return answerDto;
     } catch (e) {
       debugPrint("Exception: $e");
-      return QotdDtoPost.fromJson({});
+      return QotdDtoPost(chosen_answer: '', quiz_id: 0, student_id: '');
     }
   }
 
@@ -151,8 +158,10 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
         'Quiz Titles: ${quizItems.map((quiz) => quiz.title).toList()}',
         wrapWidth: 1024,
       );
-      await local.insertQuestionsToCache(questions);
-      await local.insertQuizToCache(quizItems);
+      await local.replaceGeneratedMockboardCache(
+        questions: questions,
+        quizItems: quizItems,
+      );
       return questions;
     } catch (e) {
       debugPrint("Exception: $e");
@@ -206,7 +215,6 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
       final evaluation = _evaluateMtleResult(answers);
 
       await _supabase.from('quiz_attempts').insert({
-        'quiz_id': 1,
         'student_id': userId,
         'score': evaluation.gwa,
         'attempted_at': DateTime.now().toIso8601String(),

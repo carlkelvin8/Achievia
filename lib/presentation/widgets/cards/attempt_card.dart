@@ -7,6 +7,7 @@ import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
 import 'package:achievia/presentation/widgets/cards/data_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -32,7 +33,7 @@ class AttemptCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Image.asset(logo, height: 40),
+              SvgPicture.asset(logo, height: 40),
               const SizedBox(width: 8),
               Text(
                 'RESULTS',

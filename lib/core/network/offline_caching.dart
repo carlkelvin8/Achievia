@@ -21,9 +21,6 @@ class OfflineCaching {
   Future<Database> _initDB() async {
     final path = join(await getDatabasesPath(), 'cache.db');
 
-    // DELETE old DB (dev only)
-    await deleteDatabase(path); // <- ensures fresh DB is created
-
     return await openDatabase(
       path,
       version: 3,
@@ -154,6 +151,34 @@ class OfflineCaching {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
+    await batch.commit(noResult: true);
+  }
+
+  Future<void> replaceGeneratedMockboardCache({
+    required List<QuestionsDto> questions,
+    required List<QuizDtoItems> quizItems,
+  }) async {
+    final db = await database;
+    final batch = db.batch()
+      ..delete('questions')
+      ..delete('quiz');
+
+    for (final question in questions) {
+      batch.insert(
+        'questions',
+        question.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
+    for (final quizItem in quizItems) {
+      batch.insert(
+        'quiz',
+        quizItem.toSqliteMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
     await batch.commit(noResult: true);
   }
 

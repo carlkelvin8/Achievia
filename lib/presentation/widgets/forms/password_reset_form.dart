@@ -14,9 +14,9 @@ class PasswordResetForm extends ConsumerStatefulWidget {
 }
 
 class _PasswordResetFormState extends ConsumerState<PasswordResetForm> {
+  final key = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    final key = GlobalKey<FormState>();
     final event = ref.read(resetPasswordNotifier.notifier);
     final state = ref.watch(resetPasswordNotifier);
     return Form(
