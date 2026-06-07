@@ -1,47 +1,55 @@
-import 'package:achievia/core/utils/tabs_helpers.dart';
-import 'package:achievia/presentation/provider/tabs/event/tab_event.dart';
-import 'package:achievia/presentation/screens/screen_contents/semi/abbreviations_semi_content.dart';
-import 'package:achievia/presentation/screens/screen_contents/semi/mnemonics_semi_content.dart';
-import 'package:achievia/presentation/screens/screen_contents/semi/procedures_semi_content.dart';
-import 'package:achievia/presentation/widgets/tabs/reusable/reusable_semi_tab.dart';
+import 'package:achievia/presentation/provider/reviewer/supplementals_provider.dart';
+import 'package:achievia/presentation/widgets/supplementals/abbreviation_list.dart';
+import 'package:achievia/presentation/widgets/supplementals/mnemonic_grid.dart';
+import 'package:achievia/presentation/widgets/supplementals/procedure_grid.dart';
+import 'package:achievia/presentation/widgets/supplementals/supplemental_filter_chips.dart';
+import 'package:achievia/presentation/widgets/supplementals/supplemental_search_bar.dart';
+import 'package:achievia/presentation/widgets/supplementals/supplemental_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SupplementalsContentScreen extends ConsumerStatefulWidget {
+class SupplementalsContentScreen extends ConsumerWidget {
   const SupplementalsContentScreen({super.key});
 
   @override
-  ConsumerState<SupplementalsContentScreen> createState() => _SupplementalsContentScreenState();
-}
-
-class _SupplementalsContentScreenState extends ConsumerState<SupplementalsContentScreen>  with TickerProviderStateMixin{
-  @override
-  Widget build(BuildContext context) {
-    final controller = ref.watch(tabProviderSemi);
-    final tabEvent = ref.read(tabProviderSemi.notifier);
-    if (controller == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_){
-      tabEvent.createController(this, 3);
-    });
-    return const SizedBox();
-    }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(supplementalsProvider);
+    final notifier = ref.read(supplementalsProvider.notifier);
 
     return Scaffold(
-      body: Column(
+      body: SafeArea(
+        top: false,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
           children: [
-            ReusableSemiTab(controller: controller, tabs: tabsSemi),
-            Expanded(
-              child: TabBarView(
-                controller: controller,
-                children: [
-                      MnemonicsSemiContent(),
-                      AbbreviationsSemiContent(),
-                      ProceduresSemiContent(),
-                  ]
-                )
-            )
+            SupplementalSearchBar(
+              controller: notifier.searchController,
+              onChanged: notifier.setQuery,
+            ),
+            const SizedBox(height: 10),
+            SupplementalFilterChips(
+              activeFilter: state.filter,
+              onSelected: notifier.setFilter,
+            ),
+            const SizedBox(height: 18),
+            if (state.shouldShow(SupplementalFilter.mnemonics))
+              SupplementalSection(
+                title: 'Mnemonics',
+                child: MnemonicGrid(items: state.visibleMnemonics()),
+              ),
+            if (state.shouldShow(SupplementalFilter.abbreviations))
+              SupplementalSection(
+                title: 'Abbreviations',
+                child: AbbreviationList(items: state.visibleAbbreviations()),
+              ),
+            if (state.shouldShow(SupplementalFilter.procedures))
+              SupplementalSection(
+                title: 'Procedures',
+                child: ProcedureGrid(items: state.visibleProcedures()),
+              ),
           ],
         ),
+      ),
     );
   }
 }

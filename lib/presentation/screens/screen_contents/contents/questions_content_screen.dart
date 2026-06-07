@@ -1,28 +1,20 @@
 import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/presentation/widgets/grids/grid_badges.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class QuestionsContentScreen extends ConsumerStatefulWidget {
+class QuestionsContentScreen extends StatelessWidget {
   const QuestionsContentScreen({super.key});
 
   @override
-  ConsumerState<QuestionsContentScreen> createState() => _QuestionsContentScreenState();
-}
-
-class _QuestionsContentScreenState extends ConsumerState<QuestionsContentScreen> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:  Padding(
-        padding:level1,
+      body: Padding(
+        padding: level1,
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-            GridBadges(token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInVzZXJuYW1lIjoiam9obmRvZSIsImVtYWlsIjoic3R1ZGVudEBleGFtcGxlLmNvbSIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzY1MTk1MDcwLCJleHAiOjE3NjU3OTk4NzB9.QqXtMoICwszYrh996IYrwoWYaLEDGegVp76ht1hcMBY', id: '1', title: 'Day 1',)
-            ],
-          ),
-        )
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [GridBadges()],
+        ),
+      ),
     );
-}
+  }
 }

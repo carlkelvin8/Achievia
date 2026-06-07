@@ -6,6 +6,9 @@ class RouteConstants {
 
   // Main app tabs
   static const String reviewers = '/main/reviewers';
+  static const String motherNotes = '/reviewers/mother-notes';
+  static const String questionBank = '/reviewers/question-bank';
+  static const String supplementals = '/reviewers/supplementals';
   static const String messages = '/main/messages';
   static const String home = '/main/home';
   static const String profile = '/main/profile';

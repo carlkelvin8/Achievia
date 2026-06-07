@@ -1,31 +1,24 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:achievia/core/constants/routers/route_constants.dart';
-import 'package:achievia/core/utils/helpers.dart';
 import 'package:achievia/presentation/provider/questions/questions_provider.dart';
+import 'package:achievia/presentation/provider/reviewer/question_bank_provider.dart';
 import 'package:achievia/presentation/widgets/cards/questions_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class GridBadges extends ConsumerWidget {
-  final String token;
-  final String id;
-  final String title;
-  const GridBadges({
-    super.key,
-    required this.token,
-    required this.id,
-    required this.title,
-  });
+  const GridBadges({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = ref.read(answerQotProvider.notifier);
+    final questionItems = ref.watch(questionBankItemsProvider);
     return Expanded(
       child: ListView.separated(
         itemBuilder: (context, index) {
-          final item = questions[index];
+          final item = questionItems[index];
 
           return QuestionsCard(
             icon: item.icon,
@@ -41,7 +34,7 @@ class GridBadges extends ConsumerWidget {
           );
         },
         separatorBuilder: (context, index) => const SizedBox(height: 10),
-        itemCount: questions.length,
+        itemCount: questionItems.length,
       ),
     );
   }
