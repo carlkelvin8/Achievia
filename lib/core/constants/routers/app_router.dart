@@ -16,6 +16,7 @@ import 'package:achievia/presentation/screens/main/messages_screen.dart';
 import 'package:achievia/presentation/screens/main/onboarding_mockboard_screen.dart';
 import 'package:achievia/presentation/screens/main/profile_screen.dart';
 import 'package:achievia/presentation/screens/main/reviewers_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/reviewer_category_screen.dart';
 import 'package:achievia/presentation/screens/main/summary_screen.dart';
 import 'package:achievia/presentation/screens/notifications/notifications_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/completed_screen.dart';
@@ -84,6 +85,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteConstants.reviewers,
         builder: (_, _) => const ReviewersScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.motherNotes,
+        builder: (_, _) => const MotherNotesScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.questionBank,
+        builder: (_, _) => const QuestionBankScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.supplementals,
+        builder: (_, _) => const SupplementalsScreen(),
       ),
       GoRoute(
         path: RouteConstants.messages,

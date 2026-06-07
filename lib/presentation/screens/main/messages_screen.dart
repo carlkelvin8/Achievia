@@ -1,8 +1,9 @@
 import 'package:achievia/core/constants/routers/route_constants.dart';
-import 'package:achievia/domain/entities/api/chat/chat_conversation_entity.dart';
 import 'package:achievia/domain/entities/api/chat/chat_person_entity.dart';
 import 'package:achievia/presentation/provider/chat/chat_provider.dart';
-import 'package:achievia/presentation/provider/tabs/event/tab_event.dart';
+import 'package:achievia/presentation/provider/chat/messages_provider.dart';
+import 'package:achievia/presentation/widgets/chat/message_filter_chips.dart';
+import 'package:achievia/presentation/widgets/chat/message_search_bar.dart';
 import 'package:achievia/presentation/widgets/list_items/message_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,31 +16,13 @@ class MessagesScreen extends ConsumerStatefulWidget {
   ConsumerState<MessagesScreen> createState() => _MessagesScreenState();
 }
 
-class _MessagesScreenState extends ConsumerState<MessagesScreen>
-    with SingleTickerProviderStateMixin {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-  String? _openingProfileId;
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
+class _MessagesScreenState extends ConsumerState<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final tabNotifier = ref.read(tabProvider.notifier);
-    final controller = ref.watch(tabProvider);
+    final messageState = ref.watch(messagesProvider);
+    final messageNotifier = ref.read(messagesProvider.notifier);
     final conversationsAsync = ref.watch(chatConversationsProvider);
-
-    if (controller == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        tabNotifier.createController(this, 3);
-      });
-      return const SizedBox();
-    }
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -50,50 +33,17 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  TextField(
-                    controller: _searchController,
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Search people to chat',
-                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      suffixIcon: _searchQuery.isEmpty
-                          ? null
-                          : IconButton(
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _searchQuery = '';
-                                });
-                              },
-                              icon: const Icon(Icons.close),
-                            ),
-                      filled: true,
-                      fillColor: theme.colorScheme.surfaceContainerHighest
-                          .withValues(alpha: 0.3),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                      ),
-                    ),
+                  MessageSearchBar(
+                    controller: messageNotifier.searchController,
+                    query: messageState.searchQuery,
+                    onChanged: messageNotifier.setSearchQuery,
+                    onClear: messageNotifier.clearSearch,
                   ),
-                  if (_isSearchingPeople) ...[
+                  if (_isSearchingPeople(messageState.searchQuery)) ...[
                     const SizedBox(height: 8),
                     _PeopleAutocompletePanel(
-                      query: _searchQuery,
-                      openingProfileId: _openingProfileId,
+                      query: messageState.searchQuery,
+                      openingProfileId: messageState.openingProfileId,
                       onOpenPerson: _openDirectChat,
                     ),
                   ],
@@ -103,42 +53,22 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
             Expanded(
               child: Column(
                 children: [
-                  TabBar(
-                    controller: controller,
-                    labelColor: theme.colorScheme.primary,
-                    unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
-                    indicatorColor: theme.colorScheme.primary,
-                    tabs: const [
-                      Tab(text: 'All'),
-                      Tab(text: 'Groups'),
-                      Tab(text: 'Personal Message'),
-                    ],
+                  MessageFilterChips(
+                    activeFilter: messageState.filter,
+                    onSelected: messageNotifier.setFilter,
+                  ),
+                  const SizedBox(height: 6),
+                  Divider(
+                    height: 1,
+                    color: theme.colorScheme.outline.withValues(alpha: 0.16),
                   ),
                   Expanded(
                     child: conversationsAsync.when(
                       data: (conversations) {
-                        final groupConversations = conversations
-                            .where(
-                              (conversation) =>
-                                  conversation.type ==
-                                  ChatConversationType.group,
-                            )
-                            .toList();
-                        final directConversations = conversations
-                            .where(
-                              (conversation) =>
-                                  conversation.type ==
-                                  ChatConversationType.direct,
-                            )
-                            .toList();
-
-                        return TabBarView(
-                          controller: controller,
-                          children: [
-                            MessageListItem(conversations: conversations),
-                            MessageListItem(conversations: groupConversations),
-                            MessageListItem(conversations: directConversations),
-                          ],
+                        return MessageListItem(
+                          conversations: messageState.filteredConversations(
+                            conversations,
+                          ),
                         );
                       },
                       loading: () =>
@@ -159,16 +89,17 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
     );
   }
 
-  bool get _isSearchingPeople => isChatPeopleAutocompleteActive(_searchQuery);
+  bool _isSearchingPeople(String query) =>
+      isChatPeopleAutocompleteActive(query);
 
   Future<void> _openDirectChat(ChatPersonEntity person) async {
-    if (_openingProfileId != null) {
+    final messageNotifier = ref.read(messagesProvider.notifier);
+    final messageState = ref.read(messagesProvider);
+    if (messageState.openingProfileId != null) {
       return;
     }
 
-    setState(() {
-      _openingProfileId = person.id;
-    });
+    messageNotifier.setOpeningProfileId(person.id);
 
     try {
       final conversation = await ref
@@ -180,10 +111,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
         return;
       }
 
-      _searchController.clear();
-      setState(() {
-        _searchQuery = '';
-      });
+      messageNotifier.clearSearch();
       context.push(RouteConstants.chatThread, extra: conversation);
     } catch (error) {
       if (!mounted) {
@@ -194,9 +122,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
       ).showSnackBar(SnackBar(content: Text('Unable to open chat: $error')));
     } finally {
       if (mounted) {
-        setState(() {
-          _openingProfileId = null;
-        });
+        messageNotifier.setOpeningProfileId(null);
       }
     }
   }

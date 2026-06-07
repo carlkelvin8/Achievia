@@ -1,6 +1,5 @@
 import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/presentation/provider/reviewer/module_provider.dart';
-import 'package:achievia/presentation/provider/tabs/event/tab_event.dart';
 import 'package:achievia/presentation/widgets/badges/pdf_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,29 +32,14 @@ class _MotherNotesContentState extends ConsumerState<MotherNotesContent> {
       return;
     }
 
-    final position = _scrollController.position;
-    final modulesState = ref.read(paginatedModulesProvider);
-
-    if (!modulesState.hasMore ||
-        modulesState.isInitialLoading ||
-        modulesState.isLoadingMore ||
-        modulesState.errorMessage != null) {
-      return;
-    }
-
-    if (position.pixels >= position.maxScrollExtent - 250) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 250) {
       ref.read(paginatedModulesProvider.notifier).loadMore();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final activeMainTab = ref.watch(indexProvider);
-    if (activeMainTab != 0) {
-      // Avoid creating the pagination provider until Reviewers is active.
-      return const SizedBox.shrink();
-    }
-
     final modulesState = ref.watch(paginatedModulesProvider);
     final modulesNotifier = ref.read(paginatedModulesProvider.notifier);
 
