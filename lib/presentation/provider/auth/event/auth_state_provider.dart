@@ -63,7 +63,7 @@ class LoginNotifier extends Notifier<LoginFormState> {
     state = state.copyWith(isToggled: !state.isToggled);
   }
 
-  Future<void> submit() async {
+  Future<bool> submit() async {
     final entity = UserEntity(
       id: 0,
       firstName: '',
@@ -85,10 +85,13 @@ class LoginNotifier extends Notifier<LoginFormState> {
       emailControllerLogin.clear();
       passwordController.clear();
       state = state.copyWith(isLoading: false);
+      return true;
     } on AuthException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.message);
+      return false;
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      return false;
     }
   }
 

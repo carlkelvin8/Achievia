@@ -19,15 +19,14 @@ class LoginForm extends ConsumerStatefulWidget {
 
 class _LoginFormState extends ConsumerState<LoginForm> {
   bool agreedToTerms = false;
-
+  final _key = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final isPasswordVisible = ref.watch(toggleProvider);
     final visibilityNotifier = ref.read(toggleProvider.notifier);
     final loginNotifier = ref.read(loginFormProvider.notifier);
-    final key = GlobalKey<FormState>();
     return Form(
-      key: key,
+      key: _key,
       child: Column(
         children: [
           ReusableField(
@@ -55,7 +54,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
             title: 'Log in',
             isLoading: ref.watch(loginFormProvider).isLoading,
             onPressed: () async {
-              if (key.currentState!.validate()) {
+              if (_key.currentState!.validate()) {
                 await loginNotifier.submit();
               }
             },
