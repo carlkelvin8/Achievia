@@ -114,7 +114,6 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                   onPressed: () {
                     dialogContext.pop();
                     context.pop();
-                    timerNotifier.reset();
                     timerNotifier.pause();
                   },
                   child: const Text('End'),

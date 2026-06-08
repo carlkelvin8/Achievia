@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:achievia/core/network/offline_caching.dart';
+import 'package:achievia/core/utils/questions_helpers.dart';
 import 'package:achievia/data/data_source/supabase_user_context.dart';
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
 import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
@@ -27,7 +27,6 @@ abstract class QuestionRepoDataSource {
 class QuestionsRemoteDatasource implements QuestionRepoDataSource {
   final SupabaseUserContext userContext;
   final OfflineCaching local;
-  final Map<String, _SubjectScore> _subjectScores = {};
 
   QuestionsRemoteDatasource(
     this.local, {
@@ -54,7 +53,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
         return [];
       }
       return response
-          .map((json) => QuestionsDto.fromJson(_normalizeSubject(json)))
+          .map((json) => QuestionsDto.fromJson(normalizeSubject(json)))
           .toList();
     } catch (e) {
       rethrow;
@@ -73,14 +72,14 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
 
       if (question == null) return QotdDto.fromJson({});
 
-      final questionId = _readInt(question['id']) ?? 0;
-      final quizId = _readInt(question['quiz_id']) ?? 0;
-      final choices = await _getChoicesForQuestion(questionId);
+      final questionId = readInt(question['id']) ?? 0;
+      final quizId = readInt(question['quiz_id']) ?? 0;
+      final choices = await getChoicesForQuestion(questionId);
 
       return QotdDto.fromJson({
         'quizId': quizId,
         'id': questionId,
-        'title': await _getQuizTitle(quizId),
+        'title': await getQuizTitle(quizId),
         'questionText': question['question_text'] ?? '',
         'choices': choices,
       });
@@ -110,7 +109,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
 
       if (choice == null) return answerDto;
 
-      final questionId = _readInt(choice['question_id']);
+      final questionId = readInt(choice['question_id']);
       if (questionId == null) return answerDto;
 
       final question = await _supabase
@@ -118,9 +117,9 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
           .select('quiz_id')
           .eq('id', questionId)
           .maybeSingle();
-      final quizId = _readInt(question?['quiz_id']);
-      final subjectName = quizId == null ? '' : await _getQuizTitle(quizId);
-      _recordAnswer(subjectName, choice['is_correct'] == true);
+      final quizId = readInt(question?['quiz_id']);
+      final subjectName = quizId == null ? '' : await getQuizTitle(quizId);
+      recordAnswer(subjectName, choice['is_correct'] == true);
 
       return answerDto;
     } catch (e) {
@@ -132,7 +131,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
   @override
   Future<List<QuestionsDto>> randomizeQuestion(int index) async {
     try {
-      _subjectScores.clear();
+      subjectScores.clear();
 
       final response = await _supabase
           .from('subjects')
@@ -149,9 +148,9 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
       final selectedSubjects = shuffledSubjects
           .take(min(6, shuffledSubjects.length))
           .toList();
-      final quizItems = await _buildQuizItems(selectedSubjects);
+      final quizItems = await buildQuizItems(selectedSubjects);
       final questions = selectedSubjects
-          .map((subject) => QuestionsDto.fromJson(_normalizeSubject(subject)))
+          .map((subject) => QuestionsDto.fromJson(normalizeSubject(subject)))
           .toList();
 
       debugPrint(
@@ -192,13 +191,13 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
           .eq('no_of_attempt', noOfAttempt)
           .maybeSingle();
 
-      if (attempt == null) return _emptyScoreResponse();
+      if (attempt == null) return emptyScoreResponse();
 
-      final answers = _normalizeAnswers(attempt['answer']);
-      return _scoreResponse(answers);
+      final answers = normalizeAnswers(attempt['answer']);
+      return scoreResponse(answers);
     } catch (e) {
       debugPrint(e.toString());
-      return _emptyScoreResponse();
+      return emptyScoreResponse();
     }
   }
 
@@ -211,8 +210,8 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
           .select('id')
           .eq('student_id', userId);
       final attemptNumber = previousAttempts.length + 1;
-      final answers = _currentAnswerPayload();
-      final evaluation = _evaluateMtleResult(answers);
+      final answers = currentAnswerPayload();
+      final evaluation = evaluateMtleResult(answers);
 
       await _supabase.from('quiz_attempts').insert({
         'student_id': userId,
@@ -223,7 +222,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
         'summary': answers,
       });
 
-      _subjectScores.clear();
+      subjectScores.clear();
       debugPrint('from datasource: $attemptNumber');
       return attemptNumber;
     } catch (e) {
@@ -231,290 +230,4 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
       return 0;
     }
   }
-
-  Future<List<QuizDtoItems>> _buildQuizItems(
-    List<Map<String, dynamic>> subjects,
-  ) async {
-    const totalQuestions = 20;
-    final basePerSubject = totalQuestions ~/ subjects.length;
-    final extra = totalQuestions % subjects.length;
-    final quizItems = <QuizDtoItems>[];
-
-    for (var subjectIndex = 0; subjectIndex < subjects.length; subjectIndex++) {
-      final subject = subjects[subjectIndex];
-      final subjectId = _readInt(subject['id']);
-      if (subjectId == null) continue;
-
-      final takeCount = basePerSubject + (subjectIndex < extra ? 1 : 0);
-      final quizRows = await _supabase
-          .from('quizzes')
-          .select('id, title, description, created_at, subject_id')
-          .eq('subject_id', subjectId);
-      final quizzes = quizRows
-          .map((row) => Map<String, dynamic>.from(row))
-          .toList();
-      final quizIds = quizzes
-          .map((quiz) => _readInt(quiz['id']))
-          .whereType<int>()
-          .toList();
-      if (quizIds.isEmpty) continue;
-
-      final questionRows = await _supabase
-          .from('questions')
-          .select('id, quiz_id, question_text')
-          .inFilter('quiz_id', quizIds)
-          .limit(takeCount);
-      final questions = questionRows
-          .map((row) => Map<String, dynamic>.from(row))
-          .toList();
-      final questionIds = questions
-          .map((question) => _readInt(question['id']))
-          .whereType<int>()
-          .toList();
-      final choicesByQuestion = await _getChoicesByQuestion(questionIds);
-      final questionsByQuiz = _groupQuestionsByQuiz(
-        questions,
-        choicesByQuestion,
-      );
-
-      for (final quiz in quizzes) {
-        final quizId = _readInt(quiz['id']);
-        if (quizId == null) continue;
-
-        final quizQuestions = questionsByQuiz[quizId] ?? [];
-        if (quizQuestions.isEmpty) continue;
-
-        quizItems.add(
-          QuizDtoItems.fromJson({
-            'id': quizId,
-            'title': quiz['title'] ?? '',
-            'description': quiz['description'] ?? '',
-            'createdAt': quiz['created_at'] ?? '',
-            'subjectId': _readInt(quiz['subject_id']) ?? 0,
-            'questions': quizQuestions,
-          }),
-        );
-      }
-    }
-
-    return quizItems;
-  }
-
-  Future<List<Map<String, dynamic>>> _getChoicesForQuestion(
-    int questionId,
-  ) async {
-    final rows = await _supabase
-        .from('choices')
-        .select('id, choice_text, is_correct, question_id')
-        .eq('question_id', questionId)
-        .order('id');
-
-    return rows.map((row) => _normalizeChoice(row)).toList();
-  }
-
-  Future<Map<int, List<Map<String, dynamic>>>> _getChoicesByQuestion(
-    List<int> questionIds,
-  ) async {
-    if (questionIds.isEmpty) return {};
-
-    final rows = await _supabase
-        .from('choices')
-        .select('id, choice_text, is_correct, question_id')
-        .inFilter('question_id', questionIds)
-        .order('id');
-    final grouped = <int, List<Map<String, dynamic>>>{};
-
-    for (final row in rows) {
-      final normalized = _normalizeChoice(row);
-      final questionId = _readInt(normalized['questionId']);
-      if (questionId == null) continue;
-      grouped.putIfAbsent(questionId, () => []).add(normalized);
-    }
-
-    return grouped;
-  }
-
-  Map<int, List<Map<String, dynamic>>> _groupQuestionsByQuiz(
-    List<Map<String, dynamic>> questions,
-    Map<int, List<Map<String, dynamic>>> choicesByQuestion,
-  ) {
-    final grouped = <int, List<Map<String, dynamic>>>{};
-
-    for (final question in questions) {
-      final quizId = _readInt(question['quiz_id']);
-      final questionId = _readInt(question['id']);
-      if (quizId == null || questionId == null) continue;
-
-      grouped.putIfAbsent(quizId, () => []).add({
-        'id': questionId,
-        'questionText': question['question_text'] ?? '',
-        'choices': choicesByQuestion[questionId] ?? [],
-      });
-    }
-
-    return grouped;
-  }
-
-  Future<String> _getQuizTitle(int quizId) async {
-    final quiz = await _supabase
-        .from('quizzes')
-        .select('title')
-        .eq('id', quizId)
-        .maybeSingle();
-
-    return quiz?['title']?.toString() ?? '';
-  }
-
-  Map<String, dynamic> _normalizeSubject(Map<String, dynamic> row) {
-    return {
-      ...row,
-      'courseId': row['course_id'] ?? row['courseId'] ?? 0,
-      'description': row['description'] ?? '',
-      'createdAt': row['created_at'] ?? row['createdAt'] ?? '',
-    };
-  }
-
-  Map<String, dynamic> _normalizeChoice(Map<String, dynamic> row) {
-    return {
-      'id': _readInt(row['id']) ?? 0,
-      'choiceText': row['choice_text'] ?? row['choiceText'] ?? '',
-      'is_correct': row['is_correct'] ?? row['is_correct'] ?? false,
-      'questionId': _readInt(row['question_id'] ?? row['questionId']) ?? 0,
-    };
-  }
-
-  void _recordAnswer(String subjectName, bool isCorrect) {
-    final normalizedSubject = subjectName.isEmpty ? 'Unknown' : subjectName;
-    final score = _subjectScores.putIfAbsent(
-      normalizedSubject,
-      () => _SubjectScore(),
-    );
-    score.total += 1;
-    if (isCorrect) score.correct += 1;
-  }
-
-  List<Map<String, dynamic>> _currentAnswerPayload() {
-    return _subjectScores.entries.map((entry) {
-      final score = entry.value;
-      return {
-        'is_correct': score.correct > 0,
-        'name': entry.key,
-        'score': score.rating,
-      };
-    }).toList();
-  }
-
-  List<Map<String, dynamic>> _normalizeAnswers(dynamic rawAnswer) {
-    final decoded = rawAnswer is String ? jsonDecode(rawAnswer) : rawAnswer;
-    if (decoded is! List) return [];
-
-    return decoded
-        .whereType<Map>()
-        .map((answer) => Map<String, dynamic>.from(answer))
-        .toList();
-  }
-
-  QuizScoreResponse _scoreResponse(List<Map<String, dynamic>> answers) {
-    final evaluation = _evaluateMtleResult(answers);
-
-    return QuizScoreResponse.fromJson({
-      'success': evaluation.passed,
-      'data': {
-        'score': {
-          'score': evaluation.gwa.toStringAsFixed(2),
-          'answer': jsonEncode(answers),
-          'passed': evaluation.passed,
-          'failedWeight': evaluation.failedWeight,
-          'hasMajorBelow50': evaluation.hasMajorBelow50,
-          'reasons': evaluation.reasons,
-        },
-      },
-    });
-  }
-
-  QuizScoreResponse _emptyScoreResponse() => _scoreResponse([]);
-
-  _MtleEvaluation _evaluateMtleResult(List<Map<String, dynamic>> answers) {
-    if (answers.length != 6) {
-      return _MtleEvaluation(
-        gwa: 0,
-        passed: false,
-        failedWeight: 0,
-        hasMajorBelow50: false,
-        reasons: ['Incomplete MTLE subject set'],
-      );
-    }
-
-    const weights = [20, 20, 20, 20, 10, 10];
-    const majorIndexes = {0, 1, 2, 3};
-    var weightedTotal = 0.0;
-    var failedWeight = 0.0;
-    var hasMajorBelow50 = false;
-
-    for (var answerIndex = 0; answerIndex < answers.length; answerIndex++) {
-      final score = _readDouble(answers[answerIndex]['score']);
-      final weight = weights[answerIndex].toDouble();
-      weightedTotal += score * weight;
-
-      if (score < 75) failedWeight += weight;
-      if (majorIndexes.contains(answerIndex) && score < 50) {
-        hasMajorBelow50 = true;
-      }
-    }
-
-    final gwa = double.parse((weightedTotal / 100).toStringAsFixed(2));
-    final reasons = <String>[];
-
-    if (gwa < 75) reasons.add('GWA is below 75%');
-    if (hasMajorBelow50) {
-      reasons.add('At least one major subject is below 50%');
-    }
-    if (failedWeight >= 60) {
-      reasons.add('Failed subjects reach 60% or more of total exam weight');
-    }
-
-    return _MtleEvaluation(
-      gwa: gwa,
-      passed: reasons.isEmpty,
-      failedWeight: failedWeight,
-      hasMajorBelow50: hasMajorBelow50,
-      reasons: reasons,
-    );
-  }
-
-  int? _readInt(dynamic value) {
-    if (value is int) return value;
-    if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value);
-    return null;
-  }
-
-  double _readDouble(dynamic value) {
-    if (value is num) return value.toDouble();
-    if (value is String) return double.tryParse(value) ?? 0;
-    return 0;
-  }
-}
-
-class _SubjectScore {
-  int correct = 0;
-  int total = 0;
-
-  double get rating => total == 0 ? 0 : (correct / total) * 100;
-}
-
-class _MtleEvaluation {
-  final double gwa;
-  final bool passed;
-  final double failedWeight;
-  final bool hasMajorBelow50;
-  final List<String> reasons;
-
-  const _MtleEvaluation({
-    required this.gwa,
-    required this.passed,
-    required this.failedWeight,
-    required this.hasMajorBelow50,
-    required this.reasons,
-  });
 }
