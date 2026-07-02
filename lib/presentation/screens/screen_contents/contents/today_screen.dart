@@ -16,7 +16,7 @@ class TodayScreen extends ConsumerStatefulWidget {
 }
 
 class _TodayScreenState extends ConsumerState<TodayScreen> {
-  final Set<int> _selectedIds = {};
+  final Set<String> _selectedIds = {};
   bool _isConfirming = false;
 
   Future<void> _confirmDone() async {

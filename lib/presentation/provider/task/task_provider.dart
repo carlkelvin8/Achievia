@@ -41,7 +41,7 @@ class MarkTaskDoneNotifier extends AsyncNotifier<void> {
   @override
   FutureOr<void> build() {}
 
-  Future<bool> markDone(int id) async {
+  Future<bool> markDone(String id) async {
     state = const AsyncLoading();
     final result = await AsyncValue.guard(
       () => ref.read(taskUseCaseProvider).markTaskDone(id),

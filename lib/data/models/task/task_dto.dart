@@ -12,7 +12,7 @@ class TaskDto {
   });
 
   Map<String, dynamic> toJson() => {
-        'tasks_name': tasksName,
+        'task_name': tasksName,
         'description': description,
         'deadline': deadline,
       };

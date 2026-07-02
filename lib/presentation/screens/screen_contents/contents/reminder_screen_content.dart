@@ -17,7 +17,7 @@ class ReminderScreenContent extends ConsumerStatefulWidget {
 }
 
 class _ReminderScreenContentState extends ConsumerState<ReminderScreenContent> {
-  final Set<int> _selectedIds = {};
+  final Set<String> _selectedIds = {};
   bool _isConfirming = false;
 
   Future<void> _confirmDone() async {

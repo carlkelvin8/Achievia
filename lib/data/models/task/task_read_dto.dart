@@ -1,7 +1,7 @@
 import 'package:achievia/domain/entities/api/task/task_api_entity.dart';
 
 class TaskReadDto {
-  final int id;
+  final String id;
   final String taskName;
   final String description;
   final String userId;
@@ -20,13 +20,13 @@ class TaskReadDto {
   });
 
   factory TaskReadDto.fromJson(Map<String, dynamic> json) => TaskReadDto(
-        id: json['id'] as int,
+        id: json['id'] as String,
         taskName: json['task_name'] as String,
         description: json['description'] as String,
         userId: json['user_id'] as String,
-        isDone: json['isDone'] as bool,
+        isDone: json['is_done'] as bool,
         deadline: DateTime.parse(json['deadline'] as String),
-        createdAt: DateTime.parse(json['createdAt'] as String),
+        createdAt: DateTime.parse(json['created_at'] as String),
       );
 
   TaskApiEntity toEntity() => TaskApiEntity(

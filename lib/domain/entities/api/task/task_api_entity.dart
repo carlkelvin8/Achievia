@@ -1,5 +1,5 @@
 class TaskApiEntity {
-  final int id;
+  final String id;
   final String taskName;
   final String description;
   final String userId;

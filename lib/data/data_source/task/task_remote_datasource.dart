@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 abstract class TaskDataSource {
   Future<void> createTask(TaskDto dto);
   Future<List<TaskReadDto>> getTasks();
-  Future<void> markTaskDone(int id);
+  Future<void> markTaskDone(String id);
 }
 
 @lazySingleton
@@ -27,7 +27,7 @@ class TaskRemoteDatasource implements TaskDataSource {
       'task_name': dto.tasksName,
       'description': dto.description,
       'user_id': userId,
-      'isDone': false,
+      'is_done': false,
       'deadline': dto.deadline,
     });
   }
@@ -38,25 +38,21 @@ class TaskRemoteDatasource implements TaskDataSource {
     final rows = await _supabase
         .from('tasks')
         .select(
-          'id, task_name, description, user_id, isDone, deadline, created_at',
+          'id, task_name, description, user_id, is_done, deadline, created_at',
         )
         .eq('user_id', userId)
         .order('created_at', ascending: false);
 
-    return rows.map((row) {
-      final json = Map<String, dynamic>.from(row);
-      json['createdAt'] = json['created_at'] ?? json['createdAt'];
-      return TaskReadDto.fromJson(json);
-    }).toList();
+    return rows.map((row) => TaskReadDto.fromJson(row)).toList();
   }
 
   @override
-  Future<void> markTaskDone(int id) async {
+  Future<void> markTaskDone(String id) async {
     final userId = await userContext.currentUserId();
 
     await _supabase
         .from('tasks')
-        .update({'isDone': true})
+        .update({'is_done': true})
         .eq('id', id)
         .eq('user_id', userId);
   }

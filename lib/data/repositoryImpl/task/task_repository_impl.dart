@@ -25,5 +25,5 @@ class TaskRepositoryImpl implements TaskRepository {
   }
 
   @override
-  Future<void> markTaskDone(int id) => datasource.markTaskDone(id);
+  Future<void> markTaskDone(String id) => datasource.markTaskDone(id);
 }

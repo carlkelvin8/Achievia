@@ -13,5 +13,5 @@ class TaskUseCase {
 
   Future<List<TaskApiEntity>> getTasks() => repository.getTasks();
 
-  Future<void> markTaskDone(int id) => repository.markTaskDone(id);
+  Future<void> markTaskDone(String id) => repository.markTaskDone(id);
 }
