@@ -1,5 +1,5 @@
 import 'package:achievia/core/utils/formatters.dart';
-import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/domain/entities/api/auth/user_entity.dart';
 import 'package:achievia/presentation/widgets/banners/build_banner.dart';
 import 'package:achievia/presentation/widgets/cards/question_of_the_day_card.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +18,8 @@ class HomeScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final qotd = ref.watch(qotdProvider);
     final goal = ref.watch(goalProvider);
+    final topMockboards = ref.watch(topMockboardAchieviansProvider);
+    final topStreaks = ref.watch(topStreakAchieviansProvider);
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -61,25 +63,90 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              const SectionLabel(title: 'Top 10 Achievans on Mock Boards'),
-              HorizontalCardList(
-                itemCount: mockTopAchievians.length,
-                itemBuilder: (context, index) => RankedProfileCard(
-                  rank: index + 1,
-                  mockProfile: mockTopAchievians[index],
-                ),
+              _LeaderboardSection(
+                title: 'Top 10 Achievians on Mock Boards',
+                entries: topMockboards,
               ),
               const SizedBox(height: 8),
-              const SectionLabel(title: "July's Top 10 Streak Achievans"),
-              HorizontalCardList(
-                itemCount: mockTopStreakAchievians.length,
-                itemBuilder: (context, index) => RankedProfileCard(
-                  rank: index + 1,
-                  mockProfile: mockTopStreakAchievians[index],
-                ),
+              _LeaderboardSection(
+                title: "This Month's Top 10 Streak Achievians",
+                entries: topStreaks,
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LeaderboardSection extends StatelessWidget {
+  final String title;
+  final AsyncValue<List<UserEntity>> entries;
+
+  const _LeaderboardSection({required this.title, required this.entries});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionLabel(title: title),
+        entries.when(
+          data: (users) {
+            if (users.isEmpty) {
+              return const _LeaderboardMessage(message: 'No rankings yet');
+            }
+
+            return HorizontalCardList(
+              itemCount: users.length,
+              itemBuilder: (context, index) =>
+                  RankedProfileCard(rank: index + 1, mockProfile: users[index]),
+            );
+          },
+          loading: () => const _LeaderboardMessage(
+            message: 'Loading rankings...',
+            showLoader: true,
+          ),
+          error: (_, __) =>
+              const _LeaderboardMessage(message: 'Unable to load rankings'),
+        ),
+      ],
+    );
+  }
+}
+
+class _LeaderboardMessage extends StatelessWidget {
+  final String message;
+  final bool showLoader;
+
+  const _LeaderboardMessage({required this.message, this.showLoader = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return SizedBox(
+      height: 72,
+      child: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (showLoader) ...[
+              const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              const SizedBox(width: 8),
+            ],
+            Text(
+              message,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         ),
       ),
     );
