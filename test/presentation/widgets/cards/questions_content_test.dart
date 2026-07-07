@@ -85,4 +85,52 @@ void main() {
       expect(find.byType(Scrollable), findsOneWidget);
     },
   );
+  testWidgets('shows visible red and green feedback after answering', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: QuestionsContent(
+            questionText: 'Question',
+            choices: [
+              ChoiceEntity(
+                id: 1,
+                choiceText: 'Wrong answer',
+                isCorrect: false,
+                questiondId: 10,
+              ),
+              ChoiceEntity(
+                id: 2,
+                choiceText: 'Correct answer',
+                isCorrect: true,
+                questiondId: 10,
+              ),
+            ],
+            selectedIndex: 0,
+            onSelect: (_) {},
+          ),
+        ),
+      ),
+    );
+
+    final wrongDecoration =
+        tester
+                .widget<AnimatedContainer>(
+                  find.byKey(const ValueKey('choice-feedback-0')),
+                )
+                .decoration
+            as BoxDecoration;
+    final correctDecoration =
+        tester
+                .widget<AnimatedContainer>(
+                  find.byKey(const ValueKey('choice-feedback-1')),
+                )
+                .decoration
+            as BoxDecoration;
+
+    expect(wrongDecoration.color, isNotNull);
+    expect(correctDecoration.color, isNotNull);
+    expect(wrongDecoration.color, isNot(correctDecoration.color));
+  });
 }

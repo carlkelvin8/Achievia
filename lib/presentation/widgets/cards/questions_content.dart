@@ -68,28 +68,51 @@ class _QuestionsContentState extends State<QuestionsContent> {
 
             Color? textColor;
             FontWeight? font;
+            Color? feedbackColor;
+            Color? feedbackBorderColor;
             if (selectedIndex != null) {
               if (choice.isCorrect) {
-                textColor = Colors.green;
+                textColor = Colors.green.shade800;
                 font = FontWeight.bold;
+                feedbackColor = Colors.green.withValues(alpha: 0.12);
+                feedbackBorderColor = Colors.green.shade600;
               } else if (isSelected) {
-                textColor = Colors.red;
+                textColor = Colors.red.shade800;
                 font = FontWeight.bold;
+                feedbackColor = Colors.red.withValues(alpha: 0.12);
+                feedbackBorderColor = Colors.red.shade600;
               }
             }
 
             return AnimatedOpacity(
               duration: const Duration(milliseconds: 150),
-              opacity: isAnswered && !isSelected ? 0.65 : 1,
-              child: RadioListTile<int>(
-                value: index,
-                // ignore: deprecated_member_use
-                groupValue: selectedIndex,
-                // ignore: deprecated_member_use
-                onChanged: isAnswered ? null : _handleSelect,
-                title: Html(
-                  data: unescape.convert(choice.choiceText),
-                  style: {'p': Style(fontWeight: font, color: textColor)},
+              opacity: isAnswered && !isSelected && !choice.isCorrect
+                  ? 0.65
+                  : 1,
+              child: AnimatedContainer(
+                key: ValueKey('choice-feedback-$index'),
+                duration: const Duration(milliseconds: 150),
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                decoration: BoxDecoration(
+                  color: feedbackColor,
+                  borderRadius: BorderRadius.circular(10),
+                  border: feedbackBorderColor == null
+                      ? null
+                      : Border.all(color: feedbackBorderColor, width: 1.5),
+                ),
+                child: RadioListTile<int>(
+                  value: index,
+                  // ignore: deprecated_member_use
+                  groupValue: selectedIndex,
+                  // ignore: deprecated_member_use
+                  onChanged: isAnswered ? null : _handleSelect,
+                  title: Html(
+                    data: unescape.convert(choice.choiceText),
+                    style: {
+                      '*': Style(fontWeight: font, color: textColor),
+                      'p': Style(fontWeight: font, color: textColor),
+                    },
+                  ),
                 ),
               ),
             );

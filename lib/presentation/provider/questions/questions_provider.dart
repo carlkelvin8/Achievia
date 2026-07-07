@@ -2,6 +2,8 @@
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/core/network/offline_caching.dart';
+import 'package:achievia/core/utils/questions_helpers.dart';
+import 'package:achievia/domain/entities/api/home/mockboard_paused_entity.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/entities/api/home/results_entity.dart';
@@ -21,6 +23,7 @@ final getQuestions = Provider<QuestionsUseCase>((ref) {
 final getOfflineCache = Provider<OfflineCaching>((ref) {
   return sl.get<OfflineCaching>();
 });
+final useCase = Provider<QuestionsUseCase>((ref) => sl<QuestionsUseCase>());
 
 final getQuestionsProviderState = FutureProvider<List<QuestionsEntity>>((
   ref,
@@ -39,7 +42,7 @@ final getResultsProviderState = FutureProvider.family<QuizScoreEntity?, int>((
   attemptNo,
 ) async {
   final gtQuestions = ref.read(getQuestions);
-  print('from $attemptNo');
+  debugPrint('from $attemptNo');
   try {
     final result = await gtQuestions.getGWA(attemptNo);
     return result;
@@ -50,7 +53,7 @@ final getResultsProviderState = FutureProvider.family<QuizScoreEntity?, int>((
 
 final getQoty = FutureProvider<QotyEntity>((ref) async {
   final gtQuestions = ref.read(getQuestions);
-  print(await gtQuestions.getQotQueston());
+  debugPrint((await gtQuestions.getQotQueston()).toString());
   return await gtQuestions.getQotQueston();
 });
 
@@ -58,10 +61,10 @@ final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref) async {
   final gtQuestions = ref.read(getOfflineCache);
   try {
     final result = await gtQuestions.getQuestionsFromCache();
-    print(result);
+    debugPrint(result.toString());
     return result.map((e) => e.toEntity()).toList();
   } catch (e) {
-    print(e);
+    debugPrint(e.toString());
     rethrow;
   }
 });
@@ -70,10 +73,10 @@ final getGeneratedQuestions = FutureProvider<List<QuizItemEntity>>((ref) async {
   final gtQuestions = ref.read(getQuestions);
   try {
     final results = await gtQuestions.getGeneratedQuestions();
-    print(results);
+    debugPrint(results.toString());
     return results;
   } catch (e) {
-    print(e);
+    debugPrint(e.toString());
     rethrow;
   }
 });
@@ -145,8 +148,39 @@ class OuterPageControllerProvider extends Notifier<PageController> {
   }
 }
 
+class ResumeExam extends Notifier<ResumeQuestionState> {
+  late final QuestionsUseCase _useCase;
+  @override
+  ResumeQuestionState build() {
+    _useCase = ref.read(useCase);
+    return ResumeQuestionState(
+      isLoading: false,
+      isFetching: false,
+      currentPage: 0,
+    );
+  }
+
+  Future<void> resumeExam(int quizId, double currentPage) async {
+    try {
+      final entity = MockboardPausedEntity(
+        id: '',
+        user_id: '',
+        quiz_id: quizId,
+        current_page: currentPage,
+        created_at: '',
+        updated_at: '',
+      );
+
+      await _useCase.upsertContinueExam(entity);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+}
+
 class PageControllerProvider extends Notifier<PageController> {
   late final QuestionsUseCase useCases;
+  bool _isSubmitting = false;
   @override
   PageController build() {
     useCases = ref.read(getQuestions);
@@ -157,11 +191,17 @@ class PageControllerProvider extends Notifier<PageController> {
 
   Future<void> next(BuildContext context, int length, int currentIndex) async {
     if (currentIndex >= length - 1) {
-      final attemptId = await useCases.submitQuiz();
-      await useCases.getGWA(attemptId);
-      ref.read(attemptIdProvider.notifier).state = attemptId;
-      // ignore: use_build_context_synchronously
-      context.push(RouteConstants.attemptScreen, extra: attemptId);
+      if (_isSubmitting) return;
+      _isSubmitting = true;
+      try {
+        final attemptId = await useCases.submitQuiz();
+        await useCases.getGWA(attemptId);
+        ref.read(attemptIdProvider.notifier).state = attemptId;
+        if (!context.mounted) return;
+        context.go(RouteConstants.attemptScreen, extra: attemptId);
+      } finally {
+        _isSubmitting = false;
+      }
       return;
     }
     if (!_isAttached) return;
@@ -253,6 +293,13 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier> {
       student_id: state.student_id,
     );
     await useCase.answerQuestion(entity);
+  }
+
+  void recordMockBoardAnswer({
+    required String subjectName,
+    required bool isCorrect,
+  }) {
+    recordAnswer(subjectName, isCorrect);
   }
 
   Future<void> randomizeQuestion(int index, BuildContext context) async {

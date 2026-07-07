@@ -1,5 +1,6 @@
 import 'package:achievia/data/repositoryImpl/questions/qot_repository_impl.dart';
 import 'package:achievia/data/repositoryImpl/questions/questions_repository_impl.dart';
+import 'package:achievia/domain/entities/api/home/mockboard_paused_entity.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/entities/api/home/results_entity.dart';
@@ -26,4 +27,6 @@ class QuestionsUseCase {
   Future<QuizScoreEntity?> getGWA(int noOfAttempt) async =>
       await impl.getQuizScores(noOfAttempt);
   Future<int> submitQuiz() async => await impl.submitQuiz();
+  Future<MockboardPausedEntity> upsertContinueExam(MockboardPausedEntity entity) async => await impl.continueQuizRepository(entity);
+  Future<MockboardPausedEntity> getContinueExam(MockboardPausedEntity entity) async => await impl.continuegetQuizRepository(entity);
 }

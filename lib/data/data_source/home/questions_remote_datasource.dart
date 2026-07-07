@@ -1,8 +1,10 @@
 import 'dart:math';
 
 import 'package:achievia/core/network/offline_caching.dart';
+import 'package:achievia/core/utils/guards.dart';
 import 'package:achievia/core/utils/questions_helpers.dart';
 import 'package:achievia/data/data_source/supabase_user_context.dart';
+import 'package:achievia/data/models/quiz/mockboards_paused_dto.dart';
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
 import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
@@ -20,6 +22,8 @@ abstract class QuestionRepoDataSource {
   Future<List<QuestionsDto>> randomizeQuestion(int index);
   Future<QuizScoreResponse> getResults(int noOfAttempt);
   Future<int> putToAttempt();
+  Future<MockboardsPausedDto> upsertPaused(MockboardsPausedDto dto);
+  Future<MockboardsPausedDto> getCurrentPaused(MockboardsPausedDto dto);
 }
 
 @lazySingleton
@@ -164,7 +168,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
       return questions;
     } catch (e) {
       debugPrint("Exception: $e");
-      return [];
+      rethrow;
     }
   }
 
@@ -228,6 +232,40 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
     } catch (e) {
       debugPrint("Exception: $e");
       return 0;
+    }
+  }
+
+  @override
+  Future<MockboardsPausedDto> upsertPaused(MockboardsPausedDto dto) async {
+    try {
+      final id = await guardFunction();
+      final response = await _supabase
+          .from('mockboards_paused')
+          .upsert({...dto.toJson(), 'user_id': id['user_id']})
+          .eq('user_id', id['user_id'])
+          .maybeSingle();
+      return MockboardsPausedDto.fromJson(response ?? {});
+    } on PostgrestException catch (e) {
+      debugPrint(e.toString());
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<MockboardsPausedDto> getCurrentPaused(MockboardsPausedDto dto) async {
+    try {
+      final guard = await guardFunction();
+      final response = await _supabase
+          .from('mockboards_paused')
+          .select('*')
+          .eq('user_id', guard['user_id'])
+          .maybeSingle();
+      if (response!.isEmpty) {
+        return MockboardsPausedDto.fromJson({});
+      }
+      return MockboardsPausedDto.fromJson(response);
+    } on PostgrestException catch (e) {
+      throw Exception(e);
     }
   }
 }

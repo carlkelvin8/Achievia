@@ -9,9 +9,9 @@ class MockboardDynamicCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(getRandomQ);
+    final provider = ref.watch(getGeneratedQuestions);
     return provider.when(
-      data: (question) {
+      data: (sections) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -28,7 +28,7 @@ class MockboardDynamicCard extends ConsumerWidget {
               color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(12),
-                child: question.isEmpty
+                child: sections.isEmpty
                     ? Text(
                         'No subjects generated yet',
                         style: GoogleFonts.poppins(
@@ -41,7 +41,7 @@ class MockboardDynamicCard extends ConsumerWidget {
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemBuilder: (context, index) => Text(
-                          '${index + 1}. ${question[index].title}',
+                          '${index + 1}. ${sections[index].title}',
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
@@ -49,7 +49,7 @@ class MockboardDynamicCard extends ConsumerWidget {
                           ),
                         ),
                         separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemCount: question.length,
+                        itemCount: sections.length,
                       ),
               ),
             ),
@@ -61,3 +61,4 @@ class MockboardDynamicCard extends ConsumerWidget {
     );
   }
 }
+

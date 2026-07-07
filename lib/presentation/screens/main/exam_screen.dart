@@ -19,7 +19,10 @@ class ExamScreen extends ConsumerStatefulWidget {
 }
 
 class _ExamScreenState extends ConsumerState<ExamScreen> {
-  final Map<int, int> selectedAnswers = {};
+  final Map<String, int> selectedAnswers = {};
+
+  String _answerKey(QuizItemEntity batch, QuestionItemEntity question) =>
+      '${batch.id}:${question.id}';
 
   void _resetQuestionPage(
     PageController controller,
@@ -46,12 +49,18 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
 
         final timerNotifier = ref.read(timerProvider.notifier);
 
+        final isLastBatch = safeIndex >= quizBatches.length - 1;
         await pageControllerNotifier.next(
           // ignore: use_build_context_synchronously
           context,
           quizBatches.length,
           safeIndex,
         );
+
+        if (isLastBatch) {
+          timerNotifier.pause();
+          return;
+        }
 
         timerNotifier.reset();
         timerNotifier.start();
@@ -95,8 +104,11 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
         : currentBatch.questions
               .where((question) => isAnsweredWatch.contains(question.id))
               .length;
+    final currentAnswerKey = currentBatch != null && currentQuestion != null
+        ? _answerKey(currentBatch, currentQuestion)
+        : null;
     final isCurrentQuestionAnswered =
-        currentQuestion != null && selectedAnswers[currentQuestion.id] != null;
+        currentAnswerKey != null && selectedAnswers[currentAnswerKey] != null;
     return Scaffold(
       appBar: ExamAppBar(
         callBackQuit: () {
@@ -179,19 +191,24 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                               itemBuilder: (context, questionIndex) {
                                 final question = batch.questions[questionIndex];
 
+                                final answerKey = _answerKey(batch, question);
+
                                 return QuestionsContent(
+                                  key: ValueKey('question-content-$answerKey'),
                                   questionText:
                                       '${questionIndex + 1}. ${question.questionText}',
                                   choices: question.choices,
-                                  selectedIndex: selectedAnswers[question.id],
+                                  selectedIndex: selectedAnswers[answerKey],
                                   onSelect: (v) async {
                                     if (v != null) {
                                       isAnswered.isAnswered(question.id);
                                       setState(() {
-                                        selectedAnswers[question.id] = v;
+                                        selectedAnswers[answerKey] = v;
                                       });
-                                      await answerQuestion.answerQuestion(
-                                        question.choices[v].choiceText,
+                                      answerQuestion.recordMockBoardAnswer(
+                                        subjectName: batch.title,
+                                        isCorrect:
+                                            question.choices[v].isCorrect,
                                       );
                                     }
                                   },
@@ -270,23 +287,24 @@ class _ExamScreenState extends ConsumerState<ExamScreen> {
                           return;
                         }
 
+                        final isLastBatch = safeIndex >= quizBatches.length - 1;
+                        if (isLastBatch) {
+                          timerNotifier.pause();
+                        }
+
                         await pageControllerNotifier.next(
                           context,
                           quizBatches.length,
                           safeIndex,
                         );
 
-                        if (safeIndex >= quizBatches.length - 1) {
+                        if (isLastBatch) {
                           isAnswered.resetState();
-                          setState(() {
-                            selectedAnswers.clear();
-                          });
-                          _resetQuestionPage(
-                            pageControllerOuterState,
-                            indexOuter,
-                          );
-                          timerNotifier.reset();
-                          timerNotifier.start();
+                          if (mounted) {
+                            setState(() {
+                              selectedAnswers.clear();
+                            });
+                          }
                           return;
                         }
 

@@ -194,7 +194,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
 String? _redirectForAuth(BuildContext context, GoRouterState state) {
   final session = Supabase.instance.client.auth.currentSession;
-  final isLoggedIn = session != null;
+  final isLoggedIn = session?.isExpired;
 
   final location = state.uri.path;
 
@@ -207,11 +207,11 @@ String? _redirectForAuth(BuildContext context, GoRouterState state) {
 
   final isAuthRoute = authRoutes.contains(location);
 
-  if (!isLoggedIn && !isAuthRoute) {
+  if (isLoggedIn! && session == null && !isAuthRoute) {
     return RouteConstants.login;
   }
 
-  if (isLoggedIn && isAuthRoute && location != RouteConstants.forgotPassword) {
+  if (!isLoggedIn && isAuthRoute && location != RouteConstants.forgotPassword) {
     return RouteConstants.main;
   }
 

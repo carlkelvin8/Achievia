@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/domain/use_cases/questions/questions_use_case.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/domain/entities/widgets/pomodoro_settings_entity.dart';
 import 'package:achievia/domain/entities/widgets/pomodoro_state_entity.dart';
 const Duration fixedTimerDuration = Duration(hours: 120);
 const Duration minTimer = Duration(seconds: 10);
-
+final useCase = Provider<QuestionsUseCase>((ref) => sl<QuestionsUseCase>());
 class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
   @override
   PomodoroSettingsEntity build() {
