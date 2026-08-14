@@ -8,6 +8,10 @@ class RouteConstants {
   static const String reviewers = '/main/reviewers';
   static const String motherNotes = '/reviewers/mother-notes';
   static const String questionBank = '/reviewers/question-bank';
+  static const String questionBankSubjects = '/question-bank/subjects';
+  static const String questionBankTopics = '/question-bank/topics';
+  static const String questionBankPractice = '/question-bank/practice';
+  static const String questionBankResults = '/question-bank/results';
   static const String supplementals = '/reviewers/supplementals';
   static const String messages = '/main/messages';
   static const String home = '/main/home';

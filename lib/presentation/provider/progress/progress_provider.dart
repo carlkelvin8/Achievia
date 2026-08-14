@@ -10,7 +10,9 @@ final progressUseCaseProvider = Provider<ProgressUseCase>((ref) {
   return sl<ProgressUseCase>();
 });
 
-final progressProvider = FutureProvider.autoDispose<ProgressEntity>((ref) async {
+final progressProvider = FutureProvider.autoDispose<ProgressEntity>((
+  ref,
+) async {
   final token = ref.watch(tokenStream).value;
   if (token == null || token.isEmpty) {
     return demoProgressData;
@@ -54,7 +56,7 @@ final progressProvider = FutureProvider.autoDispose<ProgressEntity>((ref) async 
       days: days,
     ),
   );
-});
+}, retry: (_, _) => null);
 
 List<CalendarDay> _buildCalendarDays({
   required DateTime startDate,

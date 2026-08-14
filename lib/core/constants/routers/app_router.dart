@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/domain/entities/api/chat/chat_conversation_entity.dart';
+import 'package:achievia/domain/entities/api/reviewer/question_bank_entity.dart';
 import 'package:achievia/presentation/screens/auth/forgot_password_screen_handler.dart';
 import 'package:achievia/presentation/screens/auth/login_screen.dart';
 import 'package:achievia/presentation/screens/auth/signup_screen.dart';
@@ -19,6 +20,10 @@ import 'package:achievia/presentation/screens/main/reviewers_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/reviewer_category_screen.dart';
 import 'package:achievia/presentation/screens/main/summary_screen.dart';
 import 'package:achievia/presentation/screens/notifications/notifications_screen.dart';
+import 'package:achievia/presentation/screens/question_bank/question_bank_subjects_screen.dart';
+import 'package:achievia/presentation/screens/question_bank/question_bank_topics_screen.dart';
+import 'package:achievia/presentation/screens/question_bank/question_bank_practice_screen.dart';
+import 'package:achievia/presentation/screens/question_bank/question_bank_result_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/completed_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/new_reminder_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/reminder_screen_content.dart';
@@ -93,6 +98,40 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteConstants.questionBank,
         builder: (_, _) => const QuestionBankScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.questionBankSubjects,
+        builder: (_, _) => const QuestionBankSubjectsScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.questionBankTopics,
+        builder: (context, state) {
+          final extra = state.extra;
+          if (extra is QuestionBankTopicArgs) {
+            return QuestionBankTopicsScreen(subject: extra.subject);
+          }
+          return _missingQuestionBankRoute(context);
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.questionBankPractice,
+        builder: (context, state) {
+          final extra = state.extra;
+          if (extra is QuestionBankPracticeArgs) {
+            return QuestionBankPracticeScreen(selection: extra.selection);
+          }
+          return _missingQuestionBankRoute(context);
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.questionBankResults,
+        builder: (context, state) {
+          final extra = state.extra;
+          if (extra is QuestionBankResultArgs) {
+            return QuestionBankResultScreen(args: extra);
+          }
+          return _missingQuestionBankRoute(context);
+        },
       ),
       GoRoute(
         path: RouteConstants.supplementals,
@@ -216,6 +255,25 @@ String? _redirectForAuth(BuildContext context, GoRouterState state) {
   }
 
   return null;
+}
+
+Widget _missingQuestionBankRoute(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(title: const Text('Question Bank')),
+    body: Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('Content unavailable'),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: () => context.go(RouteConstants.questionBankSubjects),
+            child: const Text('Back to subjects'),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _GoRouterRefreshStream extends ChangeNotifier {

@@ -63,14 +63,16 @@ class ReviewerCategoryCard extends StatelessWidget {
                         color: theme.colorScheme.onSurface,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                        height: 1.25,
+                    if (subtitle.trim().isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          height: 1.25,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),

@@ -330,7 +330,7 @@ final List<QuestionsEntityWidget> questions = [
     label: 'Question Bank',
     sub_label:
         'A comprehensive collection of board exam–style questions designed to cover all major topics, helping you practice, assess your understanding, and prepare effectively for the actual exam.',
-    callback: (context) => context.push(RouteConstants.onboardingQuestions),
+    callback: (context) => context.push(RouteConstants.questionBankSubjects),
   ),
   QuestionsEntityWidget(
     icon: Icons.edit_document,
