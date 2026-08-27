@@ -1,13 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/di/injection.dart';
-import 'package:achievia/core/network/offline_caching.dart';
 import 'package:achievia/core/utils/questions_helpers.dart';
 import 'package:achievia/domain/entities/api/home/mockboard_paused_entity.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/entities/api/home/results_entity.dart';
 import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
+import 'package:achievia/domain/entities/widgets/examination_results_entity.dart';
 import 'package:achievia/domain/use_cases/questions/questions_use_case.dart';
 import 'package:achievia/presentation/provider/questions/questions_state.dart';
 import 'package:achievia/presentation/widgets/dialogs/loading_dialog.dart';
@@ -20,9 +20,6 @@ final getQuestions = Provider<QuestionsUseCase>((ref) {
   return sl.get<QuestionsUseCase>();
 });
 
-final getOfflineCache = Provider<OfflineCaching>((ref) {
-  return sl.get<OfflineCaching>();
-});
 final useCase = Provider<QuestionsUseCase>((ref) => sl<QuestionsUseCase>());
 
 final getQuestionsProviderState = FutureProvider<List<QuestionsEntity>>((
@@ -51,22 +48,16 @@ final getResultsProviderState = FutureProvider.family<QuizScoreEntity?, int>((
   }
 });
 
+final recentMockBoardResultsProvider = FutureProvider<List<ExaminationResult>>((
+  ref,
+) {
+  return ref.read(getQuestions).getRecentAttemptResults();
+});
+
 final getQoty = FutureProvider<QotyEntity>((ref) async {
   final gtQuestions = ref.read(getQuestions);
   debugPrint((await gtQuestions.getQotQueston()).toString());
   return await gtQuestions.getQotQueston();
-});
-
-final getRandomQ = FutureProvider<List<QuestionsEntity>>((ref) async {
-  final gtQuestions = ref.read(getOfflineCache);
-  try {
-    final result = await gtQuestions.getQuestionsFromCache();
-    debugPrint(result.toString());
-    return result.map((e) => e.toEntity()).toList();
-  } catch (e) {
-    debugPrint(e.toString());
-    rethrow;
-  }
 });
 
 final getGeneratedQuestions = FutureProvider<List<QuizItemEntity>>((ref) async {
@@ -306,6 +297,7 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier> {
     state = state.copyWith(isLoading: true);
     await showDialog(context, false);
     await useCase.randomizeQuestions(index);
+    ref.invalidate(getGeneratedQuestions);
     if (context.mounted) context.pop();
     state = state.copyWith(isLoading: false);
   }

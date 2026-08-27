@@ -1,5 +1,6 @@
 import 'package:achievia/data/data_source/progress/progress_remote_datasource.dart';
 import 'package:achievia/domain/entities/api/progress/progress_day_entity.dart';
+import 'package:achievia/data/models/progress/progress_snapshot_dto.dart';
 import 'package:achievia/domain/repository/progress/progress_repository.dart';
 import 'package:injectable/injectable.dart';
 
@@ -18,4 +19,7 @@ class ProgressRepositoryImpl implements ProgressRepository {
     final dtos = await datasource.getActiveDays();
     return dtos.map((e) => e.toEntity()).toList();
   }
+
+  @override
+  Future<ProgressSnapshotDto> getSnapshot() => datasource.getSnapshot();
 }

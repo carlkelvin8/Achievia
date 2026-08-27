@@ -13,41 +13,46 @@ class SupplementalsContentScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(supplementalsProvider);
+    final stateAsync = ref.watch(supplementalsProvider);
     final notifier = ref.read(supplementalsProvider.notifier);
 
     return Scaffold(
-      body: SafeArea(
-        top: false,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
-          children: [
-            SupplementalSearchBar(
-              controller: notifier.searchController,
-              onChanged: notifier.setQuery,
-            ),
-            const SizedBox(height: 10),
-            SupplementalFilterChips(
-              activeFilter: state.filter,
-              onSelected: notifier.setFilter,
-            ),
-            const SizedBox(height: 18),
-            if (state.shouldShow(SupplementalFilter.mnemonics))
-              SupplementalSection(
-                title: 'Mnemonics',
-                child: MnemonicGrid(items: state.visibleMnemonics()),
+      body: stateAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) =>
+            Center(child: Text('Unable to load study aids: $error')),
+        data: (state) => SafeArea(
+          top: false,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
+            children: [
+              SupplementalSearchBar(
+                controller: notifier.searchController,
+                onChanged: notifier.setQuery,
               ),
-            if (state.shouldShow(SupplementalFilter.abbreviations))
-              SupplementalSection(
-                title: 'Abbreviations',
-                child: AbbreviationList(items: state.visibleAbbreviations()),
+              const SizedBox(height: 10),
+              SupplementalFilterChips(
+                activeFilter: state.filter,
+                onSelected: notifier.setFilter,
               ),
-            if (state.shouldShow(SupplementalFilter.procedures))
-              SupplementalSection(
-                title: 'Procedures',
-                child: ProcedureGrid(items: state.visibleProcedures()),
-              ),
-          ],
+              const SizedBox(height: 18),
+              if (state.shouldShow(SupplementalFilter.mnemonics))
+                SupplementalSection(
+                  title: 'Mnemonics',
+                  child: MnemonicGrid(items: state.visibleMnemonics()),
+                ),
+              if (state.shouldShow(SupplementalFilter.abbreviations))
+                SupplementalSection(
+                  title: 'Abbreviations',
+                  child: AbbreviationList(items: state.visibleAbbreviations()),
+                ),
+              if (state.shouldShow(SupplementalFilter.procedures))
+                SupplementalSection(
+                  title: 'Procedures',
+                  child: ProcedureGrid(items: state.visibleProcedures()),
+                ),
+            ],
+          ),
         ),
       ),
     );

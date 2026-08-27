@@ -1,11 +1,13 @@
 import 'package:achievia/data/data_source/supabase_user_context.dart';
 import 'package:achievia/data/models/progress/progress_day_dto.dart';
+import 'package:achievia/data/models/progress/progress_snapshot_dto.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class ProgressDataSource {
   Future<void> markTodayActive();
   Future<List<ProgressDayDto>> getActiveDays();
+  Future<ProgressSnapshotDto> getSnapshot();
 }
 
 @lazySingleton
@@ -47,5 +49,33 @@ class ProgressRemoteDatasource implements ProgressDataSource {
     return rows
         .map((item) => ProgressDayDto.fromJson(Map<String, dynamic>.from(item)))
         .toList();
+  }
+
+  @override
+  Future<ProgressSnapshotDto> getSnapshot() async {
+    final userId = await userContext.currentUserId();
+    final results = await Future.wait<dynamic>([
+      getActiveDays(),
+      _supabase
+          .from('quiz_attempts')
+          .select('score, answer, summary, attempted_at, no_of_attempt')
+          .eq('student_id', userId)
+          .order('attempted_at'),
+      _supabase
+          .from('study_sessions')
+          .select('started_at, ended_at, duration_minutes, session_type')
+          .eq('user_id', userId)
+          .order('started_at'),
+    ]);
+
+    return ProgressSnapshotDto(
+      activeDays: results[0] as List<ProgressDayDto>,
+      quizAttempts: (results[1] as List)
+          .map((row) => Map<String, dynamic>.from(row))
+          .toList(),
+      studySessions: (results[2] as List)
+          .map((row) => Map<String, dynamic>.from(row))
+          .toList(),
+    );
   }
 }

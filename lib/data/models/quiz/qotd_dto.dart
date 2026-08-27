@@ -1,7 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-import 'dart:convert';
-
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -24,7 +22,8 @@ class QotdDto {
     this.questions,
   });
 
-  factory QotdDto.fromJson(Map<String, dynamic> json) => _$QotdDtoFromJson(json);
+  factory QotdDto.fromJson(Map<String, dynamic> json) =>
+      _$QotdDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$QotdDtoToJson(this);
 
@@ -45,17 +44,4 @@ class QotdDto {
     questionText: entity.questionText,
     choices: entity.choices,
   );
-}
-
-extension QotdDtoSqflite on QotdDto {
-  Map<String, Object?> toSqliteMap() {
-    return {
-      'id': id,
-      'quizId': quizId,
-      'questionText': questionText,
-      'choices': jsonEncode(choices),
-      "title": title,
-      'questions': questions != null ? jsonEncode(questions) : null,
-    };
-  }
 }

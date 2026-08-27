@@ -2,27 +2,18 @@ import 'package:achievia/domain/entities/api/auth/user_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/domain/entities/widgets/qotd_entity.dart';
 import 'package:achievia/domain/entities/widgets/goal_entity.dart';
+import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/domain/use_cases/home/goal_use_case.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class QotdNotifier extends Notifier<QotdEntity> {
   @override
   QotdEntity build() {
-    // Seed with previous hard-coded demo data
-    return const QotdEntity(
-      id: 'qotd-2025-07-05',
-      question:
-          'What conditions are associated with a secretory defect in bilirubin metabolism?',
-      options: [
-        'Physiologic jaundice of the newborn',
-        'Dubin-Johnson syndrome and Rotor syndrome',
-        'Crigler-Najjar syndrome',
-        'Gilbert syndrome',
-      ],
-    );
+    return const QotdEntity(id: '', question: '', options: []);
   }
 
   void selectOption(int index) {
-    if (index < 0 || index >= state.options.length) return;
+    if (index < 0) return;
     state = state.copyWith(selectedIndex: index);
   }
 
@@ -35,24 +26,21 @@ final qotdProvider = NotifierProvider<QotdNotifier, QotdEntity>(
   () => QotdNotifier(),
 );
 
-class GoalNotifier extends Notifier<GoalEntity> {
+class GoalNotifier extends AsyncNotifier<GoalEntity?> {
   @override
-  GoalEntity build() {
-    return GoalEntity(
-      id: 'goal-2025-07-05',
-      date: DateTime(2025, 7, 5),
-      title: 'Hematology topic 1',
-      details: 'Page 1 - page 12\nJuly 5, 2025',
-      isChecked: false,
-    );
+  Future<GoalEntity?> build() {
+    return sl<GoalUseCase>().getTodayGoal();
   }
 
-  void toggleChecked() {
-    state = state.copyWith(isChecked: !state.isChecked);
+  Future<void> toggleChecked() async {
+    final goal = state.value;
+    if (goal == null) return;
+    await sl<GoalUseCase>().setChecked(goal.id, !goal.isChecked);
+    ref.invalidateSelf();
   }
 }
 
-final goalProvider = NotifierProvider<GoalNotifier, GoalEntity>(
+final goalProvider = AsyncNotifierProvider<GoalNotifier, GoalEntity?>(
   () => GoalNotifier(),
 );
 

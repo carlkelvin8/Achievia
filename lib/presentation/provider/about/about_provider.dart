@@ -1,13 +1,12 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/domain/entities/widgets/author_entity.dart';
+import 'package:achievia/domain/use_cases/about/author_use_case.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Author items provider
-final authorItemsProvider = Provider<List<AuthorEntity>>((ref) {
-  return demoAuthorItems;
+final authorItemsProvider = FutureProvider<List<AuthorEntity>>((ref) {
+  return sl<AuthorUseCase>().getAuthors();
 });
 
-// Expandable items state for Achievia screen
 class ExpandableItemsState {
   final Map<int, bool> expandedItems;
 
@@ -22,9 +21,8 @@ class ExpandableItemsState {
 
 class ExpandableItemsNotifier extends Notifier<ExpandableItemsState> {
   @override
-  ExpandableItemsState build() {
-    return ExpandableItemsState(expandedItems: {0: true});
-  }
+  ExpandableItemsState build() =>
+      const ExpandableItemsState(expandedItems: {0: true});
 
   void toggleExpanded(int index) {
     final newState = Map<int, bool>.from(state.expandedItems);
@@ -41,5 +39,5 @@ class ExpandableItemsNotifier extends Notifier<ExpandableItemsState> {
 
 final expandableItemsProvider =
     NotifierProvider<ExpandableItemsNotifier, ExpandableItemsState>(
-      () => ExpandableItemsNotifier(),
+      ExpandableItemsNotifier.new,
     );

@@ -11,7 +11,7 @@ class NotificationsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifications = ref.watch(notificationsProvider);
+    final notificationsAsync = ref.watch(notificationsProvider);
     final unreadCount = ref.watch(unreadNotificationsCountProvider);
 
     return Scaffold(
@@ -42,10 +42,7 @@ class NotificationsScreen extends ConsumerWidget {
                 ),
                 alignment: Alignment.center,
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(
-                  minWidth: 40,
-                  minHeight: 40,
-                ),
+                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                 onPressed: () {
                   // Refresh notifications
                   ref.invalidate(notificationsProvider);
@@ -55,31 +52,36 @@ class NotificationsScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: notifications.isEmpty
-          ? const EmptyStateWidget(
-              icon: Icons.notifications_none,
-              title: 'No notifications yet',
-              subtitle: 'We\'ll notify you when something important happens',
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                final notification = notifications[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: NotificationCard(
-                    notification: notification,
-                    onTap: () {
-                      // Mark as read when tapped
-                      ref
+      body: notificationsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) => const EmptyStateWidget(
+          icon: Icons.cloud_off,
+          title: 'Unable to load notifications',
+          subtitle: 'Pull to refresh and try again',
+        ),
+        data: (notifications) => notifications.isEmpty
+            ? const EmptyStateWidget(
+                icon: Icons.notifications_none,
+                title: 'No notifications yet',
+                subtitle: 'We\'ll notify you when something important happens',
+              )
+            : ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: notifications.length,
+                itemBuilder: (context, index) {
+                  final notification = notifications[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: NotificationCard(
+                      notification: notification,
+                      onTap: () => ref
                           .read(notificationsProvider.notifier)
-                          .markAsRead(notification.id);
-                    },
-                  ),
-                );
-              },
-            ),
+                          .markAsRead(notification.id),
+                    ),
+                  );
+                },
+              ),
+      ),
     );
   }
 }

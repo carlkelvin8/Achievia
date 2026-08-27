@@ -12,52 +12,79 @@
 import 'package:achievia/core/di/local_storage_service.dart' as _i982;
 import 'package:achievia/core/di/shared_pref.dart' as _i644;
 import 'package:achievia/core/network/conntectivity.dart' as _i790;
-import 'package:achievia/core/network/offline_caching.dart' as _i64;
 import 'package:achievia/core/registration/register_modules.dart' as _i790;
+import 'package:achievia/data/data_source/about/author_remote_datasource.dart'
+    as _i67;
 import 'package:achievia/data/data_source/auth/user_remote_datasource.dart'
     as _i528;
 import 'package:achievia/data/data_source/chat/chat_remote_datasource.dart'
     as _i739;
+import 'package:achievia/data/data_source/home/goal_remote_datasource.dart'
+    as _i977;
 import 'package:achievia/data/data_source/home/questions_remote_datasource.dart'
     as _i557;
+import 'package:achievia/data/data_source/notifications/notification_remote_datasource.dart'
+    as _i532;
 import 'package:achievia/data/data_source/profile/profile_remote_datasource.dart'
     as _i655;
 import 'package:achievia/data/data_source/progress/progress_remote_datasource.dart'
     as _i781;
+import 'package:achievia/data/data_source/progress/study_session_remote_datasource.dart'
+    as _i1069;
 import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart'
     as _i536;
+import 'package:achievia/data/data_source/reviewer/supplemental_remote_datasource.dart'
+    as _i124;
 import 'package:achievia/data/data_source/supabase_user_context.dart' as _i741;
 import 'package:achievia/data/data_source/task/task_remote_datasource.dart'
     as _i1006;
 import 'package:achievia/data/models/auth/user_dto.dart' as _i235;
+import 'package:achievia/data/repositoryImpl/about/author_repository_impl.dart'
+    as _i130;
 import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart'
     as _i581;
 import 'package:achievia/data/repositoryImpl/chat/chat_repository_impl.dart'
     as _i439;
+import 'package:achievia/data/repositoryImpl/home/goal_repository_impl.dart'
+    as _i96;
+import 'package:achievia/data/repositoryImpl/notifications/notification_repository_impl.dart'
+    as _i1058;
 import 'package:achievia/data/repositoryImpl/profile/profile_repository_impl.dart'
     as _i662;
 import 'package:achievia/data/repositoryImpl/progress/progress_repository_impl.dart'
     as _i754;
+import 'package:achievia/data/repositoryImpl/progress/study_session_repository_impl.dart'
+    as _i86;
 import 'package:achievia/data/repositoryImpl/questions/qot_repository_impl.dart'
     as _i548;
 import 'package:achievia/data/repositoryImpl/questions/questions_repository_impl.dart'
     as _i1000;
 import 'package:achievia/data/repositoryImpl/reviewer/module_repository_impl.dart'
     as _i656;
+import 'package:achievia/data/repositoryImpl/reviewer/supplemental_repository_impl.dart'
+    as _i930;
 import 'package:achievia/data/repositoryImpl/task/task_repository_impl.dart'
     as _i724;
 import 'package:achievia/domain/entities/api/home/questions_entity.dart'
     as _i416;
+import 'package:achievia/domain/use_cases/about/author_use_case.dart' as _i777;
 import 'package:achievia/domain/use_cases/auth/user_use_case.dart' as _i879;
 import 'package:achievia/domain/use_cases/chat/chat_use_case.dart' as _i181;
+import 'package:achievia/domain/use_cases/home/goal_use_case.dart' as _i84;
+import 'package:achievia/domain/use_cases/notifications/notification_use_case.dart'
+    as _i90;
 import 'package:achievia/domain/use_cases/profile/profile_use_case.dart'
     as _i501;
 import 'package:achievia/domain/use_cases/progress/progress_use_case.dart'
     as _i192;
+import 'package:achievia/domain/use_cases/progress/study_session_use_case.dart'
+    as _i377;
 import 'package:achievia/domain/use_cases/questions/questions_use_case.dart'
     as _i803;
 import 'package:achievia/domain/use_cases/reviewer/module_use_case.dart'
     as _i533;
+import 'package:achievia/domain/use_cases/reviewer/supplemental_use_case.dart'
+    as _i1035;
 import 'package:achievia/domain/use_cases/task/task_use_case.dart' as _i981;
 import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:get_it/get_it.dart' as _i174;
@@ -81,19 +108,18 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i741.SupabaseUserContext>(
       () => const _i741.SupabaseUserContext(),
     );
-    gh.lazySingleton<_i64.OfflineCaching>(() => _i64.OfflineCaching());
     gh.lazySingleton<_i895.Connectivity>(() => registerModules.connectivity);
+    gh.lazySingleton<_i67.AuthorRemoteDatasource>(
+      () => _i67.AuthorRemoteDatasource(),
+    );
+    gh.lazySingleton<_i124.SupplementalRemoteDatasource>(
+      () => _i124.SupplementalRemoteDatasource(),
+    );
     gh.lazySingleton<_i982.LocalStorageService>(
       () => _i982.LocalStorageService(gh<_i460.SharedPreferences>()),
     );
     gh.lazySingleton<_i790.NetworkInfo>(
       () => _i790.NetworkInfoImpl(gh<_i895.Connectivity>()),
-    );
-    gh.lazySingleton<_i557.QuestionsRemoteDatasource>(
-      () => _i557.QuestionsRemoteDatasource(
-        gh<_i64.OfflineCaching>(),
-        userContext: gh<_i741.SupabaseUserContext>(),
-      ),
     );
     gh.factory<_i655.ProfileRemoteDatasource>(
       () => _i655.ProfileRemoteDatasource(
@@ -102,6 +128,11 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i536.ModuleRemoteDatasource>(
       () => _i536.ModuleRemoteDatasource(
+        userContext: gh<_i741.SupabaseUserContext>(),
+      ),
+    );
+    gh.lazySingleton<_i557.QuestionsRemoteDatasource>(
+      () => _i557.QuestionsRemoteDatasource(
         userContext: gh<_i741.SupabaseUserContext>(),
       ),
     );
@@ -115,12 +146,25 @@ extension GetItInjectableX on _i174.GetIt {
         userContext: gh<_i741.SupabaseUserContext>(),
       ),
     );
+    gh.lazySingleton<_i977.GoalRemoteDatasource>(
+      () => _i977.GoalRemoteDatasource(
+        userContext: gh<_i741.SupabaseUserContext>(),
+      ),
+    );
+    gh.lazySingleton<_i532.NotificationRemoteDatasource>(
+      () => _i532.NotificationRemoteDatasource(
+        userContext: gh<_i741.SupabaseUserContext>(),
+      ),
+    );
+    gh.lazySingleton<_i1069.StudySessionRemoteDatasource>(
+      () => _i1069.StudySessionRemoteDatasource(
+        userContext: gh<_i741.SupabaseUserContext>(),
+      ),
+    );
     gh.lazySingleton<_i739.ChatDataSource>(() => _i739.ChatRemoteDatasource());
-    gh.lazySingleton<_i1000.QuestionsRepositoryImpl>(
-      () => _i1000.QuestionsRepositoryImpl(
-        gh<_i557.QuestionsRemoteDatasource>(),
-        gh<_i790.NetworkInfo>(),
-        gh<_i64.OfflineCaching>(),
+    gh.lazySingleton<_i548.QotRepositoryImpl>(
+      () => _i548.QotRepositoryImpl(
+        remoteDatasource: gh<_i557.QuestionsRemoteDatasource>(),
       ),
     );
     gh.factory<_i656.ModuleRepositoryImpl>(
@@ -161,6 +205,11 @@ extension GetItInjectableX on _i174.GetIt {
         datasource: gh<_i655.ProfileRemoteDatasource>(),
       ),
     );
+    gh.lazySingleton<_i1058.NotificationRepositoryImpl>(
+      () => _i1058.NotificationRepositoryImpl(
+        gh<_i532.NotificationRemoteDatasource>(),
+      ),
+    );
     gh.factory<_i416.QuestionsEntity>(
       () => _i416.QuestionsEntity(
         id: gh<String>(),
@@ -172,11 +221,26 @@ extension GetItInjectableX on _i174.GetIt {
         createdAt: gh<String>(),
       ),
     );
-    gh.lazySingleton<_i548.QotRepositoryImpl>(
-      () => _i548.QotRepositoryImpl(
-        remoteDatasource: gh<_i557.QuestionsRemoteDatasource>(),
-        network: gh<_i790.NetworkInfo>(),
+    gh.lazySingleton<_i96.GoalRepositoryImpl>(
+      () => _i96.GoalRepositoryImpl(gh<_i977.GoalRemoteDatasource>()),
+    );
+    gh.factory<_i84.GoalUseCase>(
+      () => _i84.GoalUseCase(gh<_i96.GoalRepositoryImpl>()),
+    );
+    gh.factory<_i90.NotificationUseCase>(
+      () => _i90.NotificationUseCase(gh<_i1058.NotificationRepositoryImpl>()),
+    );
+    gh.lazySingleton<_i930.SupplementalRepositoryImpl>(
+      () => _i930.SupplementalRepositoryImpl(
+        gh<_i124.SupplementalRemoteDatasource>(),
       ),
+    );
+    gh.lazySingleton<_i130.AuthorRepositoryImpl>(
+      () => _i130.AuthorRepositoryImpl(gh<_i67.AuthorRemoteDatasource>()),
+    );
+    gh.lazySingleton<_i1000.QuestionsRepositoryImpl>(
+      () =>
+          _i1000.QuestionsRepositoryImpl(gh<_i557.QuestionsRemoteDatasource>()),
     );
     gh.factory<_i581.UserRepositoryImpl>(
       () => _i581.UserRepositoryImpl(
@@ -186,8 +250,16 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i192.ProgressUseCase>(
       () => _i192.ProgressUseCase(gh<_i754.ProgressRepositoryImpl>()),
     );
+    gh.lazySingleton<_i86.StudySessionRepositoryImpl>(
+      () => _i86.StudySessionRepositoryImpl(
+        gh<_i1069.StudySessionRemoteDatasource>(),
+      ),
+    );
     gh.lazySingleton<_i724.TaskRepositoryImpl>(
       () => _i724.TaskRepositoryImpl(gh<_i1006.TaskRemoteDatasource>()),
+    );
+    gh.factory<_i777.AuthorUseCase>(
+      () => _i777.AuthorUseCase(gh<_i130.AuthorRepositoryImpl>()),
     );
     gh.factory<_i501.ProfileUseCase>(
       () => _i501.ProfileUseCase(impl: gh<_i662.ProfileRepositoryImpl>()),
@@ -201,6 +273,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i548.QotRepositoryImpl>(),
       ),
     );
+    gh.factory<_i1035.SupplementalUseCase>(
+      () => _i1035.SupplementalUseCase(gh<_i930.SupplementalRepositoryImpl>()),
+    );
     gh.factory<_i879.UserUseCase>(
       () => _i879.UserUseCase(impl: gh<_i581.UserRepositoryImpl>()),
     );
@@ -209,6 +284,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i981.TaskUseCase>(
       () => _i981.TaskUseCase(gh<_i724.TaskRepositoryImpl>()),
+    );
+    gh.factory<_i377.StudySessionUseCase>(
+      () => _i377.StudySessionUseCase(gh<_i86.StudySessionRepositoryImpl>()),
     );
     gh.factory<_i181.ChatUseCase>(
       () => _i181.ChatUseCase(gh<_i439.ChatRepositoryImpl>()),

@@ -8,6 +8,7 @@ import 'package:achievia/presentation/screens/main/profile_screen.dart';
 import 'package:achievia/presentation/screens/main/reviewers_screen.dart';
 import 'package:achievia/presentation/widgets/appbar/main_appbar.dart';
 import 'package:achievia/presentation/widgets/navigation/bottom_nav_bar.dart';
+import 'package:achievia/presentation/provider/notifications/notifications_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -69,7 +70,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(indexProvider);
-    const notificationCount = 1;
+    final notificationCount = ref.watch(unreadNotificationsCountProvider);
 
     return PopScope(
       // Never let the system pop this route automatically;

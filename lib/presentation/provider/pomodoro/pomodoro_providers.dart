@@ -5,9 +5,16 @@ import 'package:achievia/domain/use_cases/questions/questions_use_case.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/domain/entities/widgets/pomodoro_settings_entity.dart';
 import 'package:achievia/domain/entities/widgets/pomodoro_state_entity.dart';
+import 'package:achievia/domain/use_cases/progress/study_session_use_case.dart';
+import 'package:flutter/foundation.dart';
+
 const Duration fixedTimerDuration = Duration(hours: 120);
 const Duration minTimer = Duration(seconds: 10);
 final useCase = Provider<QuestionsUseCase>((ref) => sl<QuestionsUseCase>());
+final studySessionUseCaseProvider = Provider<StudySessionUseCase>((ref) {
+  return sl<StudySessionUseCase>();
+});
+
 class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
   @override
   PomodoroSettingsEntity build() {
@@ -89,12 +96,14 @@ class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
 }
 
 final pomodoroSettingsProvider =
-    NotifierProvider.autoDispose<PomodoroSettingsNotifier, PomodoroSettingsEntity>(
-      () => PomodoroSettingsNotifier(),
-    );
+    NotifierProvider.autoDispose<
+      PomodoroSettingsNotifier,
+      PomodoroSettingsEntity
+    >(() => PomodoroSettingsNotifier());
 
 class PomodoroNotifier extends Notifier<PomodoroStateEntity> {
   Timer? _timer;
+  DateTime? _focusStartedAt;
 
   @override
   PomodoroStateEntity build() {
@@ -109,6 +118,9 @@ class PomodoroNotifier extends Notifier<PomodoroStateEntity> {
 
   void start() {
     if (state.isRunning) return;
+    if (state.phase == PomodoroPhase.focus) {
+      _focusStartedAt ??= DateTime.now();
+    }
     _timer ??= Timer.periodic(const Duration(seconds: 1), _onTick);
     state = state.copyWith(isRunning: true);
   }
@@ -116,6 +128,7 @@ class PomodoroNotifier extends Notifier<PomodoroStateEntity> {
   void pause() {
     _timer?.cancel();
     _timer = null;
+    _finishFocusSession();
     state = state.copyWith(isRunning: false);
   }
 
@@ -144,6 +157,7 @@ class PomodoroNotifier extends Notifier<PomodoroStateEntity> {
     final settings = ref.read(pomodoroSettingsProvider);
     switch (state.phase) {
       case PomodoroPhase.focus:
+        _finishFocusSession();
         final completed = state.completedFocusSessions + 1;
         final isLong = completed % settings.sessionsBeforeLongBreak == 0;
         state = state.copyWith(
@@ -162,6 +176,26 @@ class PomodoroNotifier extends Notifier<PomodoroStateEntity> {
         );
         break;
     }
+  }
+
+  void _finishFocusSession() {
+    final startedAt = _focusStartedAt;
+    _focusStartedAt = null;
+    if (startedAt == null) return;
+    final endedAt = DateTime.now();
+    if (endedAt.difference(startedAt).inMinutes < 1) return;
+    final useCase = ref.read(studySessionUseCaseProvider);
+    Future<void>(() async {
+      try {
+        await useCase.recordSession(
+          startedAt: startedAt,
+          endedAt: endedAt,
+          sessionType: 'pomodoro',
+        );
+      } catch (error) {
+        debugPrint('Unable to record study session: $error');
+      }
+    });
   }
 
   // Syncs the remaining time with current settings for the active phase when not running
@@ -205,7 +239,6 @@ class PomodoroNotifier extends Notifier<PomodoroStateEntity> {
   }
 }
 
-
 class MockboardsTimer extends Notifier<PomodoroStateEntity> {
   Timer? _timer;
 
@@ -217,7 +250,6 @@ class MockboardsTimer extends Notifier<PomodoroStateEntity> {
       completedFocusSessions: 0,
       isRunning: false,
     );
-
   }
 
   void start() {
@@ -233,30 +265,27 @@ class MockboardsTimer extends Notifier<PomodoroStateEntity> {
   }
 
   void reset() {
-  pause();
-  state = PomodoroStateEntity(
-    phase: PomodoroPhase.focus,
-    remaining: minTimer,
-    completedFocusSessions: 0,
-    isRunning: false,
-  );
-}
+    pause();
+    state = PomodoroStateEntity(
+      phase: PomodoroPhase.focus,
+      remaining: minTimer,
+      completedFocusSessions: 0,
+      isRunning: false,
+    );
+  }
 
   void _onTick(Timer t) {
-  if (!state.isRunning) return;
+    if (!state.isRunning) return;
 
-  final remaining = state.remaining - const Duration(seconds: 1);
+    final remaining = state.remaining - const Duration(seconds: 1);
 
-  if (remaining <= Duration.zero) {
-    pause(); // stop at 0
-    state = state.copyWith(remaining: Duration.zero);
-  } else {
-    state = state.copyWith(remaining: remaining);
+    if (remaining <= Duration.zero) {
+      pause(); // stop at 0
+      state = state.copyWith(remaining: Duration.zero);
+    } else {
+      state = state.copyWith(remaining: remaining);
+    }
   }
-}
-
-
-  
 
   /// Formats a Duration into a readable time string (HH:MM:SS or MM:SS)
   String formatDuration(Duration duration) {
@@ -287,5 +316,6 @@ final pomodoroProvider =
       () => PomodoroNotifier(),
     );
 
-
-final timerProvider = NotifierProvider<MockboardsTimer, PomodoroStateEntity>(MockboardsTimer.new);
+final timerProvider = NotifierProvider<MockboardsTimer, PomodoroStateEntity>(
+  MockboardsTimer.new,
+);

@@ -39,7 +39,7 @@ class ModuleRepositoryImpl implements ModuleRepository {
           hasMore: remoteModules.hasMore,
         );
       } else {
-        // Fetch from cache
+        // There is no local content source; the UI renders an empty state offline.
         return PaginatedModulesEntity(
           items: const [],
           page: page,

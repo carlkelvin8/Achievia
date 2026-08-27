@@ -1,14 +1,17 @@
-import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/data/models/reviewer/supplemental_item_dto.dart';
 import 'package:achievia/domain/entities/widgets/medical_abbreviation_entity.dart';
 import 'package:achievia/domain/entities/widgets/notes_entity.dart';
 import 'package:achievia/domain/entities/widgets/pdf_entity.dart';
-import 'package:flutter/widgets.dart';
+import 'package:achievia/domain/use_cases/reviewer/supplemental_use_case.dart';
+import 'package:achievia/presentation/provider/profile/profile_provider.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum SupplementalFilter { all, mnemonics, abbreviations, procedures }
 
 final supplementalsProvider =
-    NotifierProvider<SupplementalsNotifier, SupplementalsViewState>(
+    AsyncNotifierProvider<SupplementalsNotifier, SupplementalsViewState>(
       SupplementalsNotifier.new,
     );
 
@@ -27,47 +30,72 @@ class SupplementalsViewState {
     required this.procedures,
   });
 
-  bool shouldShow(SupplementalFilter target) {
-    return filter == SupplementalFilter.all || filter == target;
-  }
+  bool shouldShow(SupplementalFilter target) =>
+      filter == SupplementalFilter.all || filter == target;
 
-  List<NotesEntity> visibleMnemonics() {
-    return _previewItems(SupplementalFilter.mnemonics, mnemonics);
-  }
+  List<NotesEntity> visibleMnemonics() =>
+      _previewItems(SupplementalFilter.mnemonics, mnemonics);
 
-  List<MedicalAbbreviation> visibleAbbreviations() {
-    return _previewItems(SupplementalFilter.abbreviations, abbreviations);
-  }
+  List<MedicalAbbreviation> visibleAbbreviations() =>
+      _previewItems(SupplementalFilter.abbreviations, abbreviations);
 
-  List<PdfEntity> visibleProcedures() {
-    return _previewItems(SupplementalFilter.procedures, procedures);
-  }
+  List<PdfEntity> visibleProcedures() =>
+      _previewItems(SupplementalFilter.procedures, procedures);
 
-  List<T> _previewItems<T>(SupplementalFilter target, List<T> items) {
-    if (filter == target) return items;
-    return items.take(4).toList();
-  }
+  List<T> _previewItems<T>(SupplementalFilter target, List<T> items) =>
+      filter == target ? items : items.take(4).toList();
 }
 
-class SupplementalsNotifier extends Notifier<SupplementalsViewState> {
+class SupplementalsNotifier extends AsyncNotifier<SupplementalsViewState> {
   late final TextEditingController searchController;
+  List<NotesEntity> _allMnemonics = const [];
+  List<MedicalAbbreviation> _allAbbreviations = const [];
+  List<PdfEntity> _allProcedures = const [];
 
   @override
-  SupplementalsViewState build() {
+  Future<SupplementalsViewState> build() async {
     searchController = TextEditingController();
     ref.onDispose(searchController.dispose);
+
+    int? courseId;
+    try {
+      courseId = (await ref.watch(profileProvider.future)).courseId;
+    } catch (_) {
+      // The content is still shared and can be loaded without a profile filter.
+    }
+
+    final items = await sl<SupplementalUseCase>().getItems(courseId: courseId);
+    _setBaseItems(items);
     return _createState(filter: SupplementalFilter.all, query: '');
   }
 
   void setFilter(SupplementalFilter filter) {
-    state = _createState(filter: filter, query: state.query);
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(_createState(filter: filter, query: current.query));
   }
 
   void setQuery(String value) {
-    state = _createState(
-      filter: state.filter,
-      query: value.trim().toLowerCase(),
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(
+      _createState(filter: current.filter, query: value.trim().toLowerCase()),
     );
+  }
+
+  void _setBaseItems(List<SupplementalItemDto> items) {
+    _allMnemonics = items
+        .map((item) => item.toMnemonic())
+        .whereType<NotesEntity>()
+        .toList();
+    _allAbbreviations = items
+        .map((item) => item.toAbbreviation())
+        .whereType<MedicalAbbreviation>()
+        .toList();
+    _allProcedures = items
+        .map((item) => item.toProcedure())
+        .whereType<PdfEntity>()
+        .toList();
   }
 
   SupplementalsViewState _createState({
@@ -77,28 +105,16 @@ class SupplementalsNotifier extends Notifier<SupplementalsViewState> {
     return SupplementalsViewState(
       filter: filter,
       query: query,
-      mnemonics: _filteredMnemonics(query),
-      abbreviations: _filteredAbbreviations(query),
-      procedures: _filteredProcedures(query),
+      mnemonics: _allMnemonics
+          .where((item) => item.title.toLowerCase().contains(query))
+          .toList(),
+      abbreviations: _allAbbreviations.where((item) {
+        return item.abbreviation.toLowerCase().contains(query) ||
+            item.expansion.toLowerCase().contains(query);
+      }).toList(),
+      procedures: _allProcedures
+          .where((item) => item.text.toLowerCase().contains(query))
+          .toList(),
     );
-  }
-
-  List<NotesEntity> _filteredMnemonics(String query) {
-    return mnemonics
-        .where((item) => item.title.toLowerCase().contains(query))
-        .toList();
-  }
-
-  List<MedicalAbbreviation> _filteredAbbreviations(String query) {
-    return medicalAbbreviations.where((item) {
-      return item.abbreviation.toLowerCase().contains(query) ||
-          item.expansion.toLowerCase().contains(query);
-    }).toList();
-  }
-
-  List<PdfEntity> _filteredProcedures(String query) {
-    return procedures
-        .where((item) => item.text.toLowerCase().contains(query))
-        .toList();
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:achievia/data/models/quiz/qotd_dto.dart';
 import 'package:achievia/domain/entities/api/home/mock_exam_subject_entity.dart';
 
@@ -34,7 +32,9 @@ class MockExamSubjectDto {
       daySubject: json['day_subject'] as String?,
       createdAt: json['createdAt'] as String,
       questions: (json['questions'] as List<dynamic>? ?? [])
-          .map((question) => QotdDto.fromJson(Map<String, dynamic>.from(question)))
+          .map(
+            (question) => QotdDto.fromJson(Map<String, dynamic>.from(question)),
+          )
           .toList(),
     );
   }
@@ -50,22 +50,5 @@ class MockExamSubjectDto {
       createdAt: createdAt,
       questions: questions.map((question) => question.toEntity()).toList(),
     );
-  }
-}
-
-extension MockExamSubjectDtoSqflite on MockExamSubjectDto {
-  Map<String, Object?> toSqliteMap() {
-    return {
-      'id': id,
-      'title': title,
-      'courseId': courseId,
-      'description': description,
-      'image': image,
-      'day_subject': daySubject,
-      'createdAt': createdAt,
-      'questions': jsonEncode(
-        questions.map((question) => question.toJson()).toList(),
-      ),
-    };
   }
 }

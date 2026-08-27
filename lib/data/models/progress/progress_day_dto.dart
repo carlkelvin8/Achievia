@@ -26,9 +26,9 @@ class ProgressDayDto {
   Map<String, dynamic> toJson() => _$ProgressDayDtoToJson(this);
 
   ProgressDayEntity toEntity() => ProgressDayEntity(
-        id: id,
-        userId: userId,
-        activityDate: activityDate,
-        isActive: isActive,
-      );
+    id: id,
+    userId: userId,
+    activityDate: activityDate,
+    isActive: isActive,
+  );
 }

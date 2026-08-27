@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:achievia/core/network/offline_caching.dart';
 import 'package:achievia/core/utils/guards.dart';
 import 'package:achievia/core/utils/questions_helpers.dart';
 import 'package:achievia/data/data_source/supabase_user_context.dart';
@@ -10,6 +9,7 @@ import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/data/models/quiz/questions_dto.dart';
 import 'package:achievia/data/models/quiz/quiz_dto.dart';
 import 'package:achievia/data/models/quiz/results_dto.dart';
+import 'package:achievia/domain/entities/widgets/examination_results_entity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -24,18 +24,16 @@ abstract class QuestionRepoDataSource {
   Future<int> putToAttempt();
   Future<MockboardsPausedDto> upsertPaused(MockboardsPausedDto dto);
   Future<MockboardsPausedDto> getCurrentPaused(MockboardsPausedDto dto);
+  Future<List<ExaminationResult>> getRecentAttemptResults();
 }
 
 @lazySingleton
 @injectable
 class QuestionsRemoteDatasource implements QuestionRepoDataSource {
   final SupabaseUserContext userContext;
-  final OfflineCaching local;
+  List<QuizDtoItems> _generatedQuiz = const [];
 
-  QuestionsRemoteDatasource(
-    this.local, {
-    this.userContext = const SupabaseUserContext(),
-  });
+  QuestionsRemoteDatasource({this.userContext = const SupabaseUserContext()});
 
   SupabaseClient get _supabase => Supabase.instance.client;
 
@@ -123,6 +121,18 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
           .maybeSingle();
       final quizId = readInt(question?['quiz_id']);
       final subjectName = quizId == null ? '' : await getQuizTitle(quizId);
+      final userId = answerDto.student_id.isEmpty
+          ? await userContext.currentUserId()
+          : answerDto.student_id;
+      if (quizId != null) {
+        await _supabase.from('qotd_answers').insert({
+          'user_id': userId,
+          'question_id': questionId,
+          'quiz_id': quizId,
+          'choice_id': readInt(choice['id']),
+          'is_correct': choice['is_correct'] == true,
+        });
+      }
       recordAnswer(subjectName, choice['is_correct'] == true);
 
       return answerDto;
@@ -161,10 +171,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
         'Quiz Titles: ${quizItems.map((quiz) => quiz.title).toList()}',
         wrapWidth: 1024,
       );
-      await local.replaceGeneratedMockboardCache(
-        questions: questions,
-        quizItems: quizItems,
-      );
+      _generatedQuiz = List<QuizDtoItems>.unmodifiable(quizItems);
       return questions;
     } catch (e) {
       debugPrint("Exception: $e");
@@ -175,8 +182,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
   @override
   Future<List<QuizDtoItems>> getTheGeneratedQuiz() async {
     try {
-      final cache = await local.getQuizFromCache();
-      return cache;
+      return _generatedQuiz;
     } catch (e) {
       debugPrint(e.toString());
       return [];
@@ -267,5 +273,25 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
     } on PostgrestException catch (e) {
       throw Exception(e);
     }
+  }
+
+  @override
+  Future<List<ExaminationResult>> getRecentAttemptResults() async {
+    final userId = await userContext.currentUserId();
+    final rows = await _supabase
+        .from('quiz_attempts')
+        .select('score, attempted_at, no_of_attempt')
+        .eq('student_id', userId)
+        .order('attempted_at', ascending: false);
+    return rows.map((row) {
+      final data = Map<String, dynamic>.from(row);
+      final attemptNo = readInt(data['no_of_attempt']);
+      return ExaminationResult(
+        examName: attemptNo == null ? 'Mock Board' : 'Mock Board $attemptNo',
+        date: data['attempted_at']?.toString() ?? '',
+        score: double.tryParse(data['score'].toString()) ?? 0,
+        passingScore: 75,
+      );
+    }).toList();
   }
 }

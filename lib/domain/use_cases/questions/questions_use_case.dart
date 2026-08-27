@@ -5,6 +5,7 @@ import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/entities/api/home/results_entity.dart';
 import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
+import 'package:achievia/domain/entities/widgets/examination_results_entity.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
@@ -27,6 +28,12 @@ class QuestionsUseCase {
   Future<QuizScoreEntity?> getGWA(int noOfAttempt) async =>
       await impl.getQuizScores(noOfAttempt);
   Future<int> submitQuiz() async => await impl.submitQuiz();
-  Future<MockboardPausedEntity> upsertContinueExam(MockboardPausedEntity entity) async => await impl.continueQuizRepository(entity);
-  Future<MockboardPausedEntity> getContinueExam(MockboardPausedEntity entity) async => await impl.continuegetQuizRepository(entity);
+  Future<MockboardPausedEntity> upsertContinueExam(
+    MockboardPausedEntity entity,
+  ) async => await impl.continueQuizRepository(entity);
+  Future<MockboardPausedEntity> getContinueExam(
+    MockboardPausedEntity entity,
+  ) async => await impl.continuegetQuizRepository(entity);
+  Future<List<ExaminationResult>> getRecentAttemptResults() =>
+      impl.getRecentAttemptResults();
 }

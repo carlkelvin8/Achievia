@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
 
 class QuizDto {
@@ -14,23 +12,35 @@ class QuizDto {
 
   QuizEntity toEntity() {
     return QuizEntity(
-      items: items.map((item) => QuizItemEntity(
-        id: item.id,
-        title: item.title,
-        description: item.description,
-        createdAt: item.createdAt,
-        subjectId: item.subjectId,
-        questions: item.questions.map((q) => QuestionItemEntity(
-          id: q.id,
-          questionText: q.questionText,
-          choices: q.choices.map((c) => ChoiceEntity(
-            questiondId: c.questionId,
-            id: c.id,
-            choiceText: c.choiceText,
-            isCorrect: c.isCorrect,
-          )).toList(),
-        )).toList(),
-      )).toList(),
+      items: items
+          .map(
+            (item) => QuizItemEntity(
+              id: item.id,
+              title: item.title,
+              description: item.description,
+              createdAt: item.createdAt,
+              subjectId: item.subjectId,
+              questions: item.questions
+                  .map(
+                    (q) => QuestionItemEntity(
+                      id: q.id,
+                      questionText: q.questionText,
+                      choices: q.choices
+                          .map(
+                            (c) => ChoiceEntity(
+                              questiondId: c.questionId,
+                              id: c.id,
+                              choiceText: c.choiceText,
+                              isCorrect: c.isCorrect,
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  )
+                  .toList(),
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -53,6 +63,7 @@ class QuizDto {
                           .map(
                             (choice) => ChoicesDto.fromJson(
                               choice as Map<String, dynamic>,
+                              questionId: question['id'] as int,
                             ),
                           )
                           .toList(),
@@ -93,12 +104,14 @@ class QuizDtoItems {
           .map(
             (question) => QuestionsItemsDto(
               id: question['id'] as int,
-              questionText: question['questionText'] ?? "",
-              choices: (question['choices'] as List<dynamic>)
-                  .map(
-                    (choice) =>
-                        ChoicesDto.fromJson(choice as Map<String, dynamic>),
-                  )
+                      questionText: question['questionText'] ?? "",
+                      choices: (question['choices'] as List<dynamic>)
+                          .map(
+                            (choice) => ChoicesDto.fromJson(
+                              choice as Map<String, dynamic>,
+                              questionId: question['id'] as int,
+                            ),
+                          )
                   .toList(),
             ),
           )
@@ -119,7 +132,6 @@ class QuizDtoItems {
     );
   }
 
-
   QuizItemEntity toEntity() {
     return QuizItemEntity(
       id: id,
@@ -128,46 +140,24 @@ class QuizDtoItems {
       createdAt: createdAt,
       subjectId: subjectId,
       questions: questions
-          .map((q) => QuestionItemEntity(
-                id: q.id,
-                questionText: q.questionText,
-                choices: q.choices
-                    .map((c) => ChoiceEntity(
-                          questiondId: c.questionId,
-                          id: c.id,
-                          choiceText: c.choiceText,
-                          isCorrect: c.isCorrect,
-                        ))
-                    .toList(),
-              ))
+          .map(
+            (q) => QuestionItemEntity(
+              id: q.id,
+              questionText: q.questionText,
+              choices: q.choices
+                  .map(
+                    (c) => ChoiceEntity(
+                      questiondId: c.questionId,
+                      id: c.id,
+                      choiceText: c.choiceText,
+                      isCorrect: c.isCorrect,
+                    ),
+                  )
+                  .toList(),
+            ),
+          )
           .toList(),
     );
-  }
-
-  Map<String, dynamic> toSqliteMap() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'createdAt': createdAt,
-      'subjectId': subjectId,
-      'questions': jsonEncode(
-        questions
-            .map((q) => {
-                  'id': q.id,
-                  'questionText': q.questionText,
-                  'choices': q.choices
-                      .map((c) => {
-                            'id': c.id,
-                            'choiceText': c.choiceText,
-                            'is_correct': c.isCorrect,
-                            'questionId': c.questionId,
-                          })
-                      .toList(),
-                })
-            .toList(),
-      ),
-    };
   }
 }
 
@@ -186,7 +176,12 @@ class QuestionsItemsDto {
       id: json['id'] as int,
       questionText: json['questionText'] ?? "",
       choices: (json['choices'] as List<dynamic>)
-          .map((choice) => ChoicesDto.fromJson(choice as Map<String, dynamic>))
+          .map(
+            (choice) => ChoicesDto.fromJson(
+              choice as Map<String, dynamic>,
+              questionId: json['id'] as int,
+            ),
+          )
           .toList(),
     );
   }
@@ -212,12 +207,15 @@ class ChoicesDto {
     required this.questionId,
   });
 
-  factory ChoicesDto.fromJson(Map<String, dynamic> json) {
+  factory ChoicesDto.fromJson(
+    Map<String, dynamic> json, {
+    int? questionId,
+  }) {
     return ChoicesDto(
       id: json['id'] as int,
       choiceText: json['choiceText'] ?? "",
       isCorrect: json['is_correct'] as bool,
-      questionId: json['questionId'] as int,
+      questionId: (json['questionId'] as int?) ?? questionId!,
     );
   }
 

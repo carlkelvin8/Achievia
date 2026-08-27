@@ -3,7 +3,6 @@ import 'package:achievia/data/models/quiz/qotd_dto_post.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:injectable/injectable.dart';
 
-import 'package:achievia/core/network/conntectivity.dart';
 import 'package:achievia/data/data_source/home/questions_remote_datasource.dart';
 import 'package:achievia/domain/repository/questions/qotd_repository.dart';
 
@@ -11,24 +10,12 @@ import 'package:achievia/domain/repository/questions/qotd_repository.dart';
 @injectable
 class QotRepositoryImpl implements QotdRepository {
   final QuestionsRemoteDatasource remoteDatasource;
-  final NetworkInfo network;
-  QotRepositoryImpl({required this.remoteDatasource, required this.network});
+  QotRepositoryImpl({required this.remoteDatasource});
   @override
   Future<QotyEntity> getQuestionOfTheDay() async {
-    final connectivity = await network.isConnected;
     try {
-      if (connectivity) {
-        final remoteQuestion = await remoteDatasource.getQotd();
-        final entity = remoteQuestion.toEntity();
-        return entity;
-      }
-      return QotyEntity(
-        quizId: 0,
-        id: 0,
-        questionText: '',
-        choices: [],
-        title: '',
-      );
+      final remoteQuestion = await remoteDatasource.getQotd();
+      return remoteQuestion.toEntity();
     } catch (e) {
       print('repo: $e');
       rethrow;
@@ -37,15 +24,10 @@ class QotRepositoryImpl implements QotdRepository {
 
   @override
   Future<QotyEntityPost> answerQuestion(QotyEntityPost entity) async {
-    final connectivity = await network.isConnected;
     try {
-      if (connectivity) {
-        final dto = QotdDtoPost.fromEntity(entity);
-        final remoteAnswer = await remoteDatasource.answerQuestion(dto);
-        print(remoteAnswer.chosen_answer);
-        return remoteAnswer.toEntity();
-      }
-      return QotyEntityPost(chosen_ans: '', quiz_id: 0, student_id: '');
+      final dto = QotdDtoPost.fromEntity(entity);
+      final remoteAnswer = await remoteDatasource.answerQuestion(dto);
+      return remoteAnswer.toEntity();
     } catch (e) {
       print('repos: $e');
       return QotyEntityPost(chosen_ans: '', quiz_id: 0, student_id: '');

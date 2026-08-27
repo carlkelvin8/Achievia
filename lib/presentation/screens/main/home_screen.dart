@@ -17,7 +17,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final qotd = ref.watch(qotdProvider);
-    final goal = ref.watch(goalProvider);
+    final goalAsync = ref.watch(goalProvider);
     final topMockboards = ref.watch(topMockboardAchieviansProvider);
     final topStreaks = ref.watch(topStreakAchieviansProvider);
 
@@ -43,13 +43,21 @@ class HomeScreen extends ConsumerWidget {
               const SectionLabel(title: "Today's Achievian Goal"),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: GoalCard(
-                  date: Formatters().formatDate(goal.date),
-                  title: goal.title,
-                  details: goal.details,
-                  isChecked: goal.isChecked,
-                  onToggle: () =>
-                      ref.read(goalProvider.notifier).toggleChecked(),
+                child: goalAsync.when(
+                  loading: () => const _HomeMessage(message: 'Loading goal...'),
+                  error: (_, __) => const _HomeMessage(
+                    message: 'Unable to load today\'s goal',
+                  ),
+                  data: (goal) => goal == null
+                      ? const _HomeMessage(message: 'No goal set for today')
+                      : GoalCard(
+                          date: Formatters().formatDate(goal.date),
+                          title: goal.title,
+                          details: goal.details,
+                          isChecked: goal.isChecked,
+                          onToggle: () =>
+                              ref.read(goalProvider.notifier).toggleChecked(),
+                        ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -76,6 +84,20 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _HomeMessage extends StatelessWidget {
+  final String message;
+
+  const _HomeMessage({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Center(child: Text(message)),
     );
   }
 }
