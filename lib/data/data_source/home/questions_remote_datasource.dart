@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:achievia/core/utils/guards.dart';
 import 'package:achievia/core/utils/questions_helpers.dart';
 import 'package:achievia/data/data_source/supabase_user_context.dart';
@@ -146,6 +144,7 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
   Future<List<QuestionsDto>> randomizeQuestion(int index) async {
     try {
       subjectScores.clear();
+      _generatedQuiz = const [];
 
       final response = await _supabase
           .from('subjects')
@@ -158,10 +157,8 @@ class QuestionsRemoteDatasource implements QuestionRepoDataSource {
           .toList();
       if (subjects.isEmpty) return [];
 
-      final shuffledSubjects = [...subjects]..shuffle(Random());
-      final selectedSubjects = shuffledSubjects
-          .take(min(6, shuffledSubjects.length))
-          .toList();
+      final selectedSubjects = selectMockBoardSubjects(subjects);
+      if (selectedSubjects.isEmpty) return [];
       final quizItems = await buildQuizItems(selectedSubjects);
       final questions = selectedSubjects
           .map((subject) => QuestionsDto.fromJson(normalizeSubject(subject)))

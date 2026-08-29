@@ -3,6 +3,7 @@ import 'package:achievia/domain/entities/api/auth/user_entity.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:achievia/data/repositoryImpl/auth/user_repository_impl.dart';
+import 'package:achievia/domain/entities/api/auth/signup_result.dart';
 
 @injectable
 class UserUseCase {
@@ -12,7 +13,7 @@ class UserUseCase {
   Future<UserEntity> getLogin(UserEntity entity) async =>
       await impl.loginRepository(entity);
 
-  Future<UserEntity> getSignup(UserEntity entity) async =>
+  Future<SignupResult> getSignup(UserEntity entity) async =>
       await impl.signUpRepository(entity);
 
   Future<UserEntity> getProfile(String token) async =>

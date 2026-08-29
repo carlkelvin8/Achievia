@@ -60,7 +60,7 @@ class _MantraCardState extends ConsumerState<MantraCard> {
         _mantraText = trimmed;
       });
 
-      SnackBarUtils.showSuccess(context, message);
+      AppToast.showSuccess(context, message);
     } catch (_) {
       // Intentionally no error toast for mantra errors.
     }

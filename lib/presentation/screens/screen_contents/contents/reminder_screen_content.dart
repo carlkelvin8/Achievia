@@ -54,7 +54,7 @@ class _ReminderScreenContentState extends ConsumerState<ReminderScreenContent> {
       _selectedIds.clear();
       _isConfirming = false;
     });
-    if (mounted) SnackBarUtils.showSuccess(context, 'Reminder marked as done!');
+    if (mounted) AppToast.showSuccess(context, 'Reminder marked as done!');
   }
 
   @override

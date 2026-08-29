@@ -34,7 +34,7 @@ class QuestionsRepositoryImpl implements QuestionsRepository {
       return response.map((e) => e.toEntity()).toList();
     } catch (e) {
       print('repo q: $e');
-      return [];
+      rethrow;
     }
   }
 

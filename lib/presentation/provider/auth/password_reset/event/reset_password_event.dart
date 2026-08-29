@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/domain/use_cases/auth/user_use_case.dart';
 import 'package:achievia/presentation/provider/auth/password_reset/state/reset_password_state.dart';
 import 'package:flutter/material.dart';
@@ -131,9 +132,7 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$e')));
+        AppToast.showError(context, '$e');
       }
       state = state.copyWith(isLoading: false);
     }
@@ -165,11 +164,12 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
         nextPage();
       }
       state = state.copyWith(isLoading: false);
+      if (context.mounted) {
+        AppToast.showSuccess(context, 'Password reset code sent to your email.');
+      }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$e')));
+        AppToast.showError(context, '$e');
       }
       state = state.copyWith(isLoading: false);
     }
@@ -186,14 +186,13 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
       state = state.copyWith(isLoading: false);
 
       if (context.mounted) {
+        AppToast.showSuccess(context, 'Password updated successfully.');
         context.go(RouteConstants.main);
       }
     } catch (e) {
+      state = state.copyWith(isLoading: false);
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$e')));
-        state = state.copyWith(isLoading: false);
+        AppToast.showError(context, '$e');
       }
     }
   }

@@ -39,6 +39,7 @@ class ReusableField extends StatelessWidget {
         suffixIcon: suffixIcon,
         prefixIcon: prefix,
         hintText: hintText,
+        errorText: errorText,
         hintStyle: TextStyle(color: Colors.grey),
 
         focusedErrorBorder: OutlineInputBorder(

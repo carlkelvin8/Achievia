@@ -1,4 +1,5 @@
 import 'package:achievia/core/constants/routers/route_constants.dart';
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/domain/entities/widgets/questions_entity.dart';
 import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
@@ -63,7 +64,10 @@ final List<QuestionsEntityWidget> questions = [
     label: 'Pre Boards',
     sub_label:
         'A final one-take comprehensive exam that simulates the actual board, available only once and unlocked 2 weeks before the scheduled board exam to help you gauge your ultimate readiness.',
-    callback: (context) => context.push(RouteConstants.onboardingQuestions),
+    callback: (context) => AppToast.showInfo(
+      context,
+      'Pre Boards will be available two weeks before your scheduled board exam.',
+    ),
   ),
 ];
 

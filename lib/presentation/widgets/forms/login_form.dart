@@ -1,5 +1,6 @@
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/presentation/provider/auth/event/auth_state_provider.dart';
 import 'package:achievia/presentation/widgets/buttons/google_sign_in_button.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
@@ -54,9 +55,26 @@ class _LoginFormState extends ConsumerState<LoginForm> {
             title: 'Log in',
             isLoading: ref.watch(loginFormProvider).isLoading,
             onPressed: () async {
-              if (_key.currentState!.validate()) {
-                await loginNotifier.submit();
+              if (!_key.currentState!.validate()) {
+                return;
               }
+
+              final success = await loginNotifier.submit();
+              if (!context.mounted) {
+                return;
+              }
+
+              final loginState = ref.read(loginFormProvider);
+              if (!success) {
+                AppToast.showError(
+                  context,
+                  loginState.errorMessage ?? 'Unable to log in.',
+                );
+                return;
+              }
+
+              AppToast.showSuccess(context, 'Logged in successfully.');
+              context.go(RouteConstants.main);
             },
             width: MediaQuery.of(context).size.width,
             height: 50,
@@ -84,10 +102,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
           const SizedBox(height: 16),
           GoogleSignInButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Google sign in is a design preview.'),
-                ),
+              AppToast.showInfo(
+                context,
+                'Google sign in is a design preview.',
               );
             },
           ),

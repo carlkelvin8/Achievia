@@ -31,7 +31,7 @@ class MedicalAbbreviationsList extends ConsumerWidget {
           subtitle: Text(abbrev.expansion),
           trailing: const Icon(Icons.arrow_forward_ios, size: 16),
           onTap: () =>
-              SnackBarUtils.showInfo(context, 'Tapped: ${abbrev.abbreviation}'),
+              AppToast.showInfo(context, 'Tapped: ${abbrev.abbreviation}'),
         );
       },
     );

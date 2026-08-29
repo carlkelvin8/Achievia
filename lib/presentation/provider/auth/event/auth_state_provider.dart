@@ -1,4 +1,6 @@
 import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/core/utils/auth_error_utils.dart';
+import 'package:achievia/domain/entities/api/auth/signup_result.dart';
 import 'package:achievia/domain/entities/api/auth/user_entity.dart';
 import 'package:achievia/domain/use_cases/auth/user_use_case.dart';
 import 'package:flutter/widgets.dart';
@@ -84,7 +86,7 @@ class LoginNotifier extends Notifier<LoginFormState> {
       await useCase.getLogin(entity);
       emailControllerLogin.clear();
       passwordController.clear();
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(isLoading: false, errorMessage: null);
       return true;
     } on AuthException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.message);
@@ -95,7 +97,7 @@ class LoginNotifier extends Notifier<LoginFormState> {
     }
   }
 
-  Future<void> submitSignup() async {
+  Future<SignupResult?> submitSignup() async {
     final entity = UserEntity(
       firstName: firstNameController.text,
       middleName: middleNameController.text,
@@ -113,19 +115,29 @@ class LoginNotifier extends Notifier<LoginFormState> {
 
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
-      await useCase.getSignup(entity);
+      final result = await useCase.getSignup(entity);
       firstNameController.clear();
       middleNameController.clear();
       lastNameController.clear();
+      schoolController.clear();
       userNameControllerSignup.clear();
       emailController.clear();
       passwordControllerSignup.clear();
       confirmPasswordControllerSignup.clear();
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(isLoading: false, errorMessage: null);
+      return result;
     } on AuthException catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.message);
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: userFacingAuthError(e),
+      );
+      return null;
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: userFacingAuthError(e),
+      );
+      return null;
     }
   }
 }
@@ -136,6 +148,8 @@ final loginFormProvider = NotifierProvider<LoginNotifier, LoginFormState>(
 final userUseCaseProvider = Provider<UserUseCase>((ref) => sl<UserUseCase>());
 
 class LoginFormState {
+  static const Object _errorMessageUnset = Object();
+
   final String email;
   final String password;
   final bool isLoading;
@@ -154,14 +168,16 @@ class LoginFormState {
     String? email,
     String? password,
     bool? isLoading,
-    String? errorMessage,
+    Object? errorMessage = _errorMessageUnset,
     bool? isToggled,
   }) {
     return LoginFormState(
       email: email ?? this.email,
       password: password ?? this.password,
       isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage,
+      errorMessage: identical(errorMessage, _errorMessageUnset)
+          ? this.errorMessage
+          : errorMessage as String?,
       isToggled: isToggled ?? this.isToggled,
     );
   }

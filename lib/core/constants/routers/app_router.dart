@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/domain/entities/api/chat/chat_conversation_entity.dart';
 import 'package:achievia/domain/entities/api/reviewer/question_bank_entity.dart';
+import 'package:achievia/presentation/screens/auth/email_confirmed_screen.dart';
 import 'package:achievia/presentation/screens/auth/forgot_password_screen_handler.dart';
 import 'package:achievia/presentation/screens/auth/login_screen.dart';
 import 'package:achievia/presentation/screens/auth/signup_screen.dart';
@@ -33,6 +34,7 @@ import 'package:achievia/presentation/screens/settings/examination/examination_s
 import 'package:achievia/presentation/screens/settings/pomodoro_timer/pomodoro_timer_screen.dart';
 import 'package:achievia/presentation/screens/settings/settings_screen.dart';
 
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -53,7 +55,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     navigatorKey: _rootNavigatorKey,
     refreshListenable: authRefresh,
 
-    redirect: _redirectForAuth,
+    redirect: (_, state) => _redirectForAuth(state, authRefresh: authRefresh),
 
     errorBuilder: (context, state) => Scaffold(
       body: Center(child: Text('No route defined for ${state.uri.path}')),
@@ -74,6 +76,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteConstants.onboarding,
         builder: (_, _) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.emailConfirmed,
+        builder: (_, _) => const EmailConfirmedScreen(),
       ),
 
       // MAIN
@@ -231,30 +237,43 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return router;
 });
 
-String? _redirectForAuth(BuildContext context, GoRouterState state) {
-  final session = Supabase.instance.client.auth.currentSession;
-  final isLoggedIn = session?.isExpired;
-
-  final location = state.uri.path;
-
-  final authRoutes = [
+String? authRedirect({required bool isLoggedIn, required String location}) {
+  const guestRoutes = <String>{
+    RouteConstants.onboarding,
     RouteConstants.login,
     RouteConstants.signUp,
-    RouteConstants.onboarding,
-    RouteConstants.forgotPassword,
-  ];
+  };
 
-  final isAuthRoute = authRoutes.contains(location);
-
-  if (isLoggedIn! && session == null && !isAuthRoute) {
-    return RouteConstants.login;
+  if (location == RouteConstants.forgotPassword) {
+    return null;
   }
 
-  if (!isLoggedIn && isAuthRoute && location != RouteConstants.forgotPassword) {
-    return RouteConstants.main;
+  if (location == RouteConstants.emailConfirmed) {
+    return null;
   }
 
-  return null;
+  if (!isLoggedIn) {
+    return guestRoutes.contains(location) ? null : RouteConstants.login;
+  }
+
+  return guestRoutes.contains(location) ? RouteConstants.main : null;
+}
+
+String? _redirectForAuth(
+  GoRouterState state, {
+  required _GoRouterRefreshStream authRefresh,
+}) {
+  final session = Supabase.instance.client.auth.currentSession;
+  final isLoggedIn = session != null && !session.isExpired;
+
+  if (isLoggedIn &&
+      authRefresh.shouldShowEmailConfirmed &&
+      state.uri.path != RouteConstants.emailConfirmed) {
+    authRefresh.consumeEmailConfirmation();
+    return RouteConstants.emailConfirmed;
+  }
+
+  return authRedirect(isLoggedIn: isLoggedIn, location: state.uri.path);
 }
 
 Widget _missingQuestionBankRoute(BuildContext context) {
@@ -277,17 +296,70 @@ Widget _missingQuestionBankRoute(BuildContext context) {
 }
 
 class _GoRouterRefreshStream extends ChangeNotifier {
-  late final StreamSubscription _subscription;
+  late final StreamSubscription<AuthState> _authSubscription;
+  late final StreamSubscription<Uri> _deeplinkSubscription;
+  bool _emailConfirmationCallbackReceived = false;
+  bool _shouldShowEmailConfirmed = false;
 
-  _GoRouterRefreshStream(Stream stream) {
-    _subscription = stream.listen((_) {
-      notifyListeners();
-    });
+  _GoRouterRefreshStream(Stream<AuthState> stream) {
+    _authSubscription = stream.listen(_handleAuthState);
+    final appLinks = AppLinks();
+    _deeplinkSubscription = appLinks.uriLinkStream.listen(_handleDeepLink);
+    unawaited(_readLatestDeepLink(appLinks));
+  }
+
+  bool get shouldShowEmailConfirmed => _shouldShowEmailConfirmed;
+
+  void consumeEmailConfirmation() {
+    _shouldShowEmailConfirmed = false;
+    _emailConfirmationCallbackReceived = false;
+  }
+
+  void _handleAuthState(AuthState state) {
+    if (state.event == AuthChangeEvent.signedIn &&
+        state.session != null &&
+        _emailConfirmationCallbackReceived) {
+      _shouldShowEmailConfirmed = true;
+    }
+    notifyListeners();
+  }
+
+  void _handleDeepLink(Uri uri) {
+    if (!_isAuthCallbackUri(uri)) {
+      return;
+    }
+
+    _emailConfirmationCallbackReceived = true;
+    if (Supabase.instance.client.auth.currentSession != null) {
+      _shouldShowEmailConfirmed = true;
+    }
+    notifyListeners();
+  }
+
+  Future<void> _readLatestDeepLink(AppLinks appLinks) async {
+    try {
+      final uri = await appLinks.getLatestLink();
+      if (uri != null) {
+        _handleDeepLink(uri);
+      }
+    } catch (_) {
+      // Supabase's own observer remains responsible for exchanging the link.
+    }
+  }
+
+  bool _isAuthCallbackUri(Uri uri) {
+    if (uri.scheme != 'achievia' || uri.host != 'callback') {
+      return false;
+    }
+
+    return uri.queryParameters.containsKey('code') ||
+        uri.fragment.contains('access_token');
   }
 
   @override
   void dispose() {
-    _subscription.cancel();
+    _authSubscription.cancel();
+    _deeplinkSubscription.cancel();
     super.dispose();
   }
 }

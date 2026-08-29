@@ -1,4 +1,5 @@
 import 'package:achievia/core/constants/routers/route_constants.dart';
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/domain/entities/api/chat/chat_person_entity.dart';
 import 'package:achievia/presentation/provider/chat/chat_provider.dart';
 import 'package:achievia/presentation/provider/chat/messages_provider.dart';
@@ -117,9 +118,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Unable to open chat: $error')));
+      AppToast.showError(context, 'Unable to open chat: $error');
     } finally {
       if (mounted) {
         messageNotifier.setOpeningProfileId(null);

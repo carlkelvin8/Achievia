@@ -36,7 +36,7 @@ class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
     final notes = _notesController.text.trim();
 
     if (title.isEmpty) {
-      SnackBarUtils.showWarning(context, 'Please enter a title');
+      AppToast.showWarning(context, 'Please enter a title');
       return;
     }
 
@@ -62,11 +62,11 @@ class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
     if (!mounted) return;
 
     if (success) {
-      SnackBarUtils.showSuccess(context, 'Reminder saved!');
+      AppToast.showSuccess(context, 'Reminder saved!');
       context.pop();
     } else {
       final error = ref.read(createTaskProvider).error;
-      SnackBarUtils.showError(
+      AppToast.showError(
         context,
         error?.toString() ?? 'Failed to save reminder',
       );

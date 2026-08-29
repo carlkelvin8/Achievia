@@ -25,7 +25,7 @@ class LocalStorageService {
   }
 
   String? get token => prefs.getString(auth_token);
-  String? get creds =>prefs.getString('user_creds');
+  String? get creds => prefs.getString('user_creds');
 
   DateTime? get boardExamDate {
     final raw = prefs.getString(board_exam_date);
@@ -46,9 +46,7 @@ class LocalStorageService {
   }
 
   Stream<String?> get tokenStream async* {
-  yield token; 
-  yield* _tokenController.stream;
+    yield token;
+    yield* _tokenController.stream;
+  }
 }
-
-}
-

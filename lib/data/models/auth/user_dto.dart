@@ -75,6 +75,7 @@ class UserDto {
     email: entity.email,
     password: entity.password,
     role: entity.role,
+    courseId: entity.courseId,
     status: entity.status,
     profileImage: entity.profileImage,
     university: entity.university,

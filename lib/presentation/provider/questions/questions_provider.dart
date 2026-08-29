@@ -1,7 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
+
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/core/utils/questions_helpers.dart';
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/domain/entities/api/home/mockboard_paused_entity.dart';
 import 'package:achievia/domain/entities/api/home/qoty_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
@@ -19,6 +22,8 @@ import 'package:go_router/go_router.dart';
 final getQuestions = Provider<QuestionsUseCase>((ref) {
   return sl.get<QuestionsUseCase>();
 });
+
+const _mockBoardGenerationTimeout = Duration(seconds: 30);
 
 final useCase = Provider<QuestionsUseCase>((ref) => sl<QuestionsUseCase>());
 
@@ -293,20 +298,55 @@ class QuestionsProvider extends Notifier<AnswerQuestionNotifier> {
     recordAnswer(subjectName, isCorrect);
   }
 
-  Future<void> randomizeQuestion(int index, BuildContext context) async {
-    state = state.copyWith(isLoading: true);
-    await showDialog(context, false);
-    await useCase.randomizeQuestions(index);
-    ref.invalidate(getGeneratedQuestions);
-    if (context.mounted) context.pop();
-    state = state.copyWith(isLoading: false);
-  }
+  Future<bool> randomizeQuestion(int index, BuildContext context) async {
+    if (state.isLoading) return false;
 
-  Future<void> showDialog(BuildContext context, bool isLoading) async {
-    showCupertinoDialog(
-      context: context,
-      barrierDismissible: isLoading,
-      builder: (context) => const LoadingDialog(),
-    );
+    state = state.copyWith(isLoading: true);
+    var loadingDialogShown = false;
+    var prepared = false;
+
+    try {
+      if (context.mounted) {
+        showCupertinoDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const LoadingDialog(),
+        );
+        loadingDialogShown = true;
+      }
+
+      final generatedQuestions = await useCase
+          .randomizeQuestions(index)
+          .timeout(
+            _mockBoardGenerationTimeout,
+            onTimeout: () => throw TimeoutException(
+              'Mock Board generation timed out',
+              _mockBoardGenerationTimeout,
+            ),
+          );
+      if (generatedQuestions.isEmpty) {
+        throw StateError('No mock board questions were generated');
+      }
+
+      ref.invalidate(getGeneratedQuestions);
+      prepared = true;
+    } catch (error, stackTrace) {
+      debugPrint('Mock Boards generation failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    } finally {
+      if (loadingDialogShown && context.mounted) {
+        final navigator = Navigator.of(context, rootNavigator: true);
+        if (navigator.canPop()) navigator.pop();
+      }
+      state = state.copyWith(isLoading: false);
+    }
+
+    if (!prepared && context.mounted) {
+      AppToast.showError(
+        context,
+        'Mock Boards could not be prepared. Please try again later.',
+      );
+    }
+    return prepared;
   }
 }

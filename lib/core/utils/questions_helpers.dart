@@ -55,6 +55,8 @@ const List<MockBoardSectionSpec> mockBoardSectionSpecs = [
       'histopathology medical technology laws ethics',
       'histopathology medical technology laws and ethics',
       'histopathology',
+      'histopath',
+      'medtech laws',
       'medical technology laws',
       'medical technology laws ethics',
       'medical technology laws and ethics',
@@ -73,6 +75,16 @@ class MockBoardSectionSpec {
     required this.title,
     required this.matchers,
   });
+}
+
+List<Map<String, dynamic>> selectMockBoardSubjects(
+  List<Map<String, dynamic>> subjects,
+) {
+  return subjects.where((subject) {
+    return mockBoardSectionSpecs.any(
+      (spec) => _subjectsForSection([subject], spec).isNotEmpty,
+    );
+  }).toList();
 }
 
 Future<List<QuizDtoItems>> buildQuizItems(

@@ -1,5 +1,6 @@
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/utils/helpers.dart';
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/presentation/provider/auth/event/auth_state_provider.dart';
 import 'package:achievia/presentation/widgets/buttons/google_sign_in_button.dart';
 import 'package:achievia/presentation/widgets/buttons/reusable_button.dart';
@@ -19,6 +20,8 @@ class SignupForm extends ConsumerStatefulWidget {
 
 class _SignupFormState extends ConsumerState<SignupForm> {
   bool agreedToTerms = false;
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -74,7 +77,7 @@ class _SignupFormState extends ConsumerState<SignupForm> {
             controller: loginNotifier.emailController,
             validator: (val) =>
                 validate('Email', val, loginNotifier.emailController),
-            errorText: ref.watch(loginFormProvider).errorMessage,
+            errorText: loginState.errorMessage,
           ),
           const SizedBox(height: 10),
 
@@ -86,8 +89,19 @@ class _SignupFormState extends ConsumerState<SignupForm> {
             ),
             hintText: 'Password',
             controller: loginNotifier.passwordControllerSignup,
-            isObscure: true,
-            errorText: ref.watch(loginFormProvider).errorMessage,
+            isObscure: !_isPasswordVisible,
+            suffixIcon: IconButton(
+              key: const ValueKey('signup-password-visibility'),
+              tooltip: _isPasswordVisible ? 'Hide password' : 'Show password',
+              onPressed: () {
+                setState(() {
+                  _isPasswordVisible = !_isPasswordVisible;
+                });
+              },
+              icon: Icon(
+                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+              ),
+            ),
           ),
           const SizedBox(height: 10),
 
@@ -98,24 +112,59 @@ class _SignupFormState extends ConsumerState<SignupForm> {
               loginNotifier.confirmPasswordControllerSignup,
             ),
             suffixIcon: IconButton(
-              onPressed: loginNotifier.toggleEye,
+              key: const ValueKey('signup-confirm-password-visibility'),
+              tooltip: _isConfirmPasswordVisible
+                  ? 'Hide confirm password'
+                  : 'Show confirm password',
+              onPressed: () {
+                setState(() {
+                  _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                });
+              },
               icon: Icon(
-                loginState.isToggled ? Icons.visibility_off : Icons.visibility,
+                _isConfirmPasswordVisible
+                    ? Icons.visibility
+                    : Icons.visibility_off,
               ),
             ),
             hintText: 'Confirm Password',
             controller: loginNotifier.confirmPasswordControllerSignup,
-            isObscure: loginState.isToggled,
-            errorText: ref.watch(loginFormProvider).errorMessage,
+            isObscure: !_isConfirmPasswordVisible,
           ),
           const SizedBox(height: 50),
           ReusableButton(
             title: 'Create Account',
-            isLoading: ref.watch(loginFormProvider).isLoading,
+            isLoading: loginState.isLoading,
             onPressed: () async {
-              if (_formKey.currentState!.validate()) {
-                await loginNotifier.submitSignup();
+              if (!_formKey.currentState!.validate()) {
+                return;
               }
+
+              final result = await loginNotifier.submitSignup();
+              if (!context.mounted) {
+                return;
+              }
+
+              final signupState = ref.read(loginFormProvider);
+              if (result == null) {
+                AppToast.showError(
+                  context,
+                  signupState.errorMessage ?? 'Unable to create the account.',
+                );
+                return;
+              }
+
+              if (result.requiresEmailConfirmation) {
+                AppToast.showInfo(
+                  context,
+                  'Check your email to confirm your account.',
+                );
+                context.go(RouteConstants.login);
+                return;
+              }
+
+              AppToast.showSuccess(context, 'Account created successfully.');
+              context.go(RouteConstants.main);
             },
             width: MediaQuery.of(context).size.width,
             height: 50,
@@ -127,11 +176,7 @@ class _SignupFormState extends ConsumerState<SignupForm> {
           const SizedBox(height: 16),
           GoogleSignInButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Google sign in is a design preview.'),
-                ),
-              );
+              AppToast.showInfo(context, 'Google sign in is a design preview.');
             },
           ),
           const SizedBox(height: 20),

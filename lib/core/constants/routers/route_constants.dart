@@ -3,6 +3,7 @@ class RouteConstants {
   static const String onboarding = '/onboarding';
   static const String login = '/login';
   static const String main = '/main';
+  static const String emailConfirmed = '/email-confirmed';
 
   // Main app tabs
   static const String reviewers = '/main/reviewers';

@@ -48,6 +48,7 @@ dependencies:
   json_annotation: ^4.9.0
   connectivity_plus: ^7.0.0
   flutter_svg: ^2.2.0
+  app_links: ^7.0.0
   injectable: ^2.6.0
   supabase_flutter: ^2.12.4
   flutter_launcher_icons: ^0.14.4

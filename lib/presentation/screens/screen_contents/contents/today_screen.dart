@@ -53,7 +53,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       _selectedIds.clear();
       _isConfirming = false;
     });
-    if (mounted) SnackBarUtils.showSuccess(context, 'Task marked as done!');
+    if (mounted) AppToast.showSuccess(context, 'Task marked as done!');
   }
 
   @override

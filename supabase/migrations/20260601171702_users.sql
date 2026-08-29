@@ -10,6 +10,8 @@ create table if not exists public.profiles (
   email text,
   avatar_url text,
   created_at timestamp with time zone default now()
+);
+
 drop trigger if exists on_auth_user_created on auth.users;
 drop function if exists public.handle_new_user();
 drop trigger if exists set_profiles_updated_at on public.profiles;
@@ -40,16 +42,6 @@ create table public.profiles (
 );
 
 -- =========================================
--- OPTIONAL: Ensure relation with auth.users
--- (recommended Supabase pattern)
--- =========================================
-alter table public.profiles
-add constraint profiles_id_fkey
-foreign key (id)
-references auth.users(id)
-on delete cascade;
-
--- =========================================
 -- INDEX (optional but recommended)
 -- =========================================
 create index if not exists profiles_id_idx
@@ -73,10 +65,6 @@ on public.profiles
 for select
 to authenticated
 using (auth.uid() = id);
-  on public.profiles
-  for select
-  to authenticated
-  using ((select auth.uid()) = id);
 
 -- INSERT own profile only
 create policy "Users can insert their own profile"
@@ -84,10 +72,6 @@ on public.profiles
 for insert
 to authenticated
 with check (auth.uid() = id);
-  on public.profiles
-  for insert
-  to authenticated
-  with check ((select auth.uid()) = id);
 
 -- UPDATE own profile only
 create policy "Users can update their own profile"
@@ -96,11 +80,6 @@ for update
 to authenticated
 using (auth.uid() = id)
 with check (auth.uid() = id);
-  on public.profiles
-  for update
-  to authenticated
-  using ((select auth.uid()) = id)
-  with check ((select auth.uid()) = id);
 
 -- DELETE own profile only
 create policy "Users can delete their own profile"
@@ -108,10 +87,6 @@ on public.profiles
 for delete
 to authenticated
 using (auth.uid() = id);
-  on public.profiles
-  for delete
-  to authenticated
-  using ((select auth.uid()) = id);
 
 create function public.set_updated_at()
 returns trigger

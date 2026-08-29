@@ -26,8 +26,11 @@ class GridBadges extends ConsumerWidget {
             sub_label: item.sub_label,
             callback: item.label == 'Mock Boards'
                 ? (context) async {
-                    await provider.randomizeQuestion(index, context);
-                    if (!context.mounted) return;
+                    final prepared = await provider.randomizeQuestion(
+                      index,
+                      context,
+                    );
+                    if (!prepared || !context.mounted) return;
                     context.push(RouteConstants.onboardingQuestions);
                   }
                 : item.callback,
