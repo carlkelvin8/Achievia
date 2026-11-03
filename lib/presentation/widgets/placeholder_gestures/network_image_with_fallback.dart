@@ -29,7 +29,7 @@ class NetworkImageWithFallback extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
       child: Image.network(
@@ -39,9 +39,9 @@ class NetworkImageWithFallback extends StatelessWidget {
         fit: fit,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
-          
+
           if (loadingWidget != null) return loadingWidget!;
-          
+
           return Container(
             width: width,
             height: height,
@@ -50,7 +50,7 @@ class NetworkImageWithFallback extends StatelessWidget {
               child: CircularProgressIndicator(
                 value: loadingProgress.expectedTotalBytes != null
                     ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
+                          loadingProgress.expectedTotalBytes!
                     : null,
                 color: theme.colorScheme.primary,
               ),
@@ -59,7 +59,7 @@ class NetworkImageWithFallback extends StatelessWidget {
         },
         errorBuilder: (context, error, stackTrace) {
           if (errorWidget != null) return errorWidget!;
-          
+
           return Container(
             width: width,
             height: height,

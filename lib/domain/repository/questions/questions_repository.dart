@@ -1,3 +1,4 @@
+import 'package:achievia/core/utils/mock_board_progress.dart';
 import 'package:achievia/domain/entities/api/home/mockboard_paused_entity.dart';
 import 'package:achievia/domain/entities/api/home/questions_entity.dart';
 import 'package:achievia/domain/entities/api/home/results_entity.dart';
@@ -10,6 +11,9 @@ abstract class QuestionsRepository {
   Future<List<QuizItemEntity>> getRandomizedQuestions();
   Future<QuizScoreEntity?> getQuizScores(int noOfAttempt);
   Future<int> submitQuiz();
+  Future<bool> startMockBoardAttempt();
+  MockBoardSession? exportMockBoardSession();
+  void restoreMockBoardSession(MockBoardSession session);
   Future<MockboardPausedEntity> continueQuizRepository(
     MockboardPausedEntity entity,
   );

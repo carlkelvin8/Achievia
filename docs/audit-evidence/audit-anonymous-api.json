@@ -1,0 +1,32 @@
+[
+  {
+    "table": "profiles",
+    "status": 200,
+    "rows_returned": 0
+  },
+  {
+    "table": "tasks",
+    "status": 200,
+    "rows_returned": 0
+  },
+  {
+    "table": "chat_messages",
+    "status": 200,
+    "rows_returned": 0
+  },
+  {
+    "table": "quiz_attempts",
+    "status": 200,
+    "rows_returned": 0
+  },
+  {
+    "table": "mockboards_paused",
+    "status": 200,
+    "rows_returned": 0
+  },
+  {
+    "table": "notifications",
+    "status": 200,
+    "rows_returned": 0
+  }
+]

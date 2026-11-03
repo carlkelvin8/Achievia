@@ -1,0 +1,6 @@
+VERIFIED: baseline signup escalation, role update, cross-user paused-exam read
+VERIFIED: hardened role, ownership, chat, privacy, input, anonymous and streak assertions
+VERIFIED: enum-safe module visibility, non-staff write denial, staff draft read/publish
+VERIFIED: eight concurrent direct-chat requests return one conversation
+FAILED: clean migration replay at 20260601172906_drop_unnecessary_tables.sql
+ERROR:  table "sessions" does not exist

@@ -1,5 +1,5 @@
 class Formatters {
-    String formatDate(DateTime date) {
+  String formatDate(DateTime date) {
     const months = [
       'January',
       'February',

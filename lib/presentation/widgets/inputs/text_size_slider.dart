@@ -1,3 +1,4 @@
+import 'package:achievia/presentation/widgets/settings/settings_card.dart';
 import 'package:flutter/material.dart';
 
 /// A reusable slider widget for adjusting text size
@@ -23,7 +24,7 @@ class TextSizeSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -56,13 +57,7 @@ class TextSizeSlider extends StatelessWidget {
         ),
         if (description != null) ...[
           const SizedBox(height: 8),
-          Text(
-            description!,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              height: 1.4,
-            ),
-          ),
+          Text(description!, style: settingsDescriptionStyle(context)),
         ],
       ],
     );

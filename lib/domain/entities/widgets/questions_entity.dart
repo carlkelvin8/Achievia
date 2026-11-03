@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 
 class QuestionsEntityWidget {
   final IconData icon;
+  final String? iconAsset;
   final String label;
-  final String sub_label;
+  final String subLabel;
   final void Function(BuildContext context)? callback;
   QuestionsEntityWidget({
     required this.icon,
+    this.iconAsset,
     required this.label,
-    required this.sub_label,
-    this.callback
+    required this.subLabel,
+    this.callback,
   });
 }

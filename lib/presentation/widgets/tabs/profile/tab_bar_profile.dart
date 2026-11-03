@@ -2,6 +2,7 @@ import 'package:achievia/presentation/screens/screen_contents/contents/profile_s
 import 'package:achievia/presentation/screens/screen_contents/contents/task_screen_content.dart';
 import 'package:achievia/presentation/screens/screen_contents/progress_screen_content.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TabBarProfile extends StatefulWidget {
   const TabBarProfile({super.key});
@@ -24,10 +25,17 @@ class _TabBarProfileState extends State<TabBarProfile>
   void initState() {
     super.initState();
     _controller = TabController(length: 3, vsync: this);
+    // The ID card is designed for portrait, so keep this page from rotating.
+    SystemChrome.setPreferredOrientations(const [
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 
   @override
   void dispose() {
+    // Release the lock so the rest of the app keeps its default behavior.
+    SystemChrome.setPreferredOrientations(const []);
     _controller.dispose();
     super.dispose();
   }

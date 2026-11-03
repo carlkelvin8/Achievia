@@ -1,3 +1,4 @@
+import 'package:achievia/core/utils/auth_error_utils.dart';
 import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/presentation/provider/task/task_provider.dart';
@@ -47,14 +48,26 @@ class _ReminderScreenContentState extends ConsumerState<ReminderScreenContent> {
 
     setState(() => _isConfirming = true);
     final notifier = ref.read(markTaskDoneProvider.notifier);
+    final failed = <String>{};
     for (final id in _selectedIds.toList()) {
-      await notifier.markDone(id);
+      if (!await notifier.markDone(id)) failed.add(id);
     }
+    if (!mounted) return;
     setState(() {
-      _selectedIds.clear();
+      // Keep failed items selected so the user can retry them.
+      _selectedIds
+        ..clear()
+        ..addAll(failed);
       _isConfirming = false;
     });
-    if (mounted) AppToast.showSuccess(context, 'Reminder marked as done!');
+    if (failed.isEmpty) {
+      AppToast.showSuccess(context, 'Reminder marked as done!');
+    } else {
+      AppToast.showError(
+        context,
+        'Some reminders could not be marked as done. Please try again.',
+      );
+    }
   }
 
   @override
@@ -90,11 +103,6 @@ class _ReminderScreenContentState extends ConsumerState<ReminderScreenContent> {
               icon: Icon(Icons.check_circle, color: theme.colorScheme.primary),
               tooltip: 'Mark as done',
               onPressed: _confirmDone,
-            )
-          else
-            IconButton(
-              icon: Icon(Icons.more_vert, color: theme.colorScheme.primary),
-              onPressed: () {},
             ),
         ],
         backgroundColor: Colors.transparent,
@@ -104,7 +112,7 @@ class _ReminderScreenContentState extends ConsumerState<ReminderScreenContent> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: Text(
-            'Error: $e',
+            userFacingError(e),
             style: TextStyle(color: theme.colorScheme.error),
           ),
         ),

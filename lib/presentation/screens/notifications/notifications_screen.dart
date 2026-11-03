@@ -28,7 +28,7 @@ class NotificationsScreen extends ConsumerWidget {
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 2,
                         offset: const Offset(0, 1),
                       ),
@@ -54,10 +54,15 @@ class NotificationsScreen extends ConsumerWidget {
       ),
       body: notificationsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const EmptyStateWidget(
+        error: (_, __) => EmptyStateWidget(
           icon: Icons.cloud_off,
           title: 'Unable to load notifications',
-          subtitle: 'Pull to refresh and try again',
+          subtitle: 'Check your connection and try again',
+          action: FilledButton.icon(
+            onPressed: () => ref.invalidate(notificationsProvider),
+            icon: const Icon(Icons.refresh),
+            label: const Text('Retry'),
+          ),
         ),
         data: (notifications) => notifications.isEmpty
             ? const EmptyStateWidget(

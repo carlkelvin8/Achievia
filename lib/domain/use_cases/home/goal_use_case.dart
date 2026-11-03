@@ -9,6 +9,9 @@ class GoalUseCase {
   GoalUseCase(this.repository);
 
   Future<GoalEntity?> getTodayGoal() => repository.getTodayGoal();
+  Future<void> saveTodayGoal(String title, String details) =>
+      repository.saveTodayGoal(title, details);
+  Future<void> clearGoal(String id) => repository.clearGoal(id);
   Future<void> setChecked(String id, bool checked) =>
       repository.setChecked(id, checked);
 }

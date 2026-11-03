@@ -1,9 +1,9 @@
+import 'package:achievia/core/utils/pomodoro_labels.dart';
 import 'package:achievia/presentation/provider/pomodoro/pomodoro_providers.dart';
 import 'package:achievia/presentation/widgets/settings/setting_tile.dart';
 import 'package:achievia/presentation/widgets/settings/settings_group_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 /// Customize section for pomodoro duration settings
 class PomodoroCustomizeSection extends ConsumerWidget {
@@ -19,7 +19,7 @@ class PomodoroCustomizeSection extends ConsumerWidget {
       children: [
         SettingTile(
           label: 'Review duration',
-          valueLabel: '${settings.focusDuration.inMinutes} mins',
+          valueLabel: formatMinutesLabel(settings.focusDuration.inMinutes),
           onTap: () => _editValue(
             context: context,
             title: 'Review duration (mins)',
@@ -37,7 +37,7 @@ class PomodoroCustomizeSection extends ConsumerWidget {
         ),
         SettingTile(
           label: 'Short break duration',
-          valueLabel: '${settings.shortBreakDuration.inMinutes} mins',
+          valueLabel: formatMinutesLabel(settings.shortBreakDuration.inMinutes),
           onTap: () => _editValue(
             context: context,
             title: 'Short break (mins)',
@@ -55,7 +55,7 @@ class PomodoroCustomizeSection extends ConsumerWidget {
         ),
         SettingTile(
           label: 'Long break duration',
-          valueLabel: '${settings.longBreakDuration.inMinutes} mins',
+          valueLabel: formatMinutesLabel(settings.longBreakDuration.inMinutes),
           onTap: () => _editValue(
             context: context,
             title: 'Long break (mins)',
@@ -73,7 +73,9 @@ class PomodoroCustomizeSection extends ConsumerWidget {
         ),
         SettingTile(
           label: 'Sessions before long break',
-          valueLabel: '${settings.sessionsBeforeLongBreak} sessions',
+          // Wider than the default so "10 sessions" is not cut off.
+          controlWidth: 180,
+          valueLabel: formatSessionsLabel(settings.sessionsBeforeLongBreak),
           onTap: () => _editValue(
             context: context,
             title: 'Sessions before long break',
@@ -107,40 +109,74 @@ class PomodoroCustomizeSection extends ConsumerWidget {
     required int max,
     required void Function(int) onSubmit,
   }) async {
-    final controller = TextEditingController(text: initial.toString());
     final value = await showDialog<int>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(title),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          keyboardType: TextInputType.number,
-          textAlign: TextAlign.center,
-          decoration: const InputDecoration(hintText: 'Enter a value'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => dialogContext.pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              final parsed = int.tryParse(controller.text.trim());
-              if (parsed == null) {
-                dialogContext.pop();
-                return;
-              }
-              final clamped = parsed.clamp(min, max);
-              dialogContext.pop(clamped);
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+      builder: (_) =>
+          _NumberEditDialog(title: title, initial: initial, min: min, max: max),
     );
     if (value != null) {
       onSubmit(value);
     }
+  }
+}
+
+/// Owns its text controller so it is disposed together with the dialog route,
+/// after the close animation has finished.
+class _NumberEditDialog extends StatefulWidget {
+  const _NumberEditDialog({
+    required this.title,
+    required this.initial,
+    required this.min,
+    required this.max,
+  });
+
+  final String title;
+  final int initial;
+  final int min;
+  final int max;
+
+  @override
+  State<_NumberEditDialog> createState() => _NumberEditDialogState();
+}
+
+class _NumberEditDialogState extends State<_NumberEditDialog> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initial.toString(),
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final parsed = int.tryParse(_controller.text.trim());
+    if (parsed == null) {
+      Navigator.of(context).pop();
+      return;
+    }
+    Navigator.of(context).pop(parsed.clamp(widget.min, widget.max));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.title),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.center,
+        decoration: const InputDecoration(hintText: 'Enter a value'),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(onPressed: _save, child: const Text('Save')),
+      ],
+    );
   }
 }

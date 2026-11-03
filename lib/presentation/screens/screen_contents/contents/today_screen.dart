@@ -1,3 +1,4 @@
+import 'package:achievia/core/utils/auth_error_utils.dart';
 import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/presentation/provider/task/task_provider.dart';
@@ -46,14 +47,26 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
 
     setState(() => _isConfirming = true);
     final notifier = ref.read(markTaskDoneProvider.notifier);
+    final failed = <String>{};
     for (final id in _selectedIds.toList()) {
-      await notifier.markDone(id);
+      if (!await notifier.markDone(id)) failed.add(id);
     }
+    if (!mounted) return;
     setState(() {
-      _selectedIds.clear();
+      // Keep failed items selected so the user can retry them.
+      _selectedIds
+        ..clear()
+        ..addAll(failed);
       _isConfirming = false;
     });
-    if (mounted) AppToast.showSuccess(context, 'Task marked as done!');
+    if (failed.isEmpty) {
+      AppToast.showSuccess(context, 'Task marked as done!');
+    } else {
+      AppToast.showError(
+        context,
+        'Some tasks could not be marked as done. Please try again.',
+      );
+    }
   }
 
   @override
@@ -91,11 +104,6 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
               icon: Icon(Icons.check_circle, color: theme.colorScheme.primary),
               tooltip: 'Mark as done',
               onPressed: _confirmDone,
-            )
-          else
-            IconButton(
-              icon: Icon(Icons.more_vert, color: theme.colorScheme.primary),
-              onPressed: () {},
             ),
         ],
       ),
@@ -103,17 +111,22 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: Text(
-            'Error: $e',
+            userFacingError(e),
             style: TextStyle(color: theme.colorScheme.error),
           ),
         ),
         data: (tasks) {
           final now = DateTime.now();
-          final today = DateTime(now.year, now.month, now.day);
+          final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59);
           final todayTasks = tasks.where((t) {
+            if (t.isDone) return false;
             final d = t.deadline.toLocal();
-            return !t.isDone && DateTime(d.year, d.month, d.day) == today;
-          }).toList();
+            // Include today and overdue tasks
+            return d.isBefore(endOfToday) ||
+                (d.year == now.year &&
+                    d.month == now.month &&
+                    d.day == now.day);
+          }).toList()..sort((a, b) => a.deadline.compareTo(b.deadline));
 
           return SingleChildScrollView(
             child: Padding(

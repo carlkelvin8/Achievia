@@ -25,17 +25,12 @@ class SettingTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: padding ?? const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Expanded(
-            child: Text(
-              label,
-              style: theme.textTheme.bodyMedium,
-            ),
-          ),
+          Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
           SizedBox(
             width: controlWidth,
             child: InkWell(
@@ -69,10 +64,7 @@ class SettingTile extends StatelessWidget {
                         ),
                       ),
                     ),
-                    _RoundIconButton(
-                      icon: Icons.add,
-                      onPressed: onIncrement,
-                    ),
+                    _RoundIconButton(icon: Icons.add, onPressed: onIncrement),
                   ],
                 ),
               ),
@@ -87,11 +79,8 @@ class SettingTile extends StatelessWidget {
 class _RoundIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
-  
-  const _RoundIconButton({
-    required this.icon,
-    required this.onPressed,
-  });
+
+  const _RoundIconButton({required this.icon, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

@@ -5,8 +5,5 @@ class SignupResult {
   final UserEntity user;
   final bool requiresEmailConfirmation;
 
-  SignupResult({
-    required this.user,
-    required this.requiresEmailConfirmation,
-  });
+  SignupResult({required this.user, required this.requiresEmailConfirmation});
 }

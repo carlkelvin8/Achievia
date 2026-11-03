@@ -46,7 +46,8 @@ class _CalendarCardState extends State<CalendarCard> {
     final candidate = DateTime(_currentMonth.year, _currentMonth.month + delta);
     final candidateMonth = _monthOnly(candidate);
 
-    if (candidateMonth.isBefore(_minMonth) || candidateMonth.isAfter(_maxMonth)) {
+    if (candidateMonth.isBefore(_minMonth) ||
+        candidateMonth.isAfter(_maxMonth)) {
       return;
     }
 
@@ -176,15 +177,19 @@ class _CalendarCardState extends State<CalendarCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStreakItem(
-                context,
-                label: "This month's streak",
-                value: '${widget.calendarData.thisMonthStreak} days',
+              Expanded(
+                child: _buildStreakItem(
+                  context,
+                  label: "This month's streak",
+                  value: '${widget.calendarData.thisMonthStreak} days',
+                ),
               ),
-              _buildStreakItem(
-                context,
-                label: 'Longest Streak',
-                value: '${widget.calendarData.longestStreak} days',
+              Expanded(
+                child: _buildStreakItem(
+                  context,
+                  label: 'Longest Streak',
+                  value: '${widget.calendarData.longestStreak} days',
+                ),
               ),
             ],
           ),
@@ -195,7 +200,7 @@ class _CalendarCardState extends State<CalendarCard> {
           ),
           const SizedBox(height: 16),
           Text(
-            'To keep your streak as an Achievian, dedicate at least 1 hour a day using the app. Consistent daily review builds habits, sharpens knowledge, and brings you closer to your goal.',
+            'To keep your streak as an Achievian, dedicate at least 1 hr a day using the app. Consistent daily review builds habits, sharpens knowledge, and brings you closer to your goal.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               height: 1.5,
@@ -286,7 +291,8 @@ class _CalendarCardState extends State<CalendarCard> {
   Widget _buildDayCell(BuildContext context, CalendarDay day) {
     final theme = Theme.of(context);
     final (backgroundColor, textColor, svgPath) = _getDayStyle(day.status);
-    final showDayNumber = day.status == DayStatus.inactive || day.status == DayStatus.blank;
+    final showDayNumber =
+        day.status == DayStatus.inactive || day.status == DayStatus.blank;
     final hasSvg = svgPath != null;
 
     return Container(
@@ -307,10 +313,7 @@ class _CalendarCardState extends State<CalendarCard> {
             Positioned.fill(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
-                child: SvgPicture.asset(
-                  svgPath,
-                  fit: BoxFit.cover,
-                ),
+                child: SvgPicture.asset(svgPath, fit: BoxFit.cover),
               ),
             ),
           if (showDayNumber)
@@ -335,33 +338,17 @@ class _CalendarCardState extends State<CalendarCard> {
     switch (status) {
       case DayStatus.completed:
         // Logged-in day
-        return (
-          Colors.transparent,
-          Colors.white,
-          'assets/images/LOGO/16.svg',
-        );
+        return (Colors.transparent, Colors.white, 'assets/images/LOGO/16.svg');
       case DayStatus.current:
       case DayStatus.upcoming:
         // Active/current-like days without SVG
-        return (
-          Colors.transparent,
-          const Color(0xFF455267),
-          null,
-        );
+        return (Colors.transparent, const Color(0xFF455267), null);
       case DayStatus.inactive:
         // In-account but not active -> show small inactive SVG
-        return (
-          Colors.transparent,
-          Colors.white,
-          'assets/images/LOGO/2.svg',
-        );
+        return (Colors.transparent, Colors.white, 'assets/images/LOGO/2.svg');
       case DayStatus.blank:
         // Padding/out-of-account-range
-        return (
-          const Color(0xFFE6E8EE),
-          const Color(0xFF8F96A3),
-          null,
-        );
+        return (const Color(0xFFE6E8EE), const Color(0xFF8F96A3), null);
     }
   }
 
@@ -378,7 +365,9 @@ class _CalendarCardState extends State<CalendarCard> {
           width: 20,
           height: 200,
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
+            color: theme.colorScheme.surfaceContainerHighest.withValues(
+              alpha: 0.2,
+            ),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Stack(
@@ -400,7 +389,10 @@ class _CalendarCardState extends State<CalendarCard> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF0A2E86),
                     shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFF009DC5), width: 1.2),
+                    border: Border.all(
+                      color: const Color(0xFF009DC5),
+                      width: 1.2,
+                    ),
                   ),
                   alignment: Alignment.center,
                   child: Text(

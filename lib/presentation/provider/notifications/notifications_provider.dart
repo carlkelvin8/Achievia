@@ -1,6 +1,7 @@
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/domain/entities/widgets/notification_entity.dart';
 import 'package:achievia/domain/use_cases/notifications/notification_use_case.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final notificationUseCaseProvider = Provider<NotificationUseCase>((ref) {
@@ -14,7 +15,12 @@ class NotificationsNotifier extends AsyncNotifier<List<NotificationEntity>> {
   }
 
   Future<void> markAsRead(String notificationId) async {
-    await ref.read(notificationUseCaseProvider).markRead(notificationId);
+    try {
+      await ref.read(notificationUseCaseProvider).markRead(notificationId);
+    } catch (error) {
+      debugPrint('Mark notification as read failed: $error');
+      return;
+    }
     ref.invalidateSelf();
   }
 
@@ -35,13 +41,11 @@ final notificationsProvider =
     );
 
 final unreadNotificationsCountProvider = Provider<int>((ref) {
-  final notifications =
-      ref.watch(notificationsProvider).value ?? const [];
+  final notifications = ref.watch(notificationsProvider).value ?? const [];
   return notifications.where((notification) => !notification.isRead).length;
 });
 
 final recentNotificationsProvider = Provider<List<NotificationEntity>>((ref) {
-  final notifications =
-      ref.watch(notificationsProvider).value ?? const [];
+  final notifications = ref.watch(notificationsProvider).value ?? const [];
   return notifications.take(5).toList();
 });

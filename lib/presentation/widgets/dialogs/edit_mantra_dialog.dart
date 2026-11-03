@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 class EditMantraDialog extends StatefulWidget {
   final String initialText;
 
-  const EditMantraDialog({
-    super.key,
-    required this.initialText,
-  });
+  const EditMantraDialog({super.key, required this.initialText});
 
   static Future<String?> show(
     BuildContext context, {
@@ -44,19 +41,13 @@ class _EditMantraDialogState extends State<EditMantraDialog> {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       contentPadding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(
-            Icons.spa_outlined,
-            color: AppColors.primaryVariant,
-            size: 24,
-          ),
+          Icon(Icons.spa_outlined, color: AppColors.primaryVariant, size: 24),
           const SizedBox(height: 6),
           Text(
             'My Achievian Mantra',

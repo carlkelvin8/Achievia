@@ -1,0 +1,13 @@
+Agent-observed browser smoke verification, 2026-09-27.
+Local release served only on loopback port 8765; temporary browser tab and server closed afterward.
+- Initial release startup eventually rendered the login screen.
+- Anonymous /#/main/profile redirected to /#/login.
+- Empty login submission showed Email is required and Password is required.
+- Login inspected at desktop and 375x812; signup inspected at 375x812.
+- Password recovery entry inspected at 768x1024; viewport override reset afterward.
+- Dark auth headers/recovery card/button contrast defects reproduced, fixed in source,
+  and verified visually using a fresh localhost origin to avoid old service-worker cache.
+- favicon.png and icons/Icon-192.png returned HTTP 200 image/png after the fix.
+- No captured warning/error console logs in the final observed session.
+No credentials submitted, no email sent, no hosted account created, no authenticated pages tested.
+This is a limited smoke check, not a complete responsive, accessibility, or browser-compatibility audit.

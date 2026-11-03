@@ -10,7 +10,7 @@ class PdfBadge extends StatefulWidget {
     required this.text,
     required this.tabType,
     this.imageUrl,
-    this.callback
+    this.callback,
   });
 
   @override
@@ -19,6 +19,21 @@ class PdfBadge extends StatefulWidget {
 
 class _PdfBadgeState extends State<PdfBadge> {
   final bool _isExpanded = false;
+
+  /// A word longer than the tile is wide would break in the middle
+  /// ("Immunohematol-ogy"), so very long words get a slightly smaller size.
+  TextStyle? _titleStyle(TextStyle? base, Color color) {
+    final longest = widget.text
+        .split(RegExp(r'\s+'))
+        .fold<int>(0, (max, word) => word.length > max ? word.length : max);
+    const fits = 12;
+    final scale = longest > fits ? (fits / longest).clamp(0.7, 1.0) : 1.0;
+    final size = base?.fontSize;
+    return base?.copyWith(
+      color: color,
+      fontSize: size == null ? null : size * scale,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +47,7 @@ class _PdfBadgeState extends State<PdfBadge> {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: themeColor.primary.withOpacity(0.3)),
+          border: Border.all(color: themeColor.primary.withValues(alpha: 0.3)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -75,13 +90,13 @@ class _PdfBadgeState extends State<PdfBadge> {
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
-                  style: textTheme?.copyWith(color: themeColor.primary),
+                  style: _titleStyle(textTheme, themeColor.primary),
                 ),
                 secondChild: SingleChildScrollView(
                   child: Text(
                     widget.text,
                     textAlign: TextAlign.center,
-                    style: textTheme?.copyWith(color: themeColor.primary),
+                    style: _titleStyle(textTheme, themeColor.primary),
                   ),
                 ),
                 crossFadeState: _isExpanded

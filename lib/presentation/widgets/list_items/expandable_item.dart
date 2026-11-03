@@ -43,8 +43,8 @@ class ExpandableItem extends StatelessWidget {
     // If imagePath is provided and no explicit background color is set, use transparent
     // Otherwise, use primary color for icons
     final backgroundColor =
-      iconBackgroundColor ??
-      (imagePath != null ? Colors.transparent : theme.colorScheme.primary);
+        iconBackgroundColor ??
+        (imagePath != null ? Colors.transparent : theme.colorScheme.primary);
     final iconColorValue = iconColor ?? Colors.white;
 
     return Container(
@@ -80,7 +80,9 @@ class ExpandableItem extends StatelessWidget {
                             borderRadius: BorderRadius.circular(borderRadius),
                             child: imagePath!.toLowerCase().endsWith('.svg')
                                 ? FutureBuilder<String>(
-                                    future: services.rootBundle.loadString(imagePath!),
+                                    future: services.rootBundle.loadString(
+                                      imagePath!,
+                                    ),
                                     builder: (context, snapshot) {
                                       if (!snapshot.hasData) {
                                         return SizedBox(
@@ -92,20 +94,43 @@ class ExpandableItem extends StatelessWidget {
                                       var svgString = snapshot.data!;
 
                                       // Extract <style> block and inline simple .cls-fill rules
-                                      final styleReg = RegExp(r'<style[^>]*>([\s\S]*?)<\/style>', caseSensitive: false);
-                                      final styleMatch = styleReg.firstMatch(svgString);
+                                      final styleReg = RegExp(
+                                        r'<style[^>]*>([\s\S]*?)<\/style>',
+                                        caseSensitive: false,
+                                      );
+                                      final styleMatch = styleReg.firstMatch(
+                                        svgString,
+                                      );
                                       if (styleMatch != null) {
                                         final styleBody = styleMatch.group(1)!;
-                                        final classReg = RegExp(r'\.([\w-]+)\s*\{[^}]*fill:\s*([^;\s}]+)[^}]*\}', caseSensitive: false);
-                                        for (final m in classReg.allMatches(styleBody)) {
+                                        final classReg = RegExp(
+                                          r'\.([\w-]+)\s*\{[^}]*fill:\s*([^;\s}]+)[^}]*\}',
+                                          caseSensitive: false,
+                                        );
+                                        for (final m in classReg.allMatches(
+                                          styleBody,
+                                        )) {
                                           final cls = m.group(1)!;
                                           final fill = m.group(2)!;
                                           // replace class="cls" with inline fill attribute
-                                          svgString = svgString.replaceAll(RegExp('class="'+cls+'"'), 'fill="$fill"');
-                                          svgString = svgString.replaceAll(RegExp("class='"+cls+"'"), "fill='$fill'");
+                                          svgString = svgString.replaceAll(
+                                            RegExp(
+                                              'class="${RegExp.escape(cls)}"',
+                                            ),
+                                            'fill="$fill"',
+                                          );
+                                          svgString = svgString.replaceAll(
+                                            RegExp(
+                                              "class='${RegExp.escape(cls)}'",
+                                            ),
+                                            "fill='$fill'",
+                                          );
                                         }
                                         // remove the style block
-                                        svgString = svgString.replaceFirst(styleReg, '');
+                                        svgString = svgString.replaceFirst(
+                                          styleReg,
+                                          '',
+                                        );
                                       }
 
                                       return SvgPicture.string(
@@ -114,7 +139,10 @@ class ExpandableItem extends StatelessWidget {
                                         height: iconSize,
                                         fit: BoxFit.contain,
                                         colorFilter: iconColor != null
-                                            ? ColorFilter.mode(iconColorValue, BlendMode.srcIn)
+                                            ? ColorFilter.mode(
+                                                iconColorValue,
+                                                BlendMode.srcIn,
+                                              )
                                             : null,
                                       );
                                     },

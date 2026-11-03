@@ -15,6 +15,13 @@ class GoalRepositoryImpl implements GoalRepository {
       (await datasource.getTodayGoal())?.toEntity();
 
   @override
+  Future<void> saveTodayGoal(String title, String details) =>
+      datasource.saveTodayGoal(title, details);
+
+  @override
+  Future<void> clearGoal(String id) => datasource.clearGoal(id);
+
+  @override
   Future<void> setChecked(String id, bool checked) =>
       datasource.setChecked(id, checked);
 }

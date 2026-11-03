@@ -20,7 +20,36 @@ class ChatThreadScreen extends ConsumerWidget {
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
 
     return Scaffold(
-      appBar: AppBar(title: Text(conversation.title)),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundImage: conversation.profileImage == null
+                  ? null
+                  : NetworkImage(conversation.profileImage!),
+              onBackgroundImageError: conversation.profileImage == null
+                  ? null
+                  : (_, _) {},
+              child: conversation.profileImage == null
+                  ? Text(
+                      conversation.title.trim().isEmpty
+                          ? '?'
+                          : conversation.title
+                                .trim()
+                                .characters
+                                .first
+                                .toUpperCase(),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(conversation.title, overflow: TextOverflow.ellipsis),
+            ),
+          ],
+        ),
+      ),
       body: Column(
         children: [
           if (state.errorMessage != null)
@@ -40,7 +69,7 @@ class ChatThreadScreen extends ConsumerWidget {
               currentUserId: currentUserId,
             ),
           ),
-          if (state.isAnyoneTyping)  _TypingIndicator(conversation.title),
+          if (state.isAnyoneTyping) _TypingIndicator(conversation.title),
           ChatComposer(
             controller: notifier.composerController,
             isSending: state.isSending,

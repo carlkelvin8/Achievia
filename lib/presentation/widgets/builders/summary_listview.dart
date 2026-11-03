@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:achievia/presentation/widgets/builders/question_jump_list.dart';
 import 'package:flutter/material.dart';
 
 class SummaryListview extends StatelessWidget {
@@ -12,11 +13,9 @@ class SummaryListview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: itemCount,
-      itemBuilder:itemBuilder,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-    );
+    // Scrolls by itself and builds rows lazily: a Mock Board has hundreds of
+    // questions, each with formatted text and possibly an image. The
+    // draggable bar jumps straight to any of them.
+    return QuestionJumpList(itemCount: itemCount, itemBuilder: itemBuilder);
   }
 }

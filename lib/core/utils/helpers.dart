@@ -1,3 +1,4 @@
+import 'package:achievia/core/constants/app_assets.dart';
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/domain/entities/widgets/questions_entity.dart';
@@ -12,57 +13,71 @@ const List<GradingBracket> gradingBrackets = [
     level: 'Recharge & Refocus',
     message:
         'Double your effort. Revisit the basics and rebuild your foundation.',
+    minScore: 0,
+    maxScoreExclusive: 50,
   ),
   GradingBracket(
     scoreRange: '50% - 64%',
     level: 'Warming Up',
     message: 'Progress is showing. Strengthen weak areas and stay consistent.',
+    minScore: 50,
+    maxScoreExclusive: 65,
   ),
   GradingBracket(
     scoreRange: '65% - 74%',
     level: 'Almost There',
     message:
         'You\'re on the right track. Improve accuracy and keep practicing.',
+    minScore: 65,
+    maxScoreExclusive: 75,
   ),
   GradingBracket(
     scoreRange: '75% - 84%',
     level: 'Solid Achievian',
     message:
         'Strong performance! Focus on high-yield topics and aim even higher.',
+    minScore: 75,
+    maxScoreExclusive: 85,
   ),
   GradingBracket(
     scoreRange: '85% - 89%',
     level: 'Board Ready',
     message:
         'You\'re nearly there. Sharpen your details and maintain your momentum.',
+    minScore: 85,
+    maxScoreExclusive: 90,
   ),
   GradingBracket(
     scoreRange: '90% and Above',
     level: 'Achievian Topnotcher Potential',
     message:
         'Excellent work! You\'re on topnotcher path - keep pushing and stay sharp.',
+    minScore: 90,
   ),
 ];
 
 final List<QuestionsEntityWidget> questions = [
   QuestionsEntityWidget(
     icon: Icons.question_answer_rounded,
+    iconAsset: questionBankIcon,
     label: 'Question Bank',
-    sub_label:
+    subLabel:
         'A comprehensive collection of board exam-style questions designed to cover all major topics, helping you practice, assess your understanding, and prepare effectively for the actual exam.',
     callback: (context) => context.push(RouteConstants.questionBankSubjects),
   ),
   QuestionsEntityWidget(
     icon: Icons.edit_document,
+    iconAsset: mockBoardsIcon,
     label: 'Mock Boards',
-    sub_label:
+    subLabel:
         'Simulated board examinations designed to mirror the actual exam experience, helping you assess your readiness, build confidence, and identify areas that need improvement before the real test.',
     callback: null,
   ),
   QuestionsEntityWidget(
     icon: Icons.emoji_events_sharp,
+    iconAsset: preBoardsIcon,
     label: 'Pre Boards',
-    sub_label:
+    subLabel:
         'A final one-take comprehensive exam that simulates the actual board, available only once and unlocked 2 weeks before the scheduled board exam to help you gauge your ultimate readiness.',
     callback: (context) => AppToast.showInfo(
       context,
@@ -79,9 +94,13 @@ final List<String> assets = [
 ];
 
 final List<String> assets2 = [
-  'General Passing Average: Minimum of 75% overall.',
-  'Minimum Subject Score: You must not score below 50% in any major subject. One subject below 50% results in automatic failure.',
+  'General Weighted Average (GWA): At least 75.00% across all six board examination subjects.',
+  'Minimum Subject Rating: No rating below 50.00% in any major subject.',
+  '60% Subject Rule: Must not fail 60% or more of the subjects, based on ratings below 75%.',
 ];
+
+const assets2Footer =
+    'All three conditions must be satisfied to obtain a passing result.';
 
 List<Widget> buildExamFooter({
   required VoidCallback onPrev,
@@ -144,7 +163,9 @@ String? validate(
       }
       break;
     case 'confirm password':
-      if (input != controller?.text) return 'Passwords do not match';
+      // Compare raw values: passwords are submitted exactly as typed, so a
+      // trimmed `input` would wrongly mismatch a password with edge spaces.
+      if ((value ?? '') != controller?.text) return 'Passwords do not match';
       break;
   }
   return null;

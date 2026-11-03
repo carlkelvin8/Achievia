@@ -1,11 +1,31 @@
+import 'package:achievia/core/utils/inline_html.dart';
 import 'package:achievia/domain/entities/widgets/notes_entity.dart';
 import 'package:achievia/presentation/widgets/supplementals/supplemental_tile_decoration.dart';
 import 'package:flutter/material.dart';
+import 'supplemental_detail_screen.dart';
 
-class MnemonicGrid extends StatelessWidget {
+class MnemonicGrid extends StatefulWidget {
   final List<NotesEntity> items;
 
   const MnemonicGrid({super.key, required this.items});
+
+  @override
+  State<MnemonicGrid> createState() => _MnemonicGridState();
+}
+
+class _MnemonicGridState extends State<MnemonicGrid> {
+  /// How many pictures are fetched ahead of a tap; the rest load on tap.
+  static const _prefetchCount = 6;
+
+  List<NotesEntity> get items => widget.items;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    for (final item in items.take(_prefetchCount)) {
+      SupplementalDetailScreen.prefetchImage(context, item.image);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,76 +42,56 @@ class MnemonicGrid extends StatelessWidget {
         childAspectRatio: 2.45,
       ),
       itemBuilder: (context, index) {
-        final item = items[index];
-        final icon = _mnemonicIcon(index);
-        return _MnemonicTile(title: item.title, icon: icon);
+        return _MnemonicTile(item: items[index]);
       },
     );
   }
 }
 
-IconData _mnemonicIcon(int index) {
-  const icons = [
-    Icons.dashboard_customize,
-    Icons.water_drop,
-    Icons.coronavirus,
-    Icons.bug_report,
-  ];
-  return icons[index % icons.length];
-}
-
 class _MnemonicTile extends StatelessWidget {
-  final String title;
-  final IconData icon;
+  final NotesEntity item;
 
-  const _MnemonicTile({required this.title, required this.icon});
+  const _MnemonicTile({required this.item});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: supplementalTileDecoration(theme),
-      child: Row(
-        children: [
-          _IconBubble(icon: icon),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: theme.colorScheme.onSurface,
-                height: 1.15,
+    return Material(
+      color: Colors.transparent,
+      child: Ink(
+        decoration: supplementalTileDecoration(theme),
+        child: InkWell(
+          onTap: () => SupplementalDetailScreen.open(
+            context,
+            title: item.title,
+            content: item.content,
+            imageUrl: item.image,
+            fileUrl: item.fileUrl,
+            isMnemonic: true,
+            // The picture is shown in the page itself; no extra button.
+            hideOpenFileForInlineImage: true,
+          ),
+          mouseCursor: SystemMouseCursors.click,
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: InlineHtmlText(
+                item.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: theme.colorScheme.onSurface,
+                  height: 1.15,
+                ),
               ),
             ),
           ),
-        ],
+        ),
       ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  final IconData icon;
-
-  const _IconBubble({required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      width: 34,
-      height: 34,
-      decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withValues(alpha: 0.10),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(icon, color: theme.colorScheme.primary, size: 21),
     );
   }
 }

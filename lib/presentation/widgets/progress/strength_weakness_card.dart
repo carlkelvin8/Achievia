@@ -35,14 +35,16 @@ class StrengthWeaknessCard extends StatelessWidget {
             subject: data.bestSubject,
             average: data.bestAverage,
             isBest: true,
+            hasData: data.bestSubject != 'N/A',
           ),
           const SizedBox(height: 12),
-          // Weakest Subject
+          // Weakest Subject (needs at least two subjects with exam data)
           SubjectRow(
             label: 'Weakest',
             subject: data.weakestSubject,
             average: data.weakestAverage,
             isBest: false,
+            hasData: data.weakestSubject != 'N/A',
           ),
         ],
       ),

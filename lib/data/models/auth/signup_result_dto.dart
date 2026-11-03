@@ -12,12 +12,12 @@ class SignupResultDto {
   });
 
   SignupResult toEntity() => SignupResult(
-        user: user.toEntity(),
-        requiresEmailConfirmation: requiresEmailConfirmation,
-      );
+    user: user.toEntity(),
+    requiresEmailConfirmation: requiresEmailConfirmation,
+  );
 
   static SignupResultDto fromEntity(SignupResult entity) => SignupResultDto(
-        user: UserDto.fromEntity(entity.user),
-        requiresEmailConfirmation: entity.requiresEmailConfirmation,
-      );
+    user: UserDto.fromEntity(entity.user),
+    requiresEmailConfirmation: entity.requiresEmailConfirmation,
+  );
 }

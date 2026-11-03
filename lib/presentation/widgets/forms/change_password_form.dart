@@ -41,11 +41,8 @@ class _ChangePasswordFormState extends ConsumerState<ChangePasswordForm> {
           const Text('Confirm Password'),
           const SizedBox(height: 10),
           ReusableField(
-            validator: (value) => validate(
-              'Confirm Password',
-              value,
-              event.passwordController,
-            ),
+            validator: (value) =>
+                validate('Confirm Password', value, event.passwordController),
             hintText: 'Re-enter your new password',
             controller: event.confirmPasswordController,
             borderRadius: BorderRadius.circular(10),

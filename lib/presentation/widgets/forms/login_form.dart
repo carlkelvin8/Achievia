@@ -102,10 +102,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
           const SizedBox(height: 16),
           GoogleSignInButton(
             onPressed: () {
-              AppToast.showInfo(
-                context,
-                'Google sign in is a design preview.',
-              );
+              AppToast.showInfo(context, 'Google sign in is a design preview.');
             },
           ),
           const SizedBox(height: 20),
@@ -113,7 +110,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
             onTap: () {
               context.push(RouteConstants.signUp);
             },
-            text: "Dont't have an account?  ",
+            text: "Don't have an account?  ",
             gesture: 'Register',
           ),
         ],

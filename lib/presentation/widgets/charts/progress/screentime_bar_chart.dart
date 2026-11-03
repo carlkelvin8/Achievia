@@ -1,3 +1,4 @@
+import 'package:achievia/core/utils/duration_labels.dart';
 import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -6,15 +7,18 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 class ScreentimeBarChart extends StatelessWidget {
   final List<DailyScreentime> data;
 
-  const ScreentimeBarChart({
-    super.key,
-    required this.data,
-  });
+  const ScreentimeBarChart({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty) return const SizedBox();
-
+    if (data.isEmpty || data.every((day) => day.minutes == 0)) {
+      return const Center(
+        child: Text(
+          'Your chart will appear after your first minute of active app use.',
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
     final theme = Theme.of(context);
     final chartData = data
         .map(
@@ -27,6 +31,17 @@ class ScreentimeBarChart extends StatelessWidget {
         .toList();
 
     return SfCartesianChart(
+      tooltipBehavior: TooltipBehavior(
+        enable: true,
+        format: 'point.x : point.y min',
+      ),
+      // Same tooltip, with the minutes shown as hours and minutes.
+      onTooltipRender: (TooltipArgs args) {
+        final index = args.pointIndex?.toInt();
+        if (index == null || index < 0 || index >= chartData.length) return;
+        final point = chartData[index];
+        args.text = '${point.dateLabel} : ${formatHoursMinutes(point.minutes)}';
+      },
       plotAreaBorderWidth: 0,
       primaryXAxis: CategoryAxis(
         labelRotation: -45,
@@ -41,6 +56,7 @@ class ScreentimeBarChart extends StatelessWidget {
         ),
       ),
       primaryYAxis: NumericAxis(
+        minimum: 0,
         labelStyle: TextStyle(
           fontSize: 10,
           color: theme.colorScheme.onSurfaceVariant,
@@ -83,4 +99,3 @@ class _BarChartData {
     required this.dateLabel,
   });
 }
-

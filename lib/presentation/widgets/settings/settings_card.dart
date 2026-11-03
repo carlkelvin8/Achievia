@@ -39,6 +39,29 @@ class SettingsCard extends StatelessWidget {
   }
 }
 
+/// The one style for every description line in Settings (Biometric Lock,
+/// Answer Feedback, Text Size, Sleep Time), so they all read the same.
+TextStyle? settingsDescriptionStyle(BuildContext context) {
+  final theme = Theme.of(context);
+  return theme.textTheme.bodySmall?.copyWith(
+    color: theme.colorScheme.onSurfaceVariant,
+    height: 1.4,
+  );
+}
+
+/// A description shown under a settings row, aligned with the card content.
+class SettingsDescription extends StatelessWidget {
+  final String text;
+
+  const SettingsDescription(this.text, {super.key});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(top: 8),
+    child: Text(text, style: settingsDescriptionStyle(context)),
+  );
+}
+
 class SettingsItem extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -88,12 +111,7 @@ class SettingsItem extends StatelessWidget {
               ),
               if (subtitle != null) ...[
                 const SizedBox(height: 2),
-                Text(
-                  subtitle!,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
+                Text(subtitle!, style: settingsDescriptionStyle(context)),
               ],
             ],
           ),

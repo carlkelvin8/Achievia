@@ -21,7 +21,7 @@ class SupabaseUserContext {
         .select()
         .eq('id', userId)
         .maybeSingle();
-        
+
     if (profile == null) {
       throw Exception('Authenticated user profile was not found');
     }

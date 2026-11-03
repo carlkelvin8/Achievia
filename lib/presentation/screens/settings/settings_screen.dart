@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/presentation/widgets/appbar/custom_app_bar.dart';
 import 'package:achievia/presentation/widgets/settings/navigation_settings_section.dart';
+import 'package:achievia/presentation/widgets/settings/answer_feedback_settings_section.dart';
 import 'package:achievia/presentation/widgets/settings/theme_settings_section.dart';
 import 'package:achievia/presentation/widgets/settings/text_size_settings_section.dart';
 import 'package:achievia/presentation/widgets/settings/sleep_time_settings_section.dart';
+import 'package:achievia/presentation/widgets/settings/legal_settings_section.dart';
 import 'package:achievia/presentation/widgets/settings/logout_settings_section.dart';
+import 'package:achievia/presentation/widgets/settings/subscription_settings_section.dart';
+import 'package:achievia/presentation/widgets/settings/mfa_settings_section.dart';
+import 'package:achievia/presentation/widgets/settings/app_lock_settings_section.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -40,8 +45,20 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             SizedBox(height: 8),
 
+            // Subscription and purchases
+            SubscriptionSettingsSection(),
+
+            // Two-factor authentication
+            MfaSettingsSection(),
+
+            // Biometric lock
+            AppLockSettingsSection(),
+
             // Navigation Settings (Pomodoro & Examination)
             NavigationSettingsSection(),
+
+            // Answer sounds and vibration (Study Deck, Take an Exam)
+            AnswerFeedbackSettingsSection(),
 
             // Theme Settings
             ThemeSettingsSection(),
@@ -51,6 +68,9 @@ class SettingsScreen extends ConsumerWidget {
 
             // Sleep Time Settings
             SleepTimeSettingsSection(),
+
+            // Privacy Policy and Terms of Service
+            LegalSettingsSection(),
 
             // Logout Settings
             LogoutSettingsSection(),
@@ -62,4 +82,3 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 }
-

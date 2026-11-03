@@ -13,4 +13,8 @@ class SupplementalRepositoryImpl implements SupplementalRepository {
   @override
   Future<List<SupplementalItemDto>> getItems({int? courseId}) =>
       datasource.getItems(courseId: courseId);
+
+  @override
+  Future<Map<int, String>> getSubjectTitles(Iterable<int> subjectIds) =>
+      datasource.getSubjectTitles(subjectIds);
 }

@@ -27,7 +27,7 @@ class CountdownBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: padding ?? EdgeInsets.zero,
       child: Row(
@@ -50,11 +50,9 @@ class CountdownBadge extends StatelessWidget {
             child: GestureDetector(
               onTap: onValueTap,
               child: Container(
-                padding: badgePadding ??
-                    const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
+                padding:
+                    badgePadding ??
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: backgroundColor ?? theme.colorScheme.surface,
                   borderRadius: BorderRadius.circular(8),

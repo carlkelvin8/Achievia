@@ -1,0 +1,79 @@
+00:00 +0: loading <repo>/test/core/utils/mock_board_generation_test.dart
+00:00 +0: <repo>/test/core/utils/mock_board_generation_test.dart: mock board generation builds six subject sections with 100 questions each
+00:00 +1: <repo>/test/core/utils/mock_board_generation_test.dart: mock board generation uses the fixed MTLE board sequence and combines configured sections
+00:00 +2: <repo>/test/core/utils/mock_board_generation_test.dart: mock board generation throws a meaningful error when a configured topic is short
+00:00 +3: <repo>/test/core/utils/module_file_access_test.dart: resolves uploaded paths and preserves full signed URLs
+00:00 +4: <repo>/test/core/utils/module_file_access_test.dart: available file passes the preview check
+00:00 +5: <repo>/test/core/utils/module_file_access_test.dart: admin PDF URL is preserved and opens as a PDF
+00:00 +6: <repo>/test/core/utils/module_file_access_test.dart: recognizes PDF content without an extension and keeps DOCX separate
+00:00 +7: <repo>/test/core/utils/module_file_access_test.dart: HTTP 400 prevents launching a blank viewer
+00:00 +8: <repo>/test/core/utils/module_file_access_test.dart: HTTP 404 prevents launching a blank viewer
+00:00 +9: <repo>/test/core/utils/module_file_access_test.dart: HTTP 403 prevents launching a blank viewer
+00:00 +10: <repo>/test/core/utils/module_file_access_test.dart: HTTP 500 prevents launching a blank viewer
+00:00 +11: <repo>/test/core/utils/progress_aggregator_test.dart: combines subject scores and uses summary when answers are empty
+00:00 +12: <repo>/test/core/utils/question_bank_helpers_test.dart: caps a randomized practice session at 20 usable questions
+00:00 +13: <repo>/test/core/utils/question_bank_helpers_test.dart: drops questions without choices and keeps fewer than 20
+00:00 +14: <repo>/test/core/utils/question_bank_helpers_test.dart: calculates zero, partial, and perfect percentage scores
+00:00 +15: <repo>/test/data/models/chat/chat_dto_test.dart: maps chat conversation row to entity
+00:00 +16: <repo>/test/data/models/chat/chat_dto_test.dart: maps chat message row to entity
+00:00 +17: <repo>/test/data/models/chat/chat_dto_test.dart: throws for unsupported chat conversation type
+00:00 +18: <repo>/test/data/models/chat/chat_dto_test.dart: maps chat person search row to entity
+00:00 +19: <repo>/test/data/models/chat/chat_dto_test.dart: chat person display name falls back to username then email
+00:00 +20: <repo>/test/data/models/quiz/qotd_dto_post_test.dart: parses student_id as a uuid string
+00:00 +21: <repo>/test/data/models/quiz/qotd_dto_post_test.dart: preserves student_id uuid when converting from entity
+00:01 +22: <repo>/test/data/models/quiz/quiz_dto_test.dart: QuizDto parses nested choices that do not include questionId
+00:01 +23: <repo>/test/data/repository/question_bank_repository_impl_test.dart: repository preserves the requested course filter
+00:01 +24: <repo>/test/presentation/provider/auth/password_reset/reset_password_event_test.dart: owns reset password form controllers
+00:01 +25: <repo>/test/presentation/provider/chat/chat_thread_state_test.dart: people search autocomplete activates after two characters
+00:01 +26: <repo>/test/presentation/provider/chat/chat_thread_state_test.dart: appendMessage ignores duplicate message ids
+00:01 +27: <repo>/test/presentation/provider/chat/chat_thread_state_test.dart: appendMessage ignores broadcast duplicate after sent message
+00:01 +28: <repo>/test/presentation/provider/chat/chat_thread_state_test.dart: typing indicator tracks and removes remote typers
+00:02 +29: <repo>/test/presentation/provider/progress/screentime_provider_test.dart: splits active usage at local midnight and keeps partial minutes
+00:02 +30: <repo>/test/presentation/provider/progress/screentime_provider_test.dart: counts foreground only and restores per-account usage
+00:02 +31: <repo>/test/presentation/provider/reviewer/question_bank_practice_provider_test.dart: subjects provider uses the signed-in profile course id
+00:02 +32: <repo>/test/presentation/provider/reviewer/question_bank_practice_provider_test.dart: subjects provider uses the sole available course when profile course is missing
+00:02 +33: <repo>/test/presentation/provider/reviewer/question_bank_practice_provider_test.dart: session locks the first answer and advances only after answering
+00:02 +34: <repo>/test/presentation/provider/reviewer/question_bank_practice_provider_test.dart: completion persists one attempt even when submitted twice
+00:02 +35: <repo>/test/presentation/screens/progress_screen_content_test.dart: empty progress cards fill phone width and explain missing data
+00:03 +36: <repo>/test/presentation/screens/question_bank/question_bank_practice_test.dart: practice requires an answer before advancing
+00:03 +37: <repo>/test/presentation/screens/question_bank/question_bank_practice_test.dart: practice requires an answer before advancing
+00:04 +38: <repo>/test/presentation/screens/question_bank/question_bank_selection_test.dart: Question Bank card opens its own subject screen
+00:04 +39: <repo>/test/presentation/screens/question_bank/question_bank_selection_test.dart: Question Bank card opens its own subject screen
+00:04 +40: <repo>/test/presentation/screens/question_bank/question_bank_selection_test.dart: Question Bank card opens its own subject screen
+00:04 +41: <repo>/test/presentation/screens/question_bank/question_bank_selection_test.dart: Question Bank card opens its own subject screen
+00:04 +42: <repo>/test/presentation/screens/question_bank/question_bank_selection_test.dart: Question Bank card opens its own subject screen
+00:04 +43: <repo>/test/presentation/widgets/cards/mockboard_dynamic_card_test.dart: renders generated subjects in order
+00:04 +44: <repo>/test/presentation/widgets/cards/questions_content_test.dart: disables choices immediately while answer callback is pending
+00:04 +45: <repo>/test/presentation/widgets/cards/questions_content_test.dart: disables choices immediately while answer callback is pending
+00:04 +46: <repo>/test/presentation/widgets/cards/questions_content_test.dart: disables choices immediately while answer callback is pending
+00:04 +47: <repo>/test/presentation/widgets/cards/questions_content_test.dart: disables choices immediately while answer callback is pending
+00:04 +48: <repo>/test/presentation/widgets/cards/question_of_the_day_card_test.dart: renders choices from question of the day data
+00:04 +49: <repo>/test/presentation/widgets/cards/question_of_the_day_card_test.dart: renders choices from question of the day data
+00:05 +50: <repo>/test/presentation/widgets/cards/question_of_the_day_card_test.dart: renders choices from question of the day data
+00:05 +51: <repo>/test/presentation/screens/question_bank/question_bank_selection_test.dart: subject screen explains a missing course assignment
+00:05 +52: <repo>/test/presentation/screens/question_bank/question_bank_selection_test.dart: subject screen explains a missing course assignment
+00:05 +53: <repo>/test/presentation/screens/question_bank/question_bank_selection_test.dart: subject screen explains a missing course assignment
+00:05 +54: <repo>/test/presentation/screens/question_bank/question_bank_selection_test.dart: subject screen explains a missing course assignment
+00:05 +55: <repo>/test/presentation/widgets/home/today_goal_section_test.dart: shows only unfinished reminders on the local date, with an existing goal
+00:05 +56: <repo>/test/presentation/widgets/inputs/custom_search_field_test.dart: shows matching suggestions and fills the selected value
+00:05 +57: <repo>/test/presentation/widgets/inputs/custom_search_field_test.dart: shows matching suggestions and fills the selected value
+00:05 +58: <repo>/test/presentation/widgets/inputs/custom_search_field_test.dart: shows matching suggestions and fills the selected value
+00:05 +59: <repo>/test/presentation/widgets/inputs/custom_search_field_test.dart: shows matching suggestions and fills the selected value
+00:05 +60: <repo>/test/presentation/widgets/inputs/custom_search_field_test.dart: shows matching suggestions and fills the selected value
+00:05 +61: <repo>/test/presentation/widgets/inputs/custom_search_field_test.dart: shows matching suggestions and fills the selected value
+00:05 +62: <repo>/test/presentation/widgets/inputs/custom_search_field_test.dart: shows matching suggestions and fills the selected value
+00:05 +63: <repo>/test/presentation/widgets/supplementals/supplemental_tiles_test.dart: mnemonic tiles are tappable
+00:05 +64: <repo>/test/presentation/widgets/supplementals/supplemental_tiles_test.dart: mnemonic tiles are tappable
+00:05 +65: <repo>/test/presentation/widgets/supplementals/supplemental_tiles_test.dart: mnemonic tiles are tappable
+00:05 +66: <repo>/test/presentation/widgets/supplementals/supplemental_tiles_test.dart: mnemonic tiles are tappable
+00:05 +67: <repo>/test/presentation/widgets/supplementals/supplemental_tiles_test.dart: mnemonic tiles are tappable
+00:06 +68: <repo>/test/presentation/widgets/supplementals/supplemental_tiles_test.dart: mnemonic tiles are tappable
+00:06 +69: <repo>/test/presentation/widgets/supplementals/supplemental_tiles_test.dart: mnemonic tiles are tappable
+00:06 +70: <repo>/test/presentation/widgets/supplementals/supplemental_tiles_test.dart: abbreviation tiles are tappable
+00:06 +71: <repo>/test/presentation/widgets/supplementals/supplemental_tiles_test.dart: procedure tiles are tappable across the whole tile
+00:06 +72: <repo>/test/presentation/widgets/supplementals/supplemental_tiles_test.dart: procedure tiles are tappable across the whole tile
+00:06 +73: <repo>/test/supabase/weekly_achievements_rpc_test.dart: weekly mockboard achievians rpc ranks by quiz attempt results
+00:06 +74: <repo>/test/supabase/weekly_achievements_rpc_test.dart: monthly streak achievians rpc ranks dynamic attempt-day streaks
+00:06 +75: <repo>/test/supabase/weekly_achievements_rpc_test.dart: leaderboard has indexes for quiz attempt rpc filters
+00:06 +76: <repo>/test/widget_test.dart: constructs the app widget
+00:06 +77: All tests passed!

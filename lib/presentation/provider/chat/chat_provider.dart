@@ -1,3 +1,4 @@
+import 'package:achievia/core/utils/auth_error_utils.dart';
 import 'dart:async';
 
 import 'package:achievia/domain/entities/api/chat/chat_conversation_entity.dart';
@@ -99,10 +100,15 @@ class ChatThreadNotifier extends Notifier<ChatThreadState> {
 
   ChatThreadNotifier(this.conversationId);
 
-  late final TextEditingController composerController;
+  late TextEditingController composerController;
   StreamSubscription<ChatMessageEntity>? _messagesSubscription;
   StreamSubscription? _typingSubscription;
   Timer? _typingIdleTimer;
+
+  /// Clears a remote "is typing" flag when no update arrives. The sender
+  /// stops after 3 seconds of idling, but a closed app never sends `false`.
+  final Map<String, Timer> _remoteTypingTimers = {};
+  static const _remoteTypingTimeout = Duration(seconds: 6);
   var _lastTypingSent = false;
   var _isDisposed = false;
 
@@ -114,6 +120,10 @@ class ChatThreadNotifier extends Notifier<ChatThreadState> {
       _isDisposed = true;
       composerController.removeListener(_onComposerChanged);
       _typingIdleTimer?.cancel();
+      for (final timer in _remoteTypingTimers.values) {
+        timer.cancel();
+      }
+      _remoteTypingTimers.clear();
       _messagesSubscription?.cancel();
       _typingSubscription?.cancel();
       if (_lastTypingSent) {
@@ -145,13 +155,21 @@ class ChatThreadNotifier extends Notifier<ChatThreadState> {
       state = state.copyWith(
         isLoading: false,
         errorMessage: null,
-        messages: _sortMessages(messages),
+        messages: _sortMessages(
+          {
+            for (final message in [...messages, ...state.messages])
+              message.id: message,
+          }.values.toList(),
+        ),
       );
     } catch (error) {
       if (_isDisposed) {
         return;
       }
-      state = state.copyWith(isLoading: false, errorMessage: error.toString());
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: userFacingError(error),
+      );
     }
   }
 
@@ -172,7 +190,7 @@ class ChatThreadNotifier extends Notifier<ChatThreadState> {
             if (_isDisposed) {
               return;
             }
-            state = state.copyWith(errorMessage: error.toString());
+            state = state.copyWith(errorMessage: userFacingError(error));
           },
         );
   }
@@ -187,6 +205,20 @@ class ChatThreadNotifier extends Notifier<ChatThreadState> {
             if (_isDisposed) {
               return;
             }
+            _remoteTypingTimers.remove(event.profileId)?.cancel();
+            if (event.isTyping) {
+              _remoteTypingTimers[event.profileId] = Timer(
+                _remoteTypingTimeout,
+                () {
+                  _remoteTypingTimers.remove(event.profileId);
+                  if (_isDisposed) return;
+                  state = state.applyTypingIndicator(
+                    profileId: event.profileId,
+                    isTyping: false,
+                  );
+                },
+              );
+            }
             state = state.applyTypingIndicator(
               profileId: event.profileId,
               isTyping: event.isTyping,
@@ -196,7 +228,7 @@ class ChatThreadNotifier extends Notifier<ChatThreadState> {
             if (_isDisposed) {
               return;
             }
-            state = state.copyWith(errorMessage: error.toString());
+            state = state.copyWith(errorMessage: userFacingError(error));
           },
         );
   }
@@ -240,7 +272,7 @@ class ChatThreadNotifier extends Notifier<ChatThreadState> {
   }
 
   Future<void> send() async {
-    if (_isDisposed) {
+    if (_isDisposed || state.isSending) {
       return;
     }
     final body = composerController.text.trim();
@@ -267,7 +299,10 @@ class ChatThreadNotifier extends Notifier<ChatThreadState> {
       if (_isDisposed) {
         return;
       }
-      state = state.copyWith(isSending: false, errorMessage: error.toString());
+      state = state.copyWith(
+        isSending: false,
+        errorMessage: userFacingError(error),
+      );
     }
   }
 }

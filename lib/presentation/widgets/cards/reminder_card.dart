@@ -35,7 +35,7 @@ class ReminderCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: margin ?? const EdgeInsets.only(top: 12, bottom: 4),
-        padding: padding ?? level2_widget,
+        padding: padding ?? level2Widget,
         decoration: BoxDecoration(
           color: theme.colorScheme.onSecondary,
           borderRadius: const BorderRadius.all(Radius.circular(12)),

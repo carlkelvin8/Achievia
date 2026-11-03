@@ -1,5 +1,6 @@
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/core/di/local_storage_service.dart';
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/presentation/widgets/placeholder_gestures/dialog_builder.dart';
 import 'package:achievia/presentation/widgets/settings/settings_card.dart';
 import 'package:flutter/material.dart';
@@ -38,8 +39,19 @@ class LogoutSettingsSection extends ConsumerWidget {
 
     if (confirmed == true) {
       final singleton = sl<LocalStorageService>();
-      await Supabase.instance.client.auth.signOut();
-      await singleton.clearToken();
+      try {
+        await Supabase.instance.client.auth.signOut();
+        await singleton.clearToken();
+      } catch (error) {
+        // Offline or server errors must not leave the user with a dead button.
+        debugPrint('Log out failed: $error');
+        if (context.mounted) {
+          AppToast.showError(
+            context,
+            'Unable to log out. Please check your connection and try again.',
+          );
+        }
+      }
     }
   }
 }

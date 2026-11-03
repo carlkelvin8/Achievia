@@ -227,7 +227,11 @@ void main() {
           questionsByQuiz: {
             10: List.generate(99, (index) => _question(index + 1, 10)),
           },
-          choicesByQuestion: const {},
+          // Usable questions have choices with exactly one correct answer.
+          choicesByQuestion: {
+            for (var id = 1; id <= 99; id++)
+              id: List.generate(4, (i) => _choice(id * 10 + i, id)),
+          },
         ),
         throwsA(
           isA<StateError>().having(

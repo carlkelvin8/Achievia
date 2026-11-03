@@ -12,14 +12,14 @@ class TaskDto {
   });
 
   Map<String, dynamic> toJson() => {
-        'task_name': tasksName,
-        'description': description,
-        'deadline': deadline,
-      };
+    'task_name': tasksName,
+    'description': description,
+    'deadline': deadline,
+  };
 
   factory TaskDto.fromEntity(TaskEntity entity) => TaskDto(
-        tasksName: entity.tasksName,
-        description: entity.description,
-        deadline: entity.deadline.toUtc().toIso8601String(),
-      );
+    tasksName: entity.tasksName,
+    description: entity.description,
+    deadline: entity.deadline.toUtc().toIso8601String(),
+  );
 }

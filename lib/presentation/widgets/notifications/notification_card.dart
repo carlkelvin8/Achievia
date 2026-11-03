@@ -167,5 +167,4 @@ class NotificationCard extends StatelessWidget {
         return Colors.grey;
     }
   }
-
 }

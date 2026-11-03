@@ -40,7 +40,9 @@ class ProfileScreenViewData {
     ProfileEntity profile, {
     DateTime? selectedBoardExamDate,
   }) {
-    final examDate = selectedBoardExamDate ?? profile.dateOfExamination;
+    // The profile is the source of truth (shared by every device). The copy
+    // kept on this device is only used while the profile has no date yet.
+    final examDate = profile.dateOfExamination ?? selectedBoardExamDate;
 
     return ProfileScreenViewData(
       card: ProfileCardViewData(
@@ -86,8 +88,13 @@ class ProfileScreenViewData {
   static String _calculateDaysLeft(DateTime? examDate) {
     if (examDate == null) return 'N/A';
 
+    // Normalize both to midnight so time-of-day never affects the day count.
     final now = DateTime.now();
-    final days = examDate.difference(now).inDays;
+    final todayMidnight = DateTime(now.year, now.month, now.day);
+    final local = examDate.toLocal();
+    final examMidnight = DateTime(local.year, local.month, local.day);
+
+    final days = examMidnight.difference(todayMidnight).inDays;
 
     if (days < 0) return 'Exam Passed';
     if (days == 0) return 'Today';

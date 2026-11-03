@@ -3,6 +3,7 @@ import 'package:achievia/core/network/conntectivity.dart';
 import 'package:achievia/data/data_source/reviewer/module_remote_datasource.dart';
 import 'package:achievia/domain/entities/api/reviewer/paginated_modules_entity.dart';
 import 'package:achievia/domain/repository/reviewer/module_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
@@ -19,38 +20,33 @@ class ModuleRepositoryImpl implements ModuleRepository {
     int limit = 20,
   }) async {
     try {
-      final connectivity = await network.isConnected;
+      final isConnected = await network.isConnected;
 
-      if (connectivity) {
-        final remoteModules = await remoteDatasource.getModules(
-          page: page,
-          limit: limit,
-        );
-        print('Repository - Remote modules received: $remoteModules');
-        final mapped = remoteModules.items
-            .map((dto) => dto.toEntity())
-            .toList();
-        print('Repository - Mapped to entities: $mapped');
-        return PaginatedModulesEntity(
-          items: mapped,
-          page: remoteModules.page,
-          limit: remoteModules.limit,
-          total: remoteModules.total,
-          hasMore: remoteModules.hasMore,
-        );
-      } else {
-        // There is no local content source; the UI renders an empty state offline.
-        return PaginatedModulesEntity(
-          items: const [],
-          page: page,
-          limit: limit,
-          total: 0,
-          hasMore: false,
+      if (!isConnected) {
+        // No local cache — propagate as an error so the UI shows the retry
+        // button instead of silently claiming there are no modules.
+        throw Exception(
+          'No internet connection. Please check your network and try again.',
         );
       }
+
+      final remoteModules = await remoteDatasource.getModules(
+        page: page,
+        limit: limit,
+      );
+
+      final mapped = remoteModules.items.map((dto) => dto.toEntity()).toList();
+
+      return PaginatedModulesEntity(
+        items: mapped,
+        page: remoteModules.page,
+        limit: remoteModules.limit,
+        total: remoteModules.total,
+        hasMore: remoteModules.hasMore,
+      );
     } catch (e, st) {
-      print('ModuleRepositoryImpl error: $e');
-      print('Stack trace: $st');
+      debugPrint('ModuleRepositoryImpl error: $e');
+      debugPrint('$st');
       rethrow;
     }
   }

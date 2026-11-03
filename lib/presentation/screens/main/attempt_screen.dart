@@ -23,15 +23,24 @@ class _AttemptScreenState extends ConsumerState<AttemptScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          // Opened from Profile: back there. Right after an exam: home.
           onPressed: () {
-            context.go(RouteConstants.main);
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(RouteConstants.main);
+            }
           },
         ),
         title: const Text('Attempt Results'),
       ),
-      body: Padding(
-        padding: EdgeInsetsGeometry.symmetric(vertical: 12, horizontal: 12),
-        child: AttemptCard(attemptId: resolvedAttemptId ?? 0),
+      // Equal side padding; scrolls when the results are taller than the
+      // screen instead of reserving empty space inside the card.
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: AttemptCard(attemptId: resolvedAttemptId ?? 0),
+        ),
       ),
     );
   }

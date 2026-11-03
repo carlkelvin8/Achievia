@@ -26,9 +26,10 @@ class GridCards extends ConsumerWidget {
         } else {
           final d = t.deadline.toLocal();
           final deadlineDay = DateTime(d.year, d.month, d.day);
-          if (deadlineDay == today) {
+          if (!deadlineDay.isAfter(today)) {
+            // today AND overdue tasks both belong to the Today screen
             todayCount++;
-          } else if (deadlineDay.isAfter(today)) {
+          } else {
             scheduledCount++;
           }
         }

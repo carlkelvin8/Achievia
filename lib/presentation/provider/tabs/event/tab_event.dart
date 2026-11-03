@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final tabProvider = NotifierProvider.autoDispose<TabEvent, TabController?>(TabEvent.new);
-final tabProviderReviewer = NotifierProvider.autoDispose<ReviewerEvent, TabController?>(ReviewerEvent.new);
-final indexProvider = NotifierProvider.autoDispose<IndexEvent, int>(IndexEvent.new);
-final tabProviderSemi = NotifierProvider.autoDispose<SupplementalsEvent, TabController?>(SupplementalsEvent.new);
+final tabProvider = NotifierProvider.autoDispose<TabEvent, TabController?>(
+  TabEvent.new,
+);
+final tabProviderReviewer =
+    NotifierProvider.autoDispose<ReviewerEvent, TabController?>(
+      ReviewerEvent.new,
+    );
+final indexProvider = NotifierProvider.autoDispose<IndexEvent, int>(
+  IndexEvent.new,
+);
+final tabProviderSemi =
+    NotifierProvider.autoDispose<SupplementalsEvent, TabController?>(
+      SupplementalsEvent.new,
+    );
 
 class TabEvent extends Notifier<TabController?> {
   @override
@@ -17,26 +27,25 @@ class TabEvent extends Notifier<TabController?> {
       controller.dispose();
     });
   }
+
   void jumpTo(int index) => state?.animateTo(index);
 }
 
 class SupplementalsEvent extends Notifier<TabController?> {
   @override
-  TabController? build()=> null;
+  TabController? build() => null;
 
-  void createController(TickerProvider vsync, int lenght){
+  void createController(TickerProvider vsync, int lenght) {
     final controller = TabController(length: lenght, vsync: vsync);
     state = controller;
 
-    ref.onDispose((){
+    ref.onDispose(() {
       controller.dispose();
     });
-
   }
-  
 }
 
-class ReviewerEvent extends Notifier<TabController?>{
+class ReviewerEvent extends Notifier<TabController?> {
   @override
   TabController? build() {
     return null;
@@ -50,7 +59,6 @@ class ReviewerEvent extends Notifier<TabController?>{
       controller.dispose();
     });
   }
-  
 }
 
 class IndexEvent extends Notifier<int> {

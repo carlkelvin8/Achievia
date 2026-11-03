@@ -1,10 +1,13 @@
+import 'package:achievia/core/utils/auth_error_utils.dart';
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/utils/snack_bar_utils.dart';
+import 'package:achievia/domain/entities/api/chat/chat_conversation_entity.dart';
 import 'package:achievia/domain/entities/api/chat/chat_person_entity.dart';
 import 'package:achievia/presentation/provider/chat/chat_provider.dart';
 import 'package:achievia/presentation/provider/chat/messages_provider.dart';
 import 'package:achievia/presentation/widgets/chat/message_filter_chips.dart';
 import 'package:achievia/presentation/widgets/chat/message_search_bar.dart';
+import 'package:achievia/presentation/widgets/chat/new_message_sheet.dart';
 import 'package:achievia/presentation/widgets/list_items/message_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,6 +30,11 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _pickPerson,
+        icon: const Icon(Icons.edit_outlined),
+        label: const Text('New message'),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -75,7 +83,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                       loading: () =>
                           const Center(child: CircularProgressIndicator()),
                       error: (error, stackTrace) => _MessagesErrorState(
-                        message: error.toString(),
+                        message: userFacingError(error),
                         onRetry: () =>
                             ref.invalidate(chatConversationsProvider),
                       ),
@@ -93,6 +101,17 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
   bool _isSearchingPeople(String query) =>
       isChatPeopleAutocompleteActive(query);
 
+  Future<void> _pickPerson() async {
+    final person = await showModalBottomSheet<ChatPersonEntity>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) => const NewMessageSheet(),
+    );
+    if (person == null || !mounted) return;
+    await _openDirectChat(person);
+  }
+
   Future<void> _openDirectChat(ChatPersonEntity person) async {
     final messageNotifier = ref.read(messagesProvider.notifier);
     final messageState = ref.read(messagesProvider);
@@ -103,22 +122,38 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
     messageNotifier.setOpeningProfileId(person.id);
 
     try {
-      final conversation = await ref
+      final started = await ref
           .read(chatUseCaseProvider)
           .startDirectConversation(person.id);
-      ref.invalidate(chatConversationsProvider);
+      // A new conversation comes back without the other person's name and
+      // picture; the person that was tapped already has both.
+      final conversation = ChatConversationEntity(
+        id: started.id,
+        type: started.type,
+        title: person.displayName,
+        createdBy: started.createdBy,
+        createdAt: started.createdAt,
+        updatedAt: started.updatedAt,
+        lastMessageAt: started.lastMessageAt,
+        latestMessage: started.latestMessage,
+        profileImage: person.profileImage,
+      );
 
       if (!mounted) {
         return;
       }
 
+      ref.invalidate(chatConversationsProvider);
       messageNotifier.clearSearch();
       context.push(RouteConstants.chatThread, extra: conversation);
     } catch (error) {
       if (!mounted) {
         return;
       }
-      AppToast.showError(context, 'Unable to open chat: $error');
+      AppToast.showError(
+        context,
+        'Unable to open chat. ${userFacingError(error)}',
+      );
     } finally {
       if (mounted) {
         messageNotifier.setOpeningProfileId(null);
@@ -225,7 +260,8 @@ class _PeopleAutocompletePanel extends ConsumerWidget {
         .take(2)
         .toList();
     if (parts.isEmpty) return '?';
-    return parts.map((part) => part[0].toUpperCase()).join();
+    // `characters` keeps emoji / surrogate pairs whole, unlike `part[0]`.
+    return parts.map((part) => part.characters.first.toUpperCase()).join();
   }
 
   String _subtitleFor(ChatPersonEntity person) {

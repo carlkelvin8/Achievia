@@ -34,6 +34,15 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<List<ChatPersonEntity>> listPeople({
+    int limit = 50,
+    int offset = 0,
+  }) async {
+    final dtos = await datasource.listPeople(limit: limit, offset: offset);
+    return dtos.map((dto) => dto.toEntity()).toList();
+  }
+
+  @override
   Future<ChatConversationEntity> startDirectConversation(
     String profileId,
   ) async {

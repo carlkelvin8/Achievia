@@ -2,27 +2,45 @@ import 'dart:async';
 
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/domain/use_cases/questions/questions_use_case.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/domain/entities/widgets/pomodoro_settings_entity.dart';
 import 'package:achievia/domain/entities/widgets/pomodoro_state_entity.dart';
 import 'package:achievia/domain/use_cases/progress/study_session_use_case.dart';
-import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-const Duration fixedTimerDuration = Duration(hours: 120);
-const Duration minTimer = Duration(seconds: 10);
 final useCase = Provider<QuestionsUseCase>((ref) => sl<QuestionsUseCase>());
 final studySessionUseCaseProvider = Provider<StudySessionUseCase>((ref) {
   return sl<StudySessionUseCase>();
 });
 
 class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
+  /// Stable SharedPreferences keys holding integer minute/session values.
+  /// One key per setting so a stored value is always a plain typed int.
+  static const focusMinutesKey = 'pomodoro_focus_minutes';
+  static const shortBreakMinutesKey = 'pomodoro_short_break_minutes';
+  static const longBreakMinutesKey = 'pomodoro_long_break_minutes';
+  static const sessionsBeforeLongKey = 'pomodoro_sessions_before_long';
+
+  bool _hydrated = false;
+  bool _disposed = false;
+  final Completer<void> _ready = Completer<void>();
+
+  /// Completes once the persisted settings have been applied (or found absent
+  /// or unreadable). Screens that start a timer wait for this so they never
+  /// begin with the defaults and then jump to the saved values.
+  Future<void> get ready => _ready.future;
+
   @override
   PomodoroSettingsEntity build() {
+    ref.onDispose(() => _disposed = true);
+    _hydrate();
     return const PomodoroSettingsEntity();
   }
 
   void setFocusMinutes(int minutes) {
     state = state.copyWith(focusDuration: Duration(minutes: minutes));
+    _persist(focusMinutesKey, minutes);
     // If timer is on focus phase and not running, reflect change immediately
     final timer = ref.read(pomodoroProvider);
     if (timer.phase == PomodoroPhase.focus && !timer.isRunning) {
@@ -33,6 +51,7 @@ class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
 
   void setShortBreakMinutes(int minutes) {
     state = state.copyWith(shortBreakDuration: Duration(minutes: minutes));
+    _persist(shortBreakMinutesKey, minutes);
     final timer = ref.read(pomodoroProvider);
     if (timer.phase == PomodoroPhase.shortBreak && !timer.isRunning) {
       ref.read(pomodoroProvider.notifier).syncWithSettings();
@@ -42,6 +61,7 @@ class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
 
   void setLongBreakMinutes(int minutes) {
     state = state.copyWith(longBreakDuration: Duration(minutes: minutes));
+    _persist(longBreakMinutesKey, minutes);
     final timer = ref.read(pomodoroProvider);
     if (timer.phase == PomodoroPhase.longBreak && !timer.isRunning) {
       ref.read(pomodoroProvider.notifier).syncWithSettings();
@@ -51,6 +71,7 @@ class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
 
   void setSessionsBeforeLong(int sessions) {
     state = state.copyWith(sessionsBeforeLongBreak: sessions);
+    _persist(sessionsBeforeLongKey, sessions);
     _updateDefaultFlag();
   }
 
@@ -64,6 +85,7 @@ class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
         longBreakDuration: const Duration(minutes: 30),
         sessionsBeforeLongBreak: 3,
       );
+      _persistAll();
       // If timer is paused, sync remaining with current phase
       ref.read(pomodoroProvider.notifier).syncWithSettings();
     } else {
@@ -93,13 +115,81 @@ class PomodoroSettingsNotifier extends Notifier<PomodoroSettingsEntity> {
   void toggleBreakMusic(bool value) {
     state = state.copyWith(breakMusicEnabled: value);
   }
+
+  /// Restores the last persisted settings when the provider is created.
+  /// Kept additive: missing or invalid keys fall back to their default, and a
+  /// failure to read local storage never changes the in-memory default.
+  Future<void> _hydrate() async {
+    if (_hydrated) return;
+    _hydrated = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (_disposed || !_hasStoredSettings(prefs)) return;
+      state = PomodoroSettingsEntity(
+        focusDuration: Duration(
+          minutes: _storedMinutes(prefs, focusMinutesKey, 25),
+        ),
+        shortBreakDuration: Duration(
+          minutes: _storedMinutes(prefs, shortBreakMinutesKey, 5),
+        ),
+        longBreakDuration: Duration(
+          minutes: _storedMinutes(prefs, longBreakMinutesKey, 30),
+        ),
+        sessionsBeforeLongBreak: _storedSessions(
+          prefs,
+          sessionsBeforeLongKey,
+          3,
+        ),
+      );
+      _updateDefaultFlag();
+    } catch (error) {
+      debugPrint('Unable to load pomodoro settings: $error');
+    } finally {
+      if (!_ready.isCompleted) _ready.complete();
+    }
+  }
+
+  bool _hasStoredSettings(SharedPreferences prefs) =>
+      prefs.getInt(focusMinutesKey) != null ||
+      prefs.getInt(shortBreakMinutesKey) != null ||
+      prefs.getInt(longBreakMinutesKey) != null ||
+      prefs.getInt(sessionsBeforeLongKey) != null;
+
+  int _storedMinutes(SharedPreferences prefs, String key, int fallback) {
+    final raw = prefs.getInt(key);
+    if (raw == null || raw <= 0 || raw > 180) return fallback;
+    return raw;
+  }
+
+  int _storedSessions(SharedPreferences prefs, String key, int fallback) {
+    final raw = prefs.getInt(key);
+    if (raw == null || raw < 1 || raw > 10) return fallback;
+    return raw;
+  }
+
+  void _persistAll() {
+    _persist(focusMinutesKey, state.focusDuration.inMinutes);
+    _persist(shortBreakMinutesKey, state.shortBreakDuration.inMinutes);
+    _persist(longBreakMinutesKey, state.longBreakDuration.inMinutes);
+    _persist(sessionsBeforeLongKey, state.sessionsBeforeLongBreak);
+  }
+
+  Future<void> _persist(String key, int value) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(key, value);
+    } catch (error) {
+      debugPrint('Unable to persist pomodoro settings: $error');
+    }
+  }
 }
 
+/// Not autoDispose: the timer reads these settings with `ref.read`, so a
+/// disposed provider would silently fall back to the 25-minute defaults.
 final pomodoroSettingsProvider =
-    NotifierProvider.autoDispose<
-      PomodoroSettingsNotifier,
-      PomodoroSettingsEntity
-    >(() => PomodoroSettingsNotifier());
+    NotifierProvider<PomodoroSettingsNotifier, PomodoroSettingsEntity>(
+      PomodoroSettingsNotifier.new,
+    );
 
 class PomodoroNotifier extends Notifier<PomodoroStateEntity> {
   Timer? _timer;
@@ -107,6 +197,7 @@ class PomodoroNotifier extends Notifier<PomodoroStateEntity> {
 
   @override
   PomodoroStateEntity build() {
+    ref.onDispose(() => _timer?.cancel());
     final settings = ref.read(pomodoroSettingsProvider);
     return PomodoroStateEntity(
       phase: PomodoroPhase.focus,
@@ -143,6 +234,31 @@ class PomodoroNotifier extends Notifier<PomodoroStateEntity> {
     );
   }
 
+  /// Full length of [phase] with the current settings.
+  Duration durationOf(PomodoroPhase phase) {
+    final settings = ref.read(pomodoroSettingsProvider);
+    switch (phase) {
+      case PomodoroPhase.focus:
+        return settings.focusDuration;
+      case PomodoroPhase.shortBreak:
+        return settings.shortBreakDuration;
+      case PomodoroPhase.longBreak:
+        return settings.longBreakDuration;
+    }
+  }
+
+  /// Switches to [phase] with a fresh countdown. A running timer keeps
+  /// running; a paused one stays paused. Leaving a Focus session records it
+  /// like a pause does.
+  void selectPhase(PomodoroPhase phase) {
+    if (state.phase == phase) return;
+    if (state.phase == PomodoroPhase.focus) _finishFocusSession();
+    if (phase == PomodoroPhase.focus && state.isRunning) {
+      _focusStartedAt = DateTime.now();
+    }
+    state = state.copyWith(phase: phase, remaining: durationOf(phase));
+  }
+
   void _onTick(Timer t) {
     if (!state.isRunning) return;
     final remaining = state.remaining - const Duration(seconds: 1);
@@ -170,6 +286,7 @@ class PomodoroNotifier extends Notifier<PomodoroStateEntity> {
         break;
       case PomodoroPhase.shortBreak:
       case PomodoroPhase.longBreak:
+        _focusStartedAt = DateTime.now();
         state = state.copyWith(
           phase: PomodoroPhase.focus,
           remaining: settings.focusDuration,
@@ -239,14 +356,22 @@ class PomodoroNotifier extends Notifier<PomodoroStateEntity> {
   }
 }
 
+/// Per-subject time limit for the Mock Boards exam, in minutes.
+///
+/// Mock Boards has always used its own fixed limit; it is deliberately
+/// independent of the subject Take an Exam configuration and of the
+/// user-customizable Pomodoro study settings.
+const mockBoardSubjectMinutes = 120;
+
 class MockboardsTimer extends Notifier<PomodoroStateEntity> {
   Timer? _timer;
 
   @override
   PomodoroStateEntity build() {
+    ref.onDispose(() => _timer?.cancel());
     return PomodoroStateEntity(
       phase: PomodoroPhase.focus,
-      remaining: minTimer,
+      remaining: const Duration(minutes: mockBoardSubjectMinutes),
       completedFocusSessions: 0,
       isRunning: false,
     );
@@ -268,10 +393,24 @@ class MockboardsTimer extends Notifier<PomodoroStateEntity> {
     pause();
     state = PomodoroStateEntity(
       phase: PomodoroPhase.focus,
-      remaining: minTimer,
+      remaining: const Duration(minutes: mockBoardSubjectMinutes),
       completedFocusSessions: 0,
       isRunning: false,
     );
+  }
+
+  /// Puts back the time left on a subject when an unfinished exam is
+  /// continued, so the clock never restarts from the full limit. At least one
+  /// second is kept so a clock saved at zero still runs out and advances.
+  void restore(Duration remaining) {
+    pause();
+    const limit = Duration(minutes: mockBoardSubjectMinutes);
+    final safe = remaining > limit
+        ? limit
+        : (remaining < const Duration(seconds: 1)
+              ? const Duration(seconds: 1)
+              : remaining);
+    state = state.copyWith(remaining: safe, isRunning: false);
   }
 
   void _onTick(Timer t) {

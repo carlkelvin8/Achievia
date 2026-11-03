@@ -21,6 +21,8 @@ abstract class UserRepositoryDataSource {
 class UserRemoteDatasource implements UserRepositoryDataSource {
   UserRemoteDatasource();
 
+  static const signupTimeout = Duration(seconds: 30);
+
   Future<bool?> _checkUsernameAvailability(String username) async {
     try {
       final response = await supabase.rpc(
@@ -38,6 +40,7 @@ class UserRemoteDatasource implements UserRepositoryDataSource {
         debugPrint(e.toString());
         return null;
       }
+      logAuthFailure('signup.username_check', e);
       rethrow;
     }
   }
@@ -62,21 +65,37 @@ class UserRemoteDatasource implements UserRepositoryDataSource {
     return UserDto.fromJson(metadata);
   }
 
+  /// Signs in with the password exactly as typed. Accounts created before
+  /// passwords stopped being trimmed were stored without surrounding
+  /// whitespace, so on rejected credentials the trimmed form is tried once.
+  Future<AuthResponse> _signIn(String? email, String password) async {
+    try {
+      return await supabaseAuth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+    } on AuthApiException catch (e) {
+      final trimmed = password.trim();
+      final rejected =
+          e.code == 'invalid_credentials' ||
+          e.message.toLowerCase().contains('invalid login credentials');
+      if (!rejected || trimmed == password || trimmed.isEmpty) rethrow;
+      return supabaseAuth.signInWithPassword(email: email, password: trimmed);
+    }
+  }
+
   @override
   Future<UserDto> login(UserDto dto) async {
     try {
-      final res = await supabaseAuth.signInWithPassword(
-        email: dto.username?.trim(),
-        password: dto.password!.trim(),
-      );
+      final res = await _signIn(dto.username?.trim(), dto.password!);
       final session = res.session;
       final user = res.user;
 
       if (session == null || session.isExpired) {
-        throw Exception("User not found");
+        throw AuthException('User not found');
       }
       if (user?.emailConfirmedAt == null) {
-        throw Exception('User is not verified yet');
+        throw AuthException('User is not verified yet');
       }
       return _fromUserMetadata(user, dto);
     } on AuthApiException catch (e) {
@@ -121,12 +140,20 @@ class UserRemoteDatasource implements UserRepositoryDataSource {
       ..remove('token');
     metadata['username'] = username;
 
-    final auth = await supabaseAuth.signUp(
-      password: dto.password!.trim(),
-      email: dto.email!.trim(),
-      data: metadata,
-      emailRedirectTo: supabaseAuthRedirectUrl,
-    );
+    final AuthResponse auth;
+    try {
+      auth = await supabaseAuth
+          .signUp(
+            password: dto.password!,
+            email: dto.email!.trim(),
+            data: metadata,
+            emailRedirectTo: supabaseAuthRedirectUrl,
+          )
+          .timeout(signupTimeout);
+    } catch (e, st) {
+      logAuthFailure('signup.auth', e, st);
+      rethrow;
+    }
 
     final user = auth.user;
     if (user == null) {
@@ -184,9 +211,7 @@ class UserRemoteDatasource implements UserRepositoryDataSource {
   @override
   Future<void> changePassword(String password) async {
     try {
-      await supabaseAuth.updateUser(UserAttributes(
-        password: password.trim()
-      ));
+      await supabaseAuth.updateUser(UserAttributes(password: password));
     } on AuthException catch (e) {
       debugPrint(e.toString());
       rethrow;
@@ -194,6 +219,5 @@ class UserRemoteDatasource implements UserRepositoryDataSource {
       debugPrint(e.toString());
       rethrow;
     }
-
   }
 }

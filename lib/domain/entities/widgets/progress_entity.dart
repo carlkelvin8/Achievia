@@ -4,6 +4,7 @@ class ProgressEntity {
   final String message;
   final StrengthWeakness strengthWeakness;
   final List<ScoreData> scoreHistory;
+  final Map<String, List<ScoreData>> subjectHistory;
   final ScreentimeData screentimeData;
   final CalendarData calendarData;
 
@@ -13,6 +14,7 @@ class ProgressEntity {
     required this.message,
     required this.strengthWeakness,
     required this.scoreHistory,
+    this.subjectHistory = const {},
     required this.screentimeData,
     required this.calendarData,
   });
@@ -23,6 +25,7 @@ class ProgressEntity {
     String? message,
     StrengthWeakness? strengthWeakness,
     List<ScoreData>? scoreHistory,
+    Map<String, List<ScoreData>>? subjectHistory,
     ScreentimeData? screentimeData,
     CalendarData? calendarData,
   }) {
@@ -32,6 +35,7 @@ class ProgressEntity {
       message: message ?? this.message,
       strengthWeakness: strengthWeakness ?? this.strengthWeakness,
       scoreHistory: scoreHistory ?? this.scoreHistory,
+      subjectHistory: subjectHistory ?? this.subjectHistory,
       screentimeData: screentimeData ?? this.screentimeData,
       calendarData: calendarData ?? this.calendarData,
     );
@@ -124,11 +128,45 @@ class GradingBracket {
   final String level;
   final String message;
 
+  /// Lower bound of this bracket's percentage range (inclusive).
+  final double minScore;
+
+  /// Exclusive upper bound of this bracket's percentage range; `null` means
+  /// the top bracket is open-ended (no upper bound).
+  final double? maxScoreExclusive;
+
   const GradingBracket({
     required this.scoreRange,
     required this.level,
     required this.message,
+    required this.minScore,
+    this.maxScoreExclusive,
   });
+}
+
+/// Grading application result for one finished exam.
+///
+/// Combines the sanitized percentage, the Passed/Failed boundary decision and
+/// the resolved bracket so every consumer (Take an Exam result page, future
+/// Exam Summary screen) shares one interpretation model.
+class GradingResult {
+  final double percentage;
+  final bool passed;
+  final GradingBracket bracket;
+
+  const GradingResult({
+    required this.percentage,
+    required this.passed,
+    required this.bracket,
+  });
+
+  String get statusLabel => passed ? 'PASSED' : 'FAILED';
+
+  /// Level / remark from the grading bracket (e.g. "Solid Achievian").
+  String get level => bracket.level;
+
+  /// Client-facing interpretation defined by the grading bracket.
+  String get message => bracket.message;
 }
 
 class CalendarData {

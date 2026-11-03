@@ -8,26 +8,32 @@ class MockboardCard extends StatelessWidget {
   final bool isOne;
   final bool isBullet;
   final bool isNumber;
+
+  /// A closing line under the bullets (no bullet of its own).
+  final String? footer;
   const MockboardCard({
     super.key,
     required this.label,
     required this.labels,
     this.isOne = false,
     this.isBullet = false,
-    this.isNumber = false
+    this.isNumber = false,
+    this.footer,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bodyStyle = GoogleFonts.poppins(
+      fontSize: 12,
+      fontWeight: FontWeight.w400,
+      color: Colors.black,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-          ),
+          style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 12),
         Card(
@@ -36,28 +42,24 @@ class MockboardCard extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: isOne
-                ? ListView.separated(
-                  physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) =>
-                        Text('• ${labels[index]}',
-                        style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black
-                          ),
-                        ),
-                    separatorBuilder: (_, __) =>
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ListView.separated(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) =>
+                            Text('• ${labels[index]}', style: bodyStyle),
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemCount: labels.length,
+                      ),
+                      if (footer != null) ...[
                         const SizedBox(height: 8),
-                    itemCount: labels.length,
+                        Text(footer!, style: bodyStyle),
+                      ],
+                    ],
                   )
-                : Text(labels.first,
-                style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black
-                          ),
-                ),
+                : Text(labels.first, style: bodyStyle),
           ),
         ),
       ],

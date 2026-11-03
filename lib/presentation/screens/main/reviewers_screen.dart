@@ -1,4 +1,5 @@
 import 'package:achievia/core/constants/routers/route_constants.dart';
+import 'package:achievia/core/constants/app_assets.dart';
 import 'package:achievia/presentation/widgets/reviewers/reviewer_category_card.dart';
 import 'package:achievia/presentation/widgets/reviewers/reviewer_screen_header.dart';
 import 'package:flutter/material.dart';
@@ -26,21 +27,21 @@ class ReviewersScreen extends StatelessWidget {
             const header = ReviewerScreenHeader();
             final cards = [
               ReviewerCategoryCard(
-                icon: Icons.menu_book_outlined,
+                iconAsset: motherNotesIcon,
                 title: 'Mother Notes',
                 subtitle: 'Study materials and notes.',
                 onTap: () => context.push(RouteConstants.motherNotes),
               ),
               ReviewerCategoryCard(
-                icon: Icons.help_outline,
+                iconAsset: questionBankReviewerIcon,
                 title: 'Question Bank',
                 subtitle: 'Practice questions and mock exams.',
                 onTap: () => context.push(RouteConstants.questionBank),
               ),
               ReviewerCategoryCard(
-                icon: Icons.emoji_events_outlined,
+                iconAsset: supplementalsIcon,
                 title: 'Supplementals',
-                subtitle: 'Mnemonics, abbreviations,\nprocedures.',
+                subtitle: 'Mnemonics, abbreviations,\ncomputations.',
                 onTap: () => context.push(RouteConstants.supplementals),
               ),
             ];

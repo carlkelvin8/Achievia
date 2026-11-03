@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:achievia/data/data_source/profile/profile_remote_datasource.dart';
 import 'package:achievia/domain/entities/api/profile/profile_entity.dart';
 import 'package:achievia/domain/repository/profile/profile_repository.dart';
@@ -19,5 +21,30 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<String> updateMantra(String mantra) async {
     return await datasource.updateMantra(mantra);
+  }
+
+  @override
+  Future<void> updatePurpose(String purpose) async {
+    await datasource.updatePurpose(purpose);
+  }
+
+  @override
+  Future<void> updateExamDate(DateTime date) async {
+    await datasource.updateExamDate(date);
+  }
+
+  @override
+  Future<void> updateDetails(Map<String, Object?> fields) async {
+    await datasource.updateDetails(fields);
+  }
+
+  @override
+  Future<void> removeProfileImage() async {
+    await datasource.removeProfileImage();
+  }
+
+  @override
+  Future<String> uploadProfileImage(Uint8List jpegBytes) async {
+    return await datasource.uploadProfileImage(jpegBytes);
   }
 }

@@ -10,4 +10,7 @@ class SupplementalUseCase {
 
   Future<List<SupplementalItemDto>> getItems({int? courseId}) =>
       repository.getItems(courseId: courseId);
+
+  Future<Map<int, String>> getSubjectTitles(Iterable<int> subjectIds) =>
+      repository.getSubjectTitles(subjectIds);
 }

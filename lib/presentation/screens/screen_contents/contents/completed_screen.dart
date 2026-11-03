@@ -1,3 +1,4 @@
+import 'package:achievia/core/utils/auth_error_utils.dart';
 import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/domain/entities/api/task/task_api_entity.dart';
 import 'package:achievia/presentation/provider/task/task_provider.dart';
@@ -29,18 +30,15 @@ class CompletedScreen extends ConsumerWidget {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.more_vert, color: theme.colorScheme.primary),
-            onPressed: () {},
-          ),
-        ],
+        actions: const [],
       ),
       body: tasksAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
-          child: Text('Error: $e',
-              style: TextStyle(color: theme.colorScheme.error)),
+          child: Text(
+            userFacingError(e),
+            style: TextStyle(color: theme.colorScheme.error),
+          ),
         ),
         data: (tasks) {
           final completed = tasks.where((t) => t.isDone).toList()
@@ -96,8 +94,9 @@ class CompletedScreen extends ConsumerWidget {
                           return ReminderCard(
                             title: item.taskName,
                             subtitle: item.description,
-                            dueDateLabel: DateFormat('MMMM d, yyyy')
-                                .format(item.deadline.toLocal()),
+                            dueDateLabel: DateFormat(
+                              'MMMM d, yyyy',
+                            ).format(item.deadline.toLocal()),
                             isCompleted: item.isDone,
                           );
                         },

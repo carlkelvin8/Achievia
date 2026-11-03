@@ -17,18 +17,20 @@ class AuthNotifier extends Notifier<bool> {
 final toggleProvider = NotifierProvider<AuthNotifier, bool>(AuthNotifier.new);
 
 class LoginNotifier extends Notifier<LoginFormState> {
-  late final TextEditingController emailControllerLogin;
-  late final TextEditingController passwordController;
-  late final TextEditingController firstNameController;
-  late final TextEditingController middleNameController;
-  late final TextEditingController lastNameController;
-  late final TextEditingController schoolController;
-  late final TextEditingController emailController;
-  late final TextEditingController passwordControllerSignup;
-  late final TextEditingController confirmPasswordControllerSignup;
-  late final TextEditingController userNameControllerSignup;
+  late TextEditingController emailControllerLogin;
+  late TextEditingController passwordController;
+  late TextEditingController firstNameController;
+  late TextEditingController middleNameController;
+  late TextEditingController lastNameController;
+  late TextEditingController schoolController;
+  late TextEditingController birthdayController;
+  late TextEditingController addressController;
+  late TextEditingController emailController;
+  late TextEditingController passwordControllerSignup;
+  late TextEditingController confirmPasswordControllerSignup;
+  late TextEditingController userNameControllerSignup;
 
-  late final UserUseCase useCase;
+  late UserUseCase useCase;
 
   @override
   LoginFormState build() {
@@ -40,6 +42,8 @@ class LoginNotifier extends Notifier<LoginFormState> {
     middleNameController = TextEditingController();
     lastNameController = TextEditingController();
     schoolController = TextEditingController();
+    birthdayController = TextEditingController();
+    addressController = TextEditingController();
     emailController = TextEditingController();
     passwordControllerSignup = TextEditingController();
     confirmPasswordControllerSignup = TextEditingController();
@@ -52,6 +56,8 @@ class LoginNotifier extends Notifier<LoginFormState> {
       middleNameController.dispose();
       lastNameController.dispose();
       schoolController.dispose();
+      birthdayController.dispose();
+      addressController.dispose();
       emailController.dispose();
       passwordControllerSignup.dispose();
       confirmPasswordControllerSignup.dispose();
@@ -66,6 +72,7 @@ class LoginNotifier extends Notifier<LoginFormState> {
   }
 
   Future<bool> submit() async {
+    if (state.isLoading) return false;
     final entity = UserEntity(
       id: 0,
       firstName: '',
@@ -84,26 +91,58 @@ class LoginNotifier extends Notifier<LoginFormState> {
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
       await useCase.getLogin(entity);
+      // The form may have been torn down while the request was in flight.
+      if (!ref.mounted) return true;
       emailControllerLogin.clear();
       passwordController.clear();
       state = state.copyWith(isLoading: false, errorMessage: null);
       return true;
     } on AuthException catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.message);
+      if (!ref.mounted) return false;
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: userFacingAuthError(e),
+      );
       return false;
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      if (!ref.mounted) return false;
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: userFacingAuthError(e),
+      );
       return false;
     }
   }
 
+  /// The date picked in the Birthday field; null until one is chosen.
+  DateTime? birthDate;
+
+  /// Whole years completed on [today].
+  static int ageOn(DateTime birth, DateTime today) {
+    var years = today.year - birth.year;
+    final hadBirthday =
+        today.month > birth.month ||
+        (today.month == birth.month && today.day >= birth.day);
+    if (!hadBirthday) years--;
+    return years < 0 ? 0 : years;
+  }
+
+  static String isoDate(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-'
+      '${d.month.toString().padLeft(2, '0')}-'
+      '${d.day.toString().padLeft(2, '0')}';
+
   Future<SignupResult?> submitSignup() async {
+    if (state.isLoading) return null;
+    final birth = birthDate;
     final entity = UserEntity(
       firstName: firstNameController.text,
       middleName: middleNameController.text,
       lastName: lastNameController.text,
       bio: '',
-      age: 0,
+      // Age is derived from the birthday, so it is saved with the profile.
+      age: birth == null ? 0 : ageOn(birth, DateTime.now()),
+      birthDate: birth == null ? null : isoDate(birth),
       username: userNameControllerSignup.text,
       email: emailController.text,
       password: passwordControllerSignup.text,
@@ -111,31 +150,43 @@ class LoginNotifier extends Notifier<LoginFormState> {
       status: '',
       profileImage: '',
       university: schoolController.text,
+      purpose: 'MTLE',
+      fullAddress: addressController.text.trim(),
     );
 
     try {
-      state = state.copyWith(isLoading: true, errorMessage: null);
+      state = state.copyWith(
+        isLoading: true,
+        errorMessage: null,
+        emailError: null,
+      );
       final result = await useCase.getSignup(entity);
+      if (!ref.mounted) return result;
       firstNameController.clear();
       middleNameController.clear();
       lastNameController.clear();
       schoolController.clear();
+      birthdayController.clear();
+      addressController.clear();
+      birthDate = null;
       userNameControllerSignup.clear();
       emailController.clear();
       passwordControllerSignup.clear();
       confirmPasswordControllerSignup.clear();
-      state = state.copyWith(isLoading: false, errorMessage: null);
-      return result;
-    } on AuthException catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: userFacingAuthError(e),
+        errorMessage: null,
+        emailError: null,
       );
-      return null;
-    } catch (e) {
+      return result;
+    } catch (e, st) {
+      logAuthFailure('signup', e, st);
+      if (!ref.mounted) return null;
+      final message = userFacingAuthError(e);
       state = state.copyWith(
         isLoading: false,
-        errorMessage: userFacingAuthError(e),
+        errorMessage: message,
+        emailError: isEmailFailure(e) ? message : null,
       );
       return null;
     }
@@ -149,6 +200,7 @@ final userUseCaseProvider = Provider<UserUseCase>((ref) => sl<UserUseCase>());
 
 class LoginFormState {
   static const Object _errorMessageUnset = Object();
+  static const Object _emailErrorUnset = Object();
 
   final String email;
   final String password;
@@ -156,12 +208,16 @@ class LoginFormState {
   final bool isToggled;
   final String? errorMessage;
 
+  /// Only set when the failure is about the email itself (invalid or taken).
+  final String? emailError;
+
   const LoginFormState({
     required this.email,
     required this.password,
     this.isLoading = false,
     this.isToggled = true,
     this.errorMessage,
+    this.emailError,
   });
 
   LoginFormState copyWith({
@@ -169,6 +225,7 @@ class LoginFormState {
     String? password,
     bool? isLoading,
     Object? errorMessage = _errorMessageUnset,
+    Object? emailError = _emailErrorUnset,
     bool? isToggled,
   }) {
     return LoginFormState(
@@ -178,6 +235,9 @@ class LoginFormState {
       errorMessage: identical(errorMessage, _errorMessageUnset)
           ? this.errorMessage
           : errorMessage as String?,
+      emailError: identical(emailError, _emailErrorUnset)
+          ? this.emailError
+          : emailError as String?,
       isToggled: isToggled ?? this.isToggled,
     );
   }

@@ -1,3 +1,4 @@
+import 'package:achievia/core/utils/auth_error_utils.dart';
 import 'package:achievia/core/constants/app_paddings.dart';
 import 'package:achievia/presentation/provider/about/about_provider.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +16,9 @@ class AuthorContentScreen extends ConsumerWidget {
     return Scaffold(
       body: authorsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) =>
-            Center(child: Text('Unable to load authors: $error')),
+        error: (error, _) => Center(
+          child: Text('Unable to load authors. ${userFacingError(error)}'),
+        ),
         data: (authors) => authors.isEmpty
             ? const EmptyStateWidget(
                 icon: Icons.people_outline,

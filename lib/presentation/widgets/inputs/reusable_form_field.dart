@@ -61,8 +61,9 @@ class ReusableField extends StatelessWidget {
                 borderSide: BorderSide(color: Color.fromARGB(255, 248, 17, 0)),
               )
             : OutlineInputBorder(
-              borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(0)),
-                borderSide: BorderSide(color: Colors.black, ),
+                borderRadius:
+                    borderRadius ?? BorderRadius.all(Radius.circular(0)),
+                borderSide: BorderSide(color: Colors.black),
               ),
       ),
     );

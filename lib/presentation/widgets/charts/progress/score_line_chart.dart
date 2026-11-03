@@ -3,18 +3,31 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+/// "25%" for whole scores, "33.5%" otherwise; one percent sign, always.
+String formatScorePercent(double score) {
+  final rounded = score.roundToDouble();
+  final text = score == rounded
+      ? rounded.toInt().toString()
+      : score.toStringAsFixed(1);
+  return '$text%';
+}
+
 class ScoreLineChart extends StatelessWidget {
   final List<ScoreData> data;
+  final String emptyMessage;
 
   const ScoreLineChart({
     super.key,
     required this.data,
+    this.emptyMessage =
+        'Complete a Mock Board or Question Bank quiz to see your scores.',
   });
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty) return const SizedBox();
-
+    if (data.isEmpty) {
+      return Center(child: Text(emptyMessage, textAlign: TextAlign.center));
+    }
     final theme = Theme.of(context);
     final chartData = data
         .map(
@@ -27,6 +40,19 @@ class ScoreLineChart extends StatelessWidget {
         .toList();
 
     return SfCartesianChart(
+      tooltipBehavior: TooltipBehavior(
+        enable: true,
+        format: 'point.x : point.y',
+      ),
+      // The percent sign is written exactly once, here: "1. Oct 12, 2026: 25%".
+      onTooltipRender: (TooltipArgs args) {
+        final index = args.pointIndex?.toInt();
+        if (index == null || index < 0 || index >= chartData.length) return;
+        final point = chartData[index];
+        args.text =
+            '${index + 1}. ${point.dateLabel}: '
+            '${formatScorePercent(point.score)}';
+      },
       plotAreaBorderWidth: 0,
       primaryXAxis: CategoryAxis(
         labelRotation: -45,
@@ -41,9 +67,9 @@ class ScoreLineChart extends StatelessWidget {
         ),
       ),
       primaryYAxis: NumericAxis(
-        minimum: data.map((e) => e.score).reduce((a, b) => a < b ? a : b) - 5,
-        maximum: data.map((e) => e.score).reduce((a, b) => a > b ? a : b) + 5,
-        interval: 5,
+        minimum: 0,
+        maximum: 100,
+        interval: 20,
         labelFormat: '{value}%',
         labelStyle: TextStyle(
           fontSize: 10,
@@ -61,7 +87,8 @@ class ScoreLineChart extends StatelessWidget {
       series: <CartesianSeries<_ChartData, String>>[
         LineSeries<_ChartData, String>(
           dataSource: chartData,
-          xValueMapper: (_ChartData data, _) => data.dateLabel,
+          xValueMapper: (_ChartData data, index) =>
+              '${index + 1}. ${data.dateLabel}',
           yValueMapper: (_ChartData data, _) => data.score,
           color: theme.colorScheme.primary,
           width: 3,
@@ -93,4 +120,3 @@ class _ChartData {
     required this.dateLabel,
   });
 }
-

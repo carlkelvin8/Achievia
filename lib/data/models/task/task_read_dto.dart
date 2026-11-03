@@ -20,22 +20,22 @@ class TaskReadDto {
   });
 
   factory TaskReadDto.fromJson(Map<String, dynamic> json) => TaskReadDto(
-        id: json['id'] as String,
-        taskName: json['task_name'] as String,
-        description: json['description'] as String,
-        userId: json['user_id'] as String,
-        isDone: json['is_done'] as bool,
-        deadline: DateTime.parse(json['deadline'] as String),
-        createdAt: DateTime.parse(json['created_at'] as String),
-      );
+    id: json['id'] as String,
+    taskName: json['task_name'] as String,
+    description: (json['description'] as String?) ?? '',
+    userId: json['user_id'] as String,
+    isDone: json['is_done'] as bool,
+    deadline: DateTime.parse(json['deadline'] as String),
+    createdAt: DateTime.parse(json['created_at'] as String),
+  );
 
   TaskApiEntity toEntity() => TaskApiEntity(
-        id: id,
-        taskName: taskName,
-        description: description,
-        userId: userId,
-        isDone: isDone,
-        deadline: deadline,
-        createdAt: createdAt,
-      );
+    id: id,
+    taskName: taskName,
+    description: description,
+    userId: userId,
+    isDone: isDone,
+    deadline: deadline,
+    createdAt: createdAt,
+  );
 }

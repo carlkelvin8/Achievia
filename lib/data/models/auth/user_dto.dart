@@ -37,6 +37,10 @@ class UserDto {
   final String? purpose;
   @JsonKey(name: 'date_of_examination')
   final DateTime? dateOfExamination;
+  @JsonKey(name: 'birth_date')
+  final String? birthDate;
+  @JsonKey(name: 'full_address')
+  final String? fullAddress;
   UserDto({
     this.id,
     this.firstName,
@@ -58,6 +62,8 @@ class UserDto {
     this.university,
     this.purpose,
     this.dateOfExamination,
+    this.birthDate,
+    this.fullAddress,
   });
 
   Map<String, dynamic> toJson() => _$UserDtoToJson(this);
@@ -81,6 +87,8 @@ class UserDto {
     university: entity.university,
     purpose: entity.purpose,
     dateOfExamination: entity.dateOfExamination,
+    birthDate: entity.birthDate,
+    fullAddress: entity.fullAddress,
   );
 
   UserEntity toEntity() => UserEntity(
@@ -100,5 +108,7 @@ class UserDto {
     university: university,
     purpose: purpose,
     dateOfExamination: dateOfExamination,
+    birthDate: birthDate,
+    fullAddress: fullAddress,
   );
 }

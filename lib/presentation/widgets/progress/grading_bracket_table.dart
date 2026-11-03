@@ -67,9 +67,8 @@ class GradingBracketTable extends StatelessWidget {
                   // Header Row
                   TableRow(
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest.withValues(
-                        alpha: 0.5,
-                      ),
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.5),
                     ),
                     children: [
                       _buildTableCell(context, 'SCORE RANGE', isHeader: true),

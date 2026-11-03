@@ -5,31 +5,40 @@ import 'package:google_fonts/google_fonts.dart';
 class AuthAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onTap;
   final bool hasCenteredTitle;
-  const AuthAppBar({super.key, required this.onTap, required this.hasCenteredTitle});
+  const AuthAppBar({
+    super.key,
+    required this.onTap,
+    required this.hasCenteredTitle,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final foreground = Theme.of(context).brightness == Brightness.dark
+        ? Theme.of(context).colorScheme.onSurface
+        : primaryVariant;
     return AppBar(
       leading: IconButton(
         onPressed: onTap,
-        icon: Icon(Icons.arrow_back, color: primaryVariant),
+        icon: Icon(Icons.arrow_back, color: foreground),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       foregroundColor: Theme.of(context).colorScheme.onSurface,
       actions: [
         Container(
           padding: EdgeInsets.only(right: 12),
-          child: Text('Need help?', style: TextStyle(color: primaryVariant)),
+          child: Text('Need help?', style: TextStyle(color: foreground)),
         ),
       ],
       centerTitle: true,
-      title:hasCenteredTitle ? Text(
-        'Achievia',
-        style: GoogleFonts.poppins(
-          fontWeight: FontWeight.w600,
-          color: primaryVariant,
-        ),
-      ) : null,
+      title: hasCenteredTitle
+          ? Text(
+              'Achievia',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                color: foreground,
+              ),
+            )
+          : null,
     );
   }
 

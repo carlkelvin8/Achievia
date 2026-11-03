@@ -7,13 +7,13 @@ part 'questions_dto.g.dart';
 
 @JsonSerializable()
 class QuestionsDto {
-
   final int id;
   final String title;
   final int courseId;
   final String description;
   final String? image; // nullable
-  final String? day_subject;
+  @JsonKey(name: 'day_subject')
+  final String? daySubject;
   final String createdAt;
 
   QuestionsDto({
@@ -22,31 +22,32 @@ class QuestionsDto {
     required this.courseId,
     required this.description,
     this.image,
-    required this.day_subject,
+    required this.daySubject,
     required this.createdAt,
   });
 
-  factory QuestionsDto.fromJson(Map<String, dynamic> json) => _$QuestionsDtoFromJson(json);
+  factory QuestionsDto.fromJson(Map<String, dynamic> json) =>
+      _$QuestionsDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$QuestionsDtoToJson(this);
 
   QuestionsEntity toEntity() => QuestionsEntity(
-      id: id.toString(),  // convert int to String if entity expects String
-      title: title,
-      courseId: courseId.toString(), 
-      description: description,
-      image: image ?? '',
-      day_subject: day_subject,
-      createdAt: createdAt,
-    );
+    id: id.toString(), // convert int to String if entity expects String
+    title: title,
+    courseId: courseId.toString(),
+    description: description,
+    image: image ?? '',
+    daySubject: daySubject,
+    createdAt: createdAt,
+  );
 
   static QuestionsDto fromEntity(QuestionsEntity entity) => QuestionsDto(
-      id: int.parse(entity.id),
-      title: entity.title,
-      courseId: int.parse(entity.courseId),
-      description: entity.description,
-      image: entity.image,
-      day_subject: entity.day_subject,
-      createdAt: entity.createdAt,
-    );
+    id: int.parse(entity.id),
+    title: entity.title,
+    courseId: int.parse(entity.courseId),
+    description: entity.description,
+    image: entity.image,
+    daySubject: entity.daySubject,
+    createdAt: entity.createdAt,
+  );
 }

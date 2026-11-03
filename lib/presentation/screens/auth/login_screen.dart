@@ -1,4 +1,6 @@
+import 'package:achievia/core/constants/app_assets.dart';
 import 'package:achievia/core/constants/app_paddings.dart';
+import 'package:achievia/presentation/widgets/builders/inline_style_svg.dart';
 import 'package:achievia/presentation/widgets/forms/login_form.dart';
 import 'package:achievia/presentation/widgets/headers/core/header1.dart';
 import 'package:achievia/presentation/widgets/headers/core/header2.dart';
@@ -12,22 +14,7 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
+class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,18 +25,16 @@ class _LoginScreenState extends State<LoginScreen>
           child: Column(
             children: <Widget>[
               const SizedBox(height: 60),
-              Center(
-                child: SizedBox(
-                  width: 130,
-                  height: 130,
-                  child: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    child: Icon(
-                      Icons.school,
-                      size: 60,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                  ),
+              // Official Achievia logo (vector, so it stays sharp at any
+              // density). The artwork fills about 74% of its square canvas;
+              // a 150 box shows it at roughly the old badge's visual size.
+              const Center(
+                child: InlineStyleSvg(
+                  key: ValueKey('login-logo'),
+                  assetPath: logo,
+                  width: 150,
+                  height: 150,
+                  semanticsLabel: 'Achievia logo',
                 ),
               ),
               Center(

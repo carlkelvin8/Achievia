@@ -1,13 +1,15 @@
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/core/utils/helpers.dart';
 import 'package:achievia/core/utils/progress_aggregator.dart';
-import 'package:achievia/data/models/progress/progress_day_dto.dart';
+import 'package:achievia/core/utils/streak_rules.dart';
 import 'package:achievia/data/models/progress/progress_snapshot_dto.dart';
 import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 import 'package:achievia/domain/use_cases/progress/progress_use_case.dart';
 import 'package:achievia/presentation/provider/auth/event/token_state_provider.dart';
 import 'package:achievia/presentation/provider/profile/profile_provider.dart';
+import 'package:achievia/presentation/provider/progress/screentime_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:achievia/presentation/provider/task/local_day_provider.dart';
 
 final progressUseCaseProvider = Provider<ProgressUseCase>((ref) {
   return sl<ProgressUseCase>();
@@ -16,8 +18,9 @@ final progressUseCaseProvider = Provider<ProgressUseCase>((ref) {
 final progressProvider = FutureProvider.autoDispose<ProgressEntity>((
   ref,
 ) async {
-  final token = ref.watch(tokenStream).value;
-  final today = DateTime.now();
+  final today = ref.watch(localDayProvider);
+  final todayMet = ref.watch(todayStreakMetProvider);
+  final token = await ref.watch(tokenStream.future);
   final normalizedToday = DateTime(today.year, today.month, today.day);
   if (token == null || token.isEmpty) {
     return aggregateProgress(
@@ -50,26 +53,19 @@ final progressProvider = FutureProvider.autoDispose<ProgressEntity>((
   }
 
   final useCase = ref.read(progressUseCaseProvider);
-  var snapshot = await useCase.getSnapshot();
-  final hasToday = snapshot.activeDays.any(
-    (day) => _dateKey(day.activityDate) == _dateKey(normalizedToday),
+  final fetched = await useCase.getSnapshot();
+  // A day is blue only after 60 minutes of use; opening the screen no longer
+  // counts. Earlier days stay as stored.
+  final snapshot = ProgressSnapshotDto(
+    activeDays: applyDailyUsageRule(
+      days: fetched.activeDays,
+      today: normalizedToday,
+      todaySeconds: todayMet ? kStreakRequiredSeconds : 0,
+    ),
+    quizAttempts: fetched.quizAttempts,
+    studySessions: fetched.studySessions,
+    subjectExamAttempts: fetched.subjectExamAttempts,
   );
-  if (!hasToday) {
-    await useCase.markTodayActive();
-    snapshot = ProgressSnapshotDto(
-      activeDays: [
-        ...snapshot.activeDays,
-        ProgressDayDto(
-          id: 0,
-          userId: '',
-          activityDate: normalizedToday,
-          isActive: true,
-        ),
-      ],
-      quizAttempts: snapshot.quizAttempts,
-      studySessions: snapshot.studySessions,
-    );
-  }
 
   return aggregateProgress(
     snapshot: snapshot,
@@ -77,12 +73,6 @@ final progressProvider = FutureProvider.autoDispose<ProgressEntity>((
     today: normalizedToday,
   );
 }, retry: (_, _) => null);
-
-String _dateKey(DateTime date) => DateTime(
-  date.year,
-  date.month,
-  date.day,
-).toIso8601String().split('T').first;
 
 final gradingBracketsProvider = Provider<List<GradingBracket>>((ref) {
   return gradingBrackets;

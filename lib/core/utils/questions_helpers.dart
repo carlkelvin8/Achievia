@@ -1,11 +1,17 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:achievia/const.dart';
+import 'package:achievia/core/utils/mock_board_errors.dart';
+import 'package:achievia/core/utils/question_eligibility.dart';
 import 'package:achievia/data/models/quiz/quiz_dto.dart';
 import 'package:achievia/data/models/quiz/results_dto.dart';
 
 final Map<String, SubjectScore> subjectScores = {};
+
+/// The choice the user picked for each question of the Mock Board in progress
+/// (question id -> choice id). The server grades these; the score kept in
+/// [subjectScores] is only used for on-screen progress.
+final Map<int, int> mockBoardSelections = {};
 
 const int mockBoardSubjectCount = 6;
 const int mockBoardQuestionsPerSubject = 100;
@@ -87,63 +93,6 @@ List<Map<String, dynamic>> selectMockBoardSubjects(
   }).toList();
 }
 
-Future<List<QuizDtoItems>> buildQuizItems(
-  List<Map<String, dynamic>> subjects,
-) async {
-  final limitedSubjects = subjects;
-  final quizzesBySubject = <int, List<Map<String, dynamic>>>{};
-  final questionsByQuiz = <int, List<Map<String, dynamic>>>{};
-  final choicesByQuestion = <int, List<Map<String, dynamic>>>{};
-
-  for (final subject in limitedSubjects) {
-    final subjectId = readInt(subject['id']);
-    if (subjectId == null) continue;
-
-    final quizRows = await supabase
-        .from('quizzes')
-        .select('*')
-        .eq('subject_id', subjectId)
-        .order('created_at');
-    final quizzes = quizRows
-        .map((row) => Map<String, dynamic>.from(row))
-        .toList();
-    quizzesBySubject[subjectId] = quizzes;
-    final quizIds = quizzes
-        .map((quiz) => readInt(quiz['id']))
-        .whereType<int>()
-        .toList();
-    if (quizIds.isEmpty) continue;
-
-    final questionRows = await supabase
-        .from('questions')
-        .select('id, quiz_id, question_text')
-        .inFilter('quiz_id', quizIds);
-    final questions = questionRows
-        .map((row) => Map<String, dynamic>.from(row))
-        .toList();
-    final questionIds = questions
-        .map((question) => readInt(question['id']))
-        .whereType<int>()
-        .toList();
-
-    for (final question in questions) {
-      final quizId = readInt(question['quiz_id']);
-      if (quizId == null) continue;
-      questionsByQuiz.putIfAbsent(quizId, () => []).add(question);
-    }
-
-    final groupedChoices = await _getChoicesByQuestion(questionIds);
-    choicesByQuestion.addAll(groupedChoices);
-  }
-
-  return buildMockBoardQuizItemsFromRows(
-    subjects: limitedSubjects,
-    quizzesBySubject: quizzesBySubject,
-    questionsByQuiz: questionsByQuiz,
-    choicesByQuestion: choicesByQuestion,
-  );
-}
-
 List<QuizDtoItems> buildMockBoardQuizItemsFromRows({
   required List<Map<String, dynamic>> subjects,
   required Map<int, List<Map<String, dynamic>>> quizzesBySubject,
@@ -154,11 +103,15 @@ List<QuizDtoItems> buildMockBoardQuizItemsFromRows({
   final rng = random ?? Random();
   final sections = <QuizDtoItems>[];
   final usedQuestionIds = <int>{};
+  var expectedTotal = 0;
 
   for (final spec in mockBoardSectionSpecs) {
     final sourceSubjects = _subjectsForSection(subjects, spec);
     if (sourceSubjects.isEmpty) {
-      throw StateError('${spec.title} has no configured database section');
+      throw MockBoardException(
+        MockBoardFailure.notConfigured,
+        '${spec.title} has no configured database section',
+      );
     }
 
     final sourceQuizzes = <Map<String, dynamic>>[];
@@ -169,36 +122,43 @@ List<QuizDtoItems> buildMockBoardQuizItemsFromRows({
       createdAt = createdAt.isEmpty
           ? (subject['created_at'] ?? subject['createdAt'] ?? '').toString()
           : createdAt;
-      sourceQuizzes.addAll(quizzesBySubject[subjectId] ?? []);
+      sourceQuizzes.addAll(
+        (quizzesBySubject[subjectId] ?? []).where((q) => !isSoftDeleted(q)),
+      );
     }
 
     if (sourceQuizzes.isEmpty) {
-      throw StateError('${spec.title} has no configured topics');
+      throw MockBoardException(
+        MockBoardFailure.notConfigured,
+        '${spec.title} has no configured topics',
+      );
     }
 
-    final topicCounts = _configuredTopicCounts(
-      quizzes: sourceQuizzes,
+    final blueprint = mockBoardSectionBlueprint(
+      subjects: sourceSubjects,
+      quizzesBySubject: quizzesBySubject,
       label: spec.title,
     );
     final subjectQuestions = <Map<String, dynamic>>[];
 
-    for (final quiz in sourceQuizzes) {
-      final quizId = readInt(quiz['id']);
-      if (quizId == null) continue;
-
-      final requiredCount = topicCounts[quizId] ?? 0;
-      if (requiredCount == 0) continue;
-
-      final availableQuestions = (questionsByQuiz[quizId] ?? []).where((
-        question,
-      ) {
-        final questionId = readInt(question['id']);
-        return questionId != null && !usedQuestionIds.contains(questionId);
-      }).toList();
+    void take(Iterable<int> quizIds, int count, String label) {
+      if (count == 0) return;
+      final availableQuestions = [
+        for (final quizId in quizIds)
+          ...(questionsByQuiz[quizId] ?? []).where((question) {
+            final questionId = readInt(question['id']);
+            return questionId != null &&
+                !usedQuestionIds.contains(questionId) &&
+                isEligibleMockBoardQuestion(
+                  question,
+                  choicesByQuestion[questionId] ?? const [],
+                );
+          }),
+      ];
       final selected = selectRandomRows(
         rows: availableQuestions,
-        count: requiredCount,
-        label: quiz['title']?.toString() ?? 'Topic $quizId',
+        count: count,
+        label: label,
         random: rng,
       );
 
@@ -210,19 +170,42 @@ List<QuizDtoItems> buildMockBoardQuizItemsFromRows({
           'id': questionId,
           'questionText':
               question['question_text'] ?? question['questionText'] ?? '',
+          'imagePath': (question['image_path'] ?? question['imagePath'] ?? '')
+              .toString(),
+          // The admin panel stores the explanation in `correct_description`;
+          // the older `rationale` column is used only when it is filled.
+          'rationale': _firstFilledText(
+            question['rationale'],
+            question['correct_description'],
+          ),
           'choices': (choicesByQuestion[questionId] ?? [])
+              .where((choice) => !isSoftDeleted(choice))
               .map((choice) => _normalizeChoice(choice))
               .toList(),
         });
       }
     }
 
+    for (final quiz in sourceQuizzes) {
+      final quizId = readInt(quiz['id']);
+      if (quizId == null) continue;
+      take(
+        [quizId],
+        blueprint.topicCounts[quizId] ?? 0,
+        quiz['title']?.toString() ?? 'Topic $quizId',
+      );
+    }
+    for (final pool in blueprint.pools) {
+      take(pool.quizIds, pool.count, pool.label);
+    }
+
     shuffleRows(subjectQuestions, rng);
     validateQuestionCount(
       actual: subjectQuestions.length,
-      expected: mockBoardQuestionsPerSubject,
+      expected: blueprint.total,
       label: spec.title,
     );
+    expectedTotal += blueprint.total;
 
     sections.add(
       QuizDtoItems.fromJson({
@@ -240,20 +223,28 @@ List<QuizDtoItems> buildMockBoardQuizItemsFromRows({
     actual: sections.length,
     expected: mockBoardSubjectCount,
     label: 'Mock Board subject count',
+    failure: MockBoardFailure.notConfigured,
   );
   validateQuestionCount(
     actual: sections.expand((section) => section.questions).length,
-    expected: mockBoardTotalQuestions,
+    expected: expectedTotal,
     label: 'Mock Board final question count',
   );
   return sections;
 }
+
+/// True when [subject] belongs to the Mock Board section [spec].
+bool isMockBoardSectionSubject(
+  Map<String, dynamic> subject,
+  MockBoardSectionSpec spec,
+) => _subjectsForSection([subject], spec).isNotEmpty;
 
 List<Map<String, dynamic>> _subjectsForSection(
   List<Map<String, dynamic>> subjects,
   MockBoardSectionSpec spec,
 ) {
   return subjects.where((subject) {
+    if (isSoftDeleted(subject)) return false;
     final title = _normalizeBoardTitle(subject['title']?.toString() ?? '');
     if (spec.title == 'Hematology' && title.contains('immunohematology')) {
       return false;
@@ -279,7 +270,8 @@ List<Map<String, dynamic>> selectRandomRows({
   Random? random,
 }) {
   if (rows.length < count) {
-    throw StateError(
+    throw MockBoardException(
+      MockBoardFailure.notEnoughQuestions,
       '$label needs $count questions but only ${rows.length} are available',
     );
   }
@@ -302,40 +294,155 @@ void validateQuestionCount({
   required int actual,
   required int expected,
   required String label,
+  MockBoardFailure failure = MockBoardFailure.notEnoughQuestions,
 }) {
   if (actual != expected) {
-    throw StateError(
+    throw MockBoardException(
+      failure,
       '$label must contain exactly $expected item(s), found $actual',
     );
   }
 }
 
-Map<int, int> _configuredTopicCounts({
-  required List<Map<String, dynamic>> quizzes,
+/// A question may enter a Mock Board only when it and its choices are not
+/// soft-deleted and the live choices have exactly one correct answer (the
+/// same rule as exams, Study Mode and the Question of the Day).
+bool isEligibleMockBoardQuestion(
+  Map<String, dynamic> question,
+  Iterable<Map<String, dynamic>> choices,
+) {
+  if (isSoftDeleted(question)) return false;
+  final live = choices.where((choice) => !isSoftDeleted(choice)).toList();
+  return isValidSingleAnswer(
+    total: live.length,
+    correct: live.where((c) => c['is_correct'] == true).length,
+    minChoices: 2,
+  );
+}
+
+/// A subject whose live topics form one pool: [count] questions are drawn at
+/// random from any of them (e.g. "2 Mycology questions from any topic").
+class MockBoardTopicPool {
+  final List<int> quizIds;
+  final int count;
+  final String label;
+
+  const MockBoardTopicPool({
+    required this.quizIds,
+    required this.count,
+    required this.label,
+  });
+}
+
+/// How one section's 100 questions are split: a fixed count per topic
+/// ([topicCounts]) plus pooled subjects ([pools]).
+class MockBoardBlueprint {
+  final Map<int, int> topicCounts;
+  final List<MockBoardTopicPool> pools;
+
+  const MockBoardBlueprint({required this.topicCounts, required this.pools});
+
+  int get total =>
+      topicCounts.values.fold<int>(0, (sum, count) => sum + count) +
+      pools.fold<int>(0, (sum, pool) => sum + pool.count);
+
+  /// Every topic that supplies questions, with the most it may supply.
+  Map<int, int> get maxNeedByQuiz => {
+    ...topicCounts,
+    for (final pool in pools)
+      for (final quizId in pool.quizIds) quizId: pool.count,
+  };
+}
+
+/// Blueprint of one section built from its (live) [subjects]. A subject with
+/// `mock_board_pool_count` set is a pool and its topics' own counts are
+/// ignored; every other live topic must have a configured count. The section
+/// must add up to exactly [mockBoardQuestionsPerSubject].
+MockBoardBlueprint mockBoardSectionBlueprint({
+  required List<Map<String, dynamic>> subjects,
+  required Map<int, List<Map<String, dynamic>>> quizzesBySubject,
   required String label,
 }) {
   final counts = <int, int>{};
+  final pools = <MockBoardTopicPool>[];
 
-  for (final quiz in quizzes) {
-    final quizId = readInt(quiz['id']);
-    if (quizId == null) continue;
-    final count = _readConfiguredQuestionCount(quiz);
-    if (count == null) {
-      throw StateError(
-        '${quiz['title'] ?? 'Topic $quizId'} must define a configured question count',
+  for (final subject in subjects) {
+    final subjectId = readInt(subject['id']);
+    if (subjectId == null) continue;
+    final quizzes = (quizzesBySubject[subjectId] ?? const [])
+        .where((quiz) => !isSoftDeleted(quiz))
+        .toList();
+    final subjectTitle = subject['title']?.toString() ?? 'Subject $subjectId';
+
+    final poolCount = readMockBoardPoolCount(subject);
+    if (poolCount != null) {
+      final quizIds = quizzes.map((q) => readInt(q['id'])).whereType<int>();
+      if (poolCount > 0 && quizIds.isEmpty) {
+        throw MockBoardException(
+          MockBoardFailure.notConfigured,
+          '$subjectTitle has no topics for its question pool',
+        );
+      }
+      pools.add(
+        MockBoardTopicPool(
+          quizIds: quizIds.toList(),
+          count: poolCount,
+          label: subjectTitle,
+        ),
       );
+      continue;
     }
-    counts[quizId] = count;
+
+    for (final quiz in quizzes) {
+      final quizId = readInt(quiz['id']);
+      if (quizId == null) continue;
+      final count = _readConfiguredQuestionCount(quiz);
+      if (count == null) {
+        throw MockBoardException(
+          MockBoardFailure.notConfigured,
+          '${quiz['title'] ?? 'Topic $quizId'} must define a configured question count',
+        );
+      }
+      counts[quizId] = count;
+    }
   }
 
-  final total = counts.values.fold<int>(0, (sum, count) => sum + count);
+  final total =
+      counts.values.fold<int>(0, (sum, count) => sum + count) +
+      pools.fold<int>(0, (sum, pool) => sum + pool.count);
   validateQuestionCount(
     actual: total,
-    expected: mockBoardQuestionsPerSubject,
-    label: 'Configured topic question total',
+    expected: _expectedSectionTotal(subjects, quizzesBySubject),
+    label: '$label configured question total',
+    failure: MockBoardFailure.notConfigured,
   );
-  return counts;
+  return MockBoardBlueprint(topicCounts: counts, pools: pools);
 }
+
+/// Questions the Medtech Laws and Ethics topics will add to Section 6. Until
+/// that subject has live topics, Section 6 runs short by this much instead of
+/// blocking every Mock Board. It disappears by itself once the topics exist.
+const int mockBoardPendingLawsQuestions = 35;
+
+/// 100, except while a "Laws" subject in the section has no live topics yet.
+int _expectedSectionTotal(
+  List<Map<String, dynamic>> subjects,
+  Map<int, List<Map<String, dynamic>>> quizzesBySubject,
+) {
+  final lawsPending = subjects.any((subject) {
+    final title = _normalizeBoardTitle(subject['title']?.toString() ?? '');
+    if (!title.contains('laws')) return false;
+    final quizzes = quizzesBySubject[readInt(subject['id'])] ?? const [];
+    return quizzes.every(isSoftDeleted);
+  });
+  return lawsPending
+      ? mockBoardQuestionsPerSubject - mockBoardPendingLawsQuestions
+      : mockBoardQuestionsPerSubject;
+}
+
+/// `subjects.mock_board_pool_count`: null when the subject is not a pool.
+int? readMockBoardPoolCount(Map<String, dynamic> subject) =>
+    readInt(subject['mock_board_pool_count'] ?? subject['mockBoardPoolCount']);
 
 int? _readConfiguredQuestionCount(Map<String, dynamic> row) {
   const keys = [
@@ -356,48 +463,6 @@ int? _readConfiguredQuestionCount(Map<String, dynamic> row) {
   return null;
 }
 
-Future<List<Map<String, dynamic>>> getChoicesForQuestion(int questionId) async {
-  final rows = await supabase
-      .from('choices')
-      .select('id, choice_text, is_correct, question_id')
-      .eq('question_id', questionId)
-      .order('id');
-
-  return rows.map((row) => _normalizeChoice(row)).toList();
-}
-
-Future<Map<int, List<Map<String, dynamic>>>> _getChoicesByQuestion(
-  List<int> questionIds,
-) async {
-  if (questionIds.isEmpty) return {};
-
-  final rows = await supabase
-      .from('choices')
-      .select('id, choice_text, is_correct, question_id')
-      .inFilter('question_id', questionIds)
-      .order('id');
-  final grouped = <int, List<Map<String, dynamic>>>{};
-
-  for (final row in rows) {
-    final normalized = _normalizeChoice(row);
-    final questionId = readInt(normalized['questionId']);
-    if (questionId == null) continue;
-    grouped.putIfAbsent(questionId, () => []).add(normalized);
-  }
-
-  return grouped;
-}
-
-Future<String> getQuizTitle(int quizId) async {
-  final quiz = await supabase
-      .from('quizzes')
-      .select('title')
-      .eq('id', quizId)
-      .maybeSingle();
-
-  return quiz?['title']?.toString() ?? '';
-}
-
 Map<String, dynamic> normalizeSubject(Map<String, dynamic> row) {
   return {
     ...row,
@@ -411,13 +476,33 @@ Map<String, dynamic> _normalizeChoice(Map<String, dynamic> row) {
   return {
     'id': readInt(row['id']) ?? 0,
     'choiceText': row['choice_text'] ?? row['choiceText'] ?? '',
-    'is_correct': row['is_correct'] ?? row['is_correct'] ?? false,
+    'is_correct': row['is_correct'] ?? false,
     'questionId': readInt(row['question_id'] ?? row['questionId']) ?? 0,
   };
 }
 
-void recordAnswer(String subjectName, bool isCorrect) {
+void recordAnswer(
+  String subjectName,
+  bool isCorrect, {
+  int? questionId,
+  int? choiceId,
+}) {
   final normalizedSubject = subjectName.isEmpty ? 'Unknown' : subjectName;
+  if (questionId != null && choiceId != null) {
+    // Changing an answer replaces the earlier one: its contribution is taken
+    // back out of the tally it was added to before the new one is added.
+    final previous = _recordedAnswers[questionId];
+    if (previous != null) {
+      final earlier = subjectScores[previous.subject]!;
+      earlier.total -= 1;
+      if (previous.isCorrect) earlier.correct -= 1;
+    }
+    mockBoardSelections[questionId] = choiceId;
+    _recordedAnswers[questionId] = (
+      subject: normalizedSubject,
+      isCorrect: isCorrect,
+    );
+  }
   final score = subjectScores.putIfAbsent(
     normalizedSubject,
     () => SubjectScore(),
@@ -426,7 +511,59 @@ void recordAnswer(String subjectName, bool isCorrect) {
   if (isCorrect) score.correct += 1;
 }
 
-List<Map<String, dynamic>> currentAnswerPayload() {
+/// What each question currently contributes to [subjectScores], so that
+/// changing an answer replaces its tally instead of adding to it. Only
+/// [resetMockBoardAnswers] clears it, together with the tallies it describes.
+final Map<int, ({String subject, bool isCorrect})> _recordedAnswers = {};
+
+/// Forgets every answer of the Mock Board in progress: selections, score
+/// tallies and the per-question contributions behind them, always together.
+void resetMockBoardAnswers() {
+  subjectScores.clear();
+  mockBoardSelections.clear();
+  _recordedAnswers.clear();
+}
+
+/// Items for the `save_mock_board_attempt` RPC: what the user answered, never
+/// what is correct. Unanswered questions carry a null `selected_choice_id`.
+/// Section ids follow the Mock Board blueprint (1..6).
+List<Map<String, dynamic>> mockBoardSubmissionItems(
+  List<QuizDtoItems> sections,
+  Map<int, int> selections,
+) {
+  return [
+    for (final section in sections)
+      for (final question in section.questions)
+        {
+          'section': section.id,
+          'question_id': question.id,
+          'selected_choice_id': selections[question.id],
+        },
+  ];
+}
+
+/// Answer payload for scoring. When the generated [sections] are known, the
+/// payload follows the section order (the MTLE weights are positional) and a
+/// section's rating is correct answers over ALL its questions, so unanswered
+/// or skipped questions count as wrong instead of inflating the score.
+List<Map<String, dynamic>> currentAnswerPayload({
+  List<QuizDtoItems> sections = const [],
+}) {
+  if (sections.isNotEmpty) {
+    return [
+      for (final section in sections)
+        () {
+          final total = section.questions.length;
+          final correct = subjectScores[section.title]?.correct ?? 0;
+          final rating = total == 0 ? 0.0 : (correct / total) * 100;
+          return {
+            'is_correct': correct > 0,
+            'name': section.title,
+            'score': rating,
+          };
+        }(),
+    ];
+  }
   return subjectScores.entries.map((entry) {
     final score = entry.value;
     return {
@@ -478,8 +615,10 @@ MtleEvaluation evaluateMtleResult(List<Map<String, dynamic>> answers) {
     );
   }
 
-  const weights = [20, 20, 20, 20, 10, 10];
-  const majorIndexes = {0, 1, 2, 3};
+  // Positional, in mockBoardSectionSpecs order: Clinical Microscopy (index 2)
+  // and Histopathology/Laws (index 5) are the two 10% subjects.
+  const weights = [20, 20, 10, 20, 20, 10];
+  const majorIndexes = {0, 1, 3, 4};
   var weightedTotal = 0.0;
   var failedWeight = 0.0;
   var hasMajorBelow50 = false;
@@ -522,6 +661,18 @@ int? readInt(dynamic value) {
   return null;
 }
 
+final _timestampWithoutOffset = RegExp(
+  r'^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?$',
+);
+
+/// `quiz_attempts.attempted_at` holds UTC, but a column without a time zone
+/// returns it with no offset, which DateTime.parse would read as local time.
+/// Values that carry an offset, and date-only values, are left as they are.
+String utcTimestampText(Object? value) {
+  final text = value?.toString() ?? '';
+  return _timestampWithoutOffset.hasMatch(text) ? '${text}Z' : text;
+}
+
 double _readDouble(dynamic value) {
   if (value is num) return value.toDouble();
   if (value is String) return double.tryParse(value) ?? 0;
@@ -549,4 +700,13 @@ class MtleEvaluation {
     required this.hasMajorBelow50,
     required this.reasons,
   });
+}
+
+/// First value holding real text (not null, empty or the literal "null").
+String _firstFilledText(Object? first, [Object? second]) {
+  for (final value in [first, second]) {
+    final text = (value ?? '').toString().trim();
+    if (text.isNotEmpty && text.toLowerCase() != 'null') return text;
+  }
+  return '';
 }

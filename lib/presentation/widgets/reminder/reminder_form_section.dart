@@ -38,7 +38,7 @@ class ReminderFormSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          ReusableField(controller: titleController, hintText: 'Buy groceries'),
+          ReusableField(controller: titleController, hintText: 'Input title'),
           const SizedBox(height: 16),
           const Text(
             'Notes',
@@ -51,7 +51,7 @@ class ReminderFormSection extends StatelessWidget {
           const SizedBox(height: 8),
           ReusableField(
             controller: notesController,
-            hintText: 'Don\'t forget the milk!',
+            hintText: 'Input note',
             maxLines: 4,
           ),
         ],

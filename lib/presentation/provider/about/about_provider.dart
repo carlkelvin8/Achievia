@@ -41,3 +41,9 @@ final expandableItemsProvider =
     NotifierProvider<ExpandableItemsNotifier, ExpandableItemsState>(
       ExpandableItemsNotifier.new,
     );
+
+// Separate provider for Mission/Vision/Core Values section
+final mvcExpandableItemsProvider =
+    NotifierProvider<ExpandableItemsNotifier, ExpandableItemsState>(
+      ExpandableItemsNotifier.new,
+    );

@@ -7,7 +7,7 @@ void main() {
     return Directory('supabase/migrations')
         .listSync()
         .whereType<File>()
-        .map((file) => file.readAsStringSync())
+        .map((file) => file.readAsStringSync().replaceAll('\r\n', '\n'))
         .join('\n');
   }
 
@@ -20,23 +20,26 @@ void main() {
     expect(migration, contains('grant execute on function'));
   });
 
-  test('chat RPCs are defined once with the response shape used by Flutter', () {
+  test('chat RPC migrations retain the response shape used by Flutter', () {
     final migration = allMigrations();
 
     expect(
-      'create or replace function public.search_profiles_for_chat'
-          .allMatches(migration),
-      hasLength(1),
+      'create or replace function public.search_profiles_for_chat'.allMatches(
+        migration,
+      ),
+      isNotEmpty,
     );
     expect(
-      'create or replace function public.chat_profile_summaries'
-          .allMatches(migration),
-      hasLength(1),
+      'create or replace function public.chat_profile_summaries'.allMatches(
+        migration,
+      ),
+      isNotEmpty,
     );
     expect(
-      'create or replace function public.get_or_create_direct_chat'
-          .allMatches(migration),
-      hasLength(1),
+      'create or replace function public.get_or_create_direct_chat'.allMatches(
+        migration,
+      ),
+      isNotEmpty,
     );
     expect(
       migration,

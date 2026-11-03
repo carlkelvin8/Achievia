@@ -17,7 +17,8 @@ class ForgotPasswordScreenHandler extends ConsumerStatefulWidget {
       _ForgotPasswordScreenHandlerState();
 }
 
-class _ForgotPasswordScreenHandlerState extends ConsumerState<ForgotPasswordScreenHandler> {
+class _ForgotPasswordScreenHandlerState
+    extends ConsumerState<ForgotPasswordScreenHandler> {
   @override
   Widget build(BuildContext context) {
     final notifier = ref.read(resetPasswordNotifier.notifier);
@@ -31,12 +32,15 @@ class _ForgotPasswordScreenHandlerState extends ConsumerState<ForgotPasswordScre
             onPageChanged: (value) => notifier.setPageIndex(value),
             children: [
               ForgotPasswordStep(
-                headerText: 'Reset your password', 
-                labelText: 'Please enter your email and we will send an OTP code in the next step to reset your password.', 
-                child: PasswordResetForm(),),
+                headerText: 'Reset your password',
+                labelText:
+                    'Please enter your email and we will send an OTP code in the next step to reset your password.',
+                child: PasswordResetForm(),
+              ),
               ForgotPasswordStep(
                 headerText: 'OTP code verification',
-                labelText:'We have an OTP code to your email in ${notifier.emailAddressController.text} Enter the OTP code below to verify',
+                labelText:
+                    'We have an OTP code to your email in ${notifier.emailAddressController.text} Enter the OTP code below to verify',
                 child: OtpFormForgot(),
               ),
               ForgotPasswordStep(

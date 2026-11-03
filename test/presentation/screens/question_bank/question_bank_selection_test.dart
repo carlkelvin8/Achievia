@@ -3,6 +3,7 @@ import 'package:achievia/presentation/provider/reviewer/question_bank_practice_p
 import 'package:achievia/presentation/screens/question_bank/question_bank_subjects_screen.dart';
 import 'package:achievia/presentation/screens/question_bank/question_bank_topics_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/questions_content_screen.dart';
+import 'package:achievia/presentation/widgets/reviewers/reviewer_category_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -136,7 +137,17 @@ void main() {
 
     expect(find.text('Clinical Chemistry'), findsOneWidget);
     expect(find.text('Enzymes'), findsOneWidget);
-    expect(find.text('Practice up to 20 questions'), findsOneWidget);
+    // Plain rows: no "Study deck" label and no leading icon.
+    expect(find.text('Study deck'), findsNothing);
+    expect(find.byIcon(Icons.quiz_outlined), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(ReviewerCategoryCard),
+        matching: find.byType(Icon),
+      ),
+      findsOneWidget,
+      reason: 'only the chevron',
+    );
   });
 }
 

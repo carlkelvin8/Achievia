@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:achievia/domain/entities/api/reviewer/exam_summary_entity.dart';
 import 'package:achievia/data/data_source/reviewer/question_bank_remote_datasource.dart';
 import 'package:achievia/data/repositoryImpl/questions/question_bank_repository_impl.dart';
 import 'package:achievia/domain/entities/api/reviewer/question_bank_entity.dart';
@@ -50,15 +51,28 @@ class _FakeQuestionBankDataSource implements QuestionBankDataSource {
   }) async => const [];
 
   @override
+  Future<List<QuestionItemEntity>> getSubjectExamQuestions(
+    int subjectId, {
+    int count = 100,
+    Random? random,
+  }) async => const [];
+
+  @override
+  Future<ExamAttemptSummary> getExamSummary(String attemptId) async =>
+      throw UnimplementedError();
+  @override
   Future<QuestionBankAttempt> saveAttempt({
     required QuestionBankSelection selection,
     required int correctAnswers,
     required int totalQuestions,
+    ExamAttemptSnapshot? snapshot,
   }) async {
     throw UnimplementedError();
   }
 
   @override
-  Future<List<QuestionBankAttempt>> getRecentAttempts({int limit = 5}) async =>
-      const [];
+  Future<List<QuestionBankAttempt>> getRecentAttempts({
+    int limit = 5,
+    String? attemptType,
+  }) async => const [];
 }

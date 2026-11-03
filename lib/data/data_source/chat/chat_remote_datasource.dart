@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:achievia/data/models/chat/chat_conversation_dto.dart';
 import 'package:achievia/data/models/chat/chat_message_dto.dart';
 import 'package:achievia/data/models/chat/chat_person_dto.dart';
+import 'package:achievia/domain/entities/api/chat/chat_person_entity.dart';
 import 'package:achievia/domain/entities/api/chat/chat_typing_event_entity.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -11,6 +12,7 @@ abstract class ChatDataSource {
   Future<List<ChatConversationDto>> getConversations();
   Future<List<ChatMessageDto>> getMessages(String conversationId);
   Future<List<ChatPersonDto>> searchPeople(String query);
+  Future<List<ChatPersonDto>> listPeople({int limit = 50, int offset = 0});
   Future<ChatConversationDto> startDirectConversation(String profileId);
   Future<ChatMessageDto> sendMessage(String conversationId, String body);
   Stream<ChatMessageDto> subscribeToMessages(String conversationId);
@@ -22,7 +24,10 @@ abstract class ChatDataSource {
 
 @LazySingleton(as: ChatDataSource)
 class ChatRemoteDatasource implements ChatDataSource {
-  SupabaseClient get _supabase => Supabase.instance.client;
+  final SupabaseClient? client;
+  ChatRemoteDatasource({@ignoreParam this.client});
+
+  SupabaseClient get _supabase => client ?? Supabase.instance.client;
 
   @override
   Future<List<ChatConversationDto>> getConversations() async {
@@ -45,19 +50,22 @@ class ChatRemoteDatasource implements ChatDataSource {
         .inFilter('id', conversationIds)
         .order('last_message_at', ascending: false, nullsFirst: false);
 
-    final directTitles = await _directConversationTitles(
+    final directPeople = await _directConversationPeople(
       currentUserId: userId,
       conversationRows: conversationRows,
     );
 
     return conversationRows.map((row) {
       final json = Map<String, dynamic>.from(row);
-      json['title'] = directTitles[json['id']] ?? json['title'];
+      final person = directPeople[json['id']];
+      json['title'] = person?.displayName ?? json['title'];
+      json['profile_image'] = person?.profileImage;
       return ChatConversationDto.fromJson(json);
     }).toList();
   }
 
-  Future<Map<String, String>> _directConversationTitles({
+  /// The other person in each direct conversation (name and picture).
+  Future<Map<String, ChatPersonEntity>> _directConversationPeople({
     required String currentUserId,
     required List<dynamic> conversationRows,
   }) async {
@@ -111,7 +119,7 @@ class ChatRemoteDatasource implements ChatDataSource {
     return {
       for (final entry in targetProfileByConversation.entries)
         if (peopleById[entry.value] != null)
-          entry.key: peopleById[entry.value]!.displayName,
+          entry.key: peopleById[entry.value]!,
     };
   }
 
@@ -121,10 +129,10 @@ class ChatRemoteDatasource implements ChatDataSource {
         .from('chat_messages')
         .select('id, conversation_id, sender_id, body, created_at')
         .eq('conversation_id', conversationId)
-        .order('created_at')
+        .order('created_at', ascending: false)
         .limit(100);
 
-    return rows.map((row) => ChatMessageDto.fromJson(row)).toList();
+    return rows.reversed.map((row) => ChatMessageDto.fromJson(row)).toList();
   }
 
   @override
@@ -146,6 +154,30 @@ class ChatRemoteDatasource implements ChatDataSource {
   }
 
   @override
+  Future<List<ChatPersonDto>> listPeople({
+    int limit = 50,
+    int offset = 0,
+  }) async {
+    _currentAuthUserId();
+    final rows = await _supabase.rpc<List<dynamic>>(
+      'list_profiles_for_chat',
+      params: {'result_limit': limit, 'result_offset': offset},
+    );
+
+    return rows
+        .map((row) => ChatPersonDto.fromJson(Map<String, dynamic>.from(row)))
+        .toList();
+  }
+
+  /// The first object of an RPC result that is either one object or a list.
+  static Map<String, dynamic>? _singleRow(Object? result) {
+    final value = result is List
+        ? (result.isEmpty ? null : result.first)
+        : result;
+    return value is Map ? Map<String, dynamic>.from(value) : null;
+  }
+
+  @override
   Future<ChatConversationDto> startDirectConversation(String profileId) async {
     final trimmedProfileId = profileId.trim();
     if (trimmedProfileId.isEmpty) {
@@ -157,21 +189,27 @@ class ChatRemoteDatasource implements ChatDataSource {
     }
 
     _currentAuthUserId();
-    final rows = await _supabase.rpc<List<dynamic>>(
+    // The function is declared as returning one conversation object, but a
+    // deployed variant answers with a one-element list. Both are accepted so
+    // opening a chat never depends on which one the database returns.
+    final result = await _supabase.rpc<dynamic>(
       'get_or_create_direct_chat',
       params: {'target_profile_id': trimmedProfileId},
     );
-
-    if (rows.isEmpty) {
+    final row = _singleRow(result);
+    if (row == null || row.isEmpty) {
       throw Exception('Unable to start direct chat');
     }
 
-    return ChatConversationDto.fromJson(Map<String, dynamic>.from(rows.first));
+    return ChatConversationDto.fromJson(row);
   }
 
   @override
   Future<ChatMessageDto> sendMessage(String conversationId, String body) async {
     final trimmedBody = body.trim();
+    if (trimmedBody.length > 10000) {
+      throw ArgumentError('Messages must be at most 10000 characters');
+    }
     if (trimmedBody.isEmpty) {
       throw ArgumentError.value(body, 'body', 'Message body cannot be empty');
     }
@@ -189,21 +227,6 @@ class ChatRemoteDatasource implements ChatDataSource {
 
     final dto = ChatMessageDto.fromJson(row);
 
-    await _supabase
-        .from('chat_conversations')
-        .update({
-          'last_message_at': dto.createdAt.toIso8601String(),
-          'latest_message': dto.body,
-        })
-        .eq('id', conversationId);
-
-    await _supabase
-        .channel('chat:$conversationId')
-        .sendBroadcastMessage(
-          event: 'message.created',
-          payload: _messageToJson(dto),
-        );
-
     return dto;
   }
 
@@ -214,11 +237,19 @@ class ChatRemoteDatasource implements ChatDataSource {
 
     channel = _supabase
         .channel('chat:$conversationId')
-        .onBroadcast(
-          event: 'message.created',
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'chat_messages',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'conversation_id',
+            value: conversationId,
+          ),
           callback: (payload) {
-            final json = _messagePayload(payload);
-            controller.add(ChatMessageDto.fromJson(json));
+            if (!controller.isClosed) {
+              controller.add(ChatMessageDto.fromJson(payload.newRecord));
+            }
           },
         );
 
@@ -236,7 +267,10 @@ class ChatRemoteDatasource implements ChatDataSource {
   @override
   Future<void> sendTypingIndicator(String conversationId, bool isTyping) async {
     final profileId = _currentAuthUserId();
-    final channel = _supabase.channel('chat-typing:$conversationId');
+    final channel = _supabase.channel(
+      'chat-typing:$conversationId',
+      opts: const RealtimeChannelConfig(private: true),
+    );
     await channel.sendBroadcastMessage(
       event: 'typing.changed',
       payload: {
@@ -257,7 +291,10 @@ class ChatRemoteDatasource implements ChatDataSource {
     final controller = StreamController<ChatTypingEventEntity>();
 
     channel = _supabase
-        .channel('chat-typing:$conversationId')
+        .channel(
+          'chat-typing:$conversationId',
+          opts: const RealtimeChannelConfig(private: true),
+        )
         .onBroadcast(
           event: 'typing.changed',
           callback: (payload) {
@@ -271,6 +308,10 @@ class ChatRemoteDatasource implements ChatDataSource {
             if (profileId == null ||
                 profileId == currentProfileId ||
                 isTyping == null) {
+              return;
+            }
+
+            if (controller.isClosed) {
               return;
             }
 
@@ -299,47 +340,6 @@ class ChatRemoteDatasource implements ChatDataSource {
     return id;
   }
 
-  Map<String, dynamic> _messageToJson(ChatMessageDto dto) {
-    return {
-      'id': dto.id,
-      'conversation_id': dto.conversationId,
-      'sender_id': dto.senderId,
-      'body': dto.body,
-      'created_at': dto.createdAt.toIso8601String(),
-    };
-  }
-
-  Map<String, dynamic> _messagePayload(Map<String, dynamic> payload) {
-    final json = _messagePayloadCandidate(payload);
-    if (json == null) {
-      throw const FormatException('Broadcast payload is missing message data');
-    }
-    return json;
-  }
-
-  Map<String, dynamic>? _messagePayloadCandidate(
-    Map<String, dynamic> payload, [
-    int depth = 0,
-  ]) {
-    if (_isMessageJson(payload)) return payload;
-    if (depth >= 2) return null;
-
-    final envelopePayload = payload['payload'];
-    final envelopeJson = _asJsonMap(envelopePayload);
-    if (envelopeJson != null) {
-      final message = _messagePayloadCandidate(envelopeJson, depth + 1);
-      if (message != null) return message;
-    }
-
-    final messageJson = _asJsonMap(payload['message']);
-    if (messageJson != null) {
-      final message = _messagePayloadCandidate(messageJson, depth + 1);
-      if (message != null) return message;
-    }
-
-    return null;
-  }
-
   Map<String, dynamic>? _asJsonMap(Object? value) {
     if (value is Map<String, dynamic>) return value;
     if (value is Map) return Map<String, dynamic>.from(value);
@@ -358,13 +358,5 @@ class ChatRemoteDatasource implements ChatDataSource {
     }
 
     return null;
-  }
-
-  bool _isMessageJson(Map<String, dynamic> json) {
-    return json.containsKey('id') &&
-        json.containsKey('conversation_id') &&
-        json.containsKey('sender_id') &&
-        json.containsKey('body') &&
-        json.containsKey('created_at');
   }
 }

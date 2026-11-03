@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:achievia/domain/entities/api/reviewer/exam_summary_entity.dart';
 import 'package:achievia/domain/entities/api/profile/profile_entity.dart';
 import 'package:achievia/domain/entities/api/reviewer/question_bank_entity.dart';
 import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
@@ -174,19 +175,30 @@ class _FakeQuestionBankRepository implements QuestionBankRepository {
   }) async => _questions;
 
   @override
+  Future<List<QuestionItemEntity>> getSubjectExamQuestions(
+    int subjectId, {
+    int count = 100,
+    Random? random,
+  }) async => const [];
+
+  @override
+  Future<ExamAttemptSummary> getExamSummary(String attemptId) async =>
+      throw UnimplementedError();
+  @override
   Future<QuestionBankAttempt> saveAttempt({
     required QuestionBankSelection selection,
     required int correctAnswers,
     required int totalQuestions,
+    ExamAttemptSnapshot? snapshot,
   }) async {
     saveCount += 1;
     return QuestionBankAttempt(
       id: 'attempt-$saveCount',
       userId: 'user-1',
       subjectId: selection.subject.id,
-      topicId: selection.topic.id,
+      topicId: selection.topic?.id,
       subjectTitle: selection.subject.title,
-      topicTitle: selection.topic.title,
+      topicTitle: selection.topic?.title ?? 'Subject Exam',
       correctAnswers: correctAnswers,
       totalQuestions: totalQuestions,
       score: 100,
@@ -195,6 +207,8 @@ class _FakeQuestionBankRepository implements QuestionBankRepository {
   }
 
   @override
-  Future<List<QuestionBankAttempt>> getRecentAttempts({int limit = 5}) async =>
-      const [];
+  Future<List<QuestionBankAttempt>> getRecentAttempts({
+    int limit = 5,
+    String? attemptType,
+  }) async => const [];
 }

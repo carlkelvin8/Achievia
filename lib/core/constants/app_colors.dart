@@ -31,9 +31,7 @@ final focusedPinTheme = defaultPinTheme.copyDecorationWith(
 );
 
 final submittedPinTheme = defaultPinTheme.copyWith(
-  decoration: defaultPinTheme.decoration!.copyWith(
-    color: primaryVariant,
-  ),
+  decoration: defaultPinTheme.decoration!.copyWith(color: primaryVariant),
 );
 
 // Light Theme Colors

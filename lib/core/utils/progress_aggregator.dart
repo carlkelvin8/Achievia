@@ -1,5 +1,6 @@
-import 'dart:convert';
-
+import 'package:achievia/core/utils/achievia_grading.dart'
+    show bracketForPercentage;
+import 'package:achievia/core/utils/subject_performance.dart';
 import 'package:achievia/data/models/progress/progress_snapshot_dto.dart';
 import 'package:achievia/domain/entities/widgets/progress_entity.dart';
 
@@ -8,10 +9,19 @@ ProgressEntity aggregateProgress({
   required DateTime startDate,
   required DateTime today,
 }) {
-  final attempts = [...snapshot.quizAttempts]
-    ..sort(
-      (a, b) => _date(a['attempted_at']).compareTo(_date(b['attempted_at'])),
-    );
+  final attempts =
+      snapshot.quizAttempts
+          .where(
+            (row) =>
+                DateTime.tryParse(row['attempted_at']?.toString() ?? '') !=
+                    null &&
+                _score(row['score']) != null,
+          )
+          .toList()
+        ..sort(
+          (a, b) =>
+              _date(a['attempted_at']).compareTo(_date(b['attempted_at'])),
+        );
   final history = attempts
       .map(
         (row) => ScoreData(
@@ -21,29 +31,23 @@ ProgressEntity aggregateProgress({
       )
       .toList();
   final currentScore = history.isEmpty ? 0.0 : history.last.score;
-  final bracket = _bracketFor(currentScore);
+  final bracket = bracketForPercentage(currentScore);
 
-  final subjectScores = <String, List<double>>{};
-  for (final attempt in attempts) {
-    final rawAnswers = attempt['answer'] ?? attempt['summary'];
-    final decoded = rawAnswers is String ? _decode(rawAnswers) : rawAnswers;
-    if (decoded is! List) continue;
-    for (final rawAnswer in decoded) {
-      if (rawAnswer is! Map) continue;
-      final answer = Map<String, dynamic>.from(rawAnswer);
-      final name = answer['name']?.toString().trim() ?? '';
-      if (name.isEmpty) continue;
-      subjectScores.putIfAbsent(name, () => []).add(_number(answer['score']));
-    }
-  }
-  final averages = subjectScores.map(
-    (name, values) => MapEntry(
-      name,
-      values.reduce((left, right) => left + right) / values.length,
-    ),
+  // The per-subject graph uses only completed individual subject exams
+  // (Question Bank, attempt_type = subject_exam), never Mock Board subject
+  // breakdowns or practice attempts.
+  final subjectHistory = _subjectHistoryFromSubjectExams(
+    snapshot.subjectExamAttempts,
   );
-  final best = _extreme(averages, highest: true);
-  final weakest = _extreme(averages, highest: false);
+  // Best/Weakest use only completed individual subject exams (Question Bank),
+  // never Mock Board subject breakdowns.
+  final performance = summarizeSubjectPerformance(
+    snapshot.subjectExamAttempts
+        .map(SubjectExamAttempt.tryFromRow)
+        .whereType<SubjectExamAttempt>(),
+  );
+  final best = performance.best;
+  final weakest = performance.weakest;
 
   final dailyMinutes = <String, int>{};
   for (final session in snapshot.studySessions) {
@@ -78,7 +82,8 @@ ProgressEntity aggregateProgress({
   for (
     var cursor = normalizedStart;
     !cursor.isAfter(normalizedToday);
-    cursor = cursor.add(const Duration(days: 1))
+    // Calendar-day step: adding 24h to a local date drifts across DST changes.
+    cursor = DateTime(cursor.year, cursor.month, cursor.day + 1)
   ) {
     days.add(
       CalendarDay(
@@ -90,18 +95,27 @@ ProgressEntity aggregateProgress({
     );
   }
 
-  final streak = _currentStreak(activeKeys, normalizedToday);
+  final streak = _longestStreakInMonth(
+    days
+        .where(
+          (d) =>
+              d.date.year == normalizedToday.year &&
+              d.date.month == normalizedToday.month,
+        )
+        .toList(),
+  );
   return ProgressEntity(
     currentScore: currentScore,
-    level: bracket.$1,
-    message: bracket.$2,
+    level: bracket.level,
+    message: bracket.message,
     strengthWeakness: StrengthWeakness(
-      bestSubject: best?.key ?? 'N/A',
-      bestAverage: best?.value ?? 0,
-      weakestSubject: weakest?.key ?? 'N/A',
-      weakestAverage: weakest?.value ?? 0,
+      bestSubject: best?.subjectName ?? 'N/A',
+      bestAverage: best?.averagePercentage ?? 0,
+      weakestSubject: weakest?.subjectName ?? 'N/A',
+      weakestAverage: weakest?.averagePercentage ?? 0,
     ),
     scoreHistory: history,
+    subjectHistory: subjectHistory,
     screentimeData: ScreentimeData(
       dailyAverage: minuteValues.isEmpty
           ? 0
@@ -120,29 +134,58 @@ ProgressEntity aggregateProgress({
   );
 }
 
-MapEntry<String, double>? _extreme(
-  Map<String, double> values, {
-  required bool highest,
-}) {
-  if (values.isEmpty) return null;
-  return values.entries.reduce(
-    (left, right) => highest
-        ? (left.value >= right.value ? left : right)
-        : (left.value <= right.value ? left : right),
-  );
-}
-
-List<dynamic>? _decode(String value) {
-  try {
-    final decoded = jsonDecode(value);
-    return decoded is List ? decoded : null;
-  } catch (_) {
-    return null;
+/// Groups Question Bank subject exam rows by subject id and returns one
+/// chronologically sorted history line per subject, keyed by display name.
+///
+/// Grouping by the stable subject id means a renamed subject stays on the same
+/// line, while two different subjects that happen to share a display name are
+/// kept apart (the later one is suffixed with its id).
+Map<String, List<ScoreData>> _subjectHistoryFromSubjectExams(
+  List<Map<String, dynamic>> rows,
+) {
+  final byId = <int, List<SubjectExamAttempt>>{};
+  final seenAttemptIds = <String>{};
+  for (final attempt
+      in rows
+          .map(SubjectExamAttempt.tryFromRow)
+          .whereType<SubjectExamAttempt>()) {
+    if (attempt.id.isNotEmpty && !seenAttemptIds.add(attempt.id)) continue;
+    byId.putIfAbsent(attempt.subjectId, () => []).add(attempt);
   }
+
+  final result = <String, List<ScoreData>>{};
+  final claimedLabels = <String, int>{};
+  byId.forEach((id, attempts) {
+    var latest = attempts.first;
+    for (final attempt in attempts) {
+      if (attempt.completedAt.isAfter(latest.completedAt)) latest = attempt;
+    }
+    final preferred = latest.subjectName.isNotEmpty
+        ? latest.subjectName
+        : attempts
+              .map((attempt) => attempt.subjectName)
+              .firstWhere((name) => name.isNotEmpty, orElse: () => '');
+    if (preferred.isEmpty) return;
+
+    var label = preferred;
+    final claimedBy = claimedLabels[label];
+    if (claimedBy != null && claimedBy != id) {
+      label = '$preferred ($id)';
+    }
+    claimedLabels[label] = id;
+
+    final sorted = [...attempts]
+      ..sort((a, b) => a.completedAt.compareTo(b.completedAt));
+    result[label] = [
+      for (final attempt in sorted)
+        ScoreData(date: attempt.completedAt, score: attempt.percentage),
+    ];
+  });
+  return result;
 }
 
 DateTime _date(Object? value) =>
-    DateTime.tryParse(value?.toString() ?? '') ??
+    DateTime.tryParse(value?.toString() ?? '')?.toLocal() ??
     DateTime.fromMillisecondsSinceEpoch(0);
 
 String _dateKey(DateTime value) => DateTime(
@@ -156,19 +199,20 @@ double _number(Object? value) {
   return double.tryParse(value?.toString() ?? '') ?? 0;
 }
 
+double? _score(Object? value) {
+  final score = value is num
+      ? value.toDouble()
+      : double.tryParse(value?.toString() ?? '');
+  return score != null && score.isFinite && score >= 0 && score <= 100
+      ? score
+      : null;
+}
+
 int _max(int left, int right) => left > right ? left : right;
 int _min(int left, int right) => left < right ? left : right;
 
-int _currentStreak(Set<String> activeKeys, DateTime today) {
-  var cursor = today;
-  var count = 0;
-  while (activeKeys.contains(_dateKey(cursor))) {
-    count++;
-    cursor = cursor.subtract(const Duration(days: 1));
-  }
-  return count;
-}
-
+/// Longest consecutive run of completed days within a given list.
+/// Used for both "this month's streak" (month-scoped) and all-time longest.
 int _longestStreak(List<CalendarDay> days) {
   var current = 0;
   var longest = 0;
@@ -183,30 +227,6 @@ int _longestStreak(List<CalendarDay> days) {
   return longest;
 }
 
-(String, String) _bracketFor(double score) {
-  if (score >= 90) {
-    return (
-      'Achievian Topnotcher Potential',
-      'Excellent work! Keep pushing and stay sharp.',
-    );
-  }
-  if (score >= 85) {
-    return ('Board Ready', 'You\'re nearly there. Sharpen your details.');
-  }
-  if (score >= 75) {
-    return (
-      'Solid Achievian',
-      'Strong performance! Focus on high-yield topics.',
-    );
-  }
-  if (score >= 65) {
-    return ('Almost There', 'You\'re on the right track. Keep practicing.');
-  }
-  if (score >= 50) {
-    return ('Warming Up', 'Strengthen weak areas and stay consistent.');
-  }
-  return (
-    'Recharge & Refocus',
-    'Revisit the basics and rebuild your foundation.',
-  );
-}
+/// Longest consecutive streak within a single calendar month.
+int _longestStreakInMonth(List<CalendarDay> monthDays) =>
+    _longestStreak(monthDays);

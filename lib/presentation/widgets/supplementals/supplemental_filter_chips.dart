@@ -33,7 +33,7 @@ class SupplementalFilterChips extends StatelessWidget {
             onTap: () => onSelected(SupplementalFilter.abbreviations),
           ),
           _SupplementalChip(
-            label: 'Procedures',
+            label: 'Computations',
             selected: activeFilter == SupplementalFilter.procedures,
             onTap: () => onSelected(SupplementalFilter.procedures),
           ),

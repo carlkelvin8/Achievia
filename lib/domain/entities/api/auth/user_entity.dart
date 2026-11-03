@@ -19,6 +19,12 @@ class UserEntity {
   final String? university;
   final String? purpose;
   final DateTime? dateOfExamination;
+
+  /// Date of birth as `yyyy-MM-dd`; collected at sign-up.
+  final String? birthDate;
+
+  /// Full address collected at sign-up; used on receipts.
+  final String? fullAddress;
   UserEntity({
     this.id,
     this.firstName,
@@ -39,5 +45,7 @@ class UserEntity {
     this.university,
     this.purpose,
     this.dateOfExamination,
+    this.birthDate,
+    this.fullAddress,
   });
 }

@@ -9,6 +9,7 @@ abstract class ChatRepository {
   Future<List<ChatConversationEntity>> getConversations();
   Future<List<ChatMessageEntity>> getMessages(String conversationId);
   Future<List<ChatPersonEntity>> searchPeople(String query);
+  Future<List<ChatPersonEntity>> listPeople({int limit = 50, int offset = 0});
   Future<ChatConversationEntity> startDirectConversation(String profileId);
   Future<ChatMessageEntity> sendMessage(String conversationId, String body);
   Stream<ChatMessageEntity> subscribeToMessages(String conversationId);

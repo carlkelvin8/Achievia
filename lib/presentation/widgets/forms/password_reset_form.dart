@@ -88,7 +88,11 @@ class _PasswordResetFormState extends ConsumerState<PasswordResetForm> {
 
                       Text(
                         'Your account security is our priority. We use industry-standard encryption to protect your data.',
-                        style: TextStyle(fontSize: 15, height: 1.5),
+                        style: TextStyle(
+                          fontSize: 15,
+                          height: 1.5,
+                          color: Color(0xFF374151),
+                        ),
                       ),
                     ],
                   ),
@@ -101,6 +105,7 @@ class _PasswordResetFormState extends ConsumerState<PasswordResetForm> {
             isLoading: state.isLoading,
             backgroundColor: primaryVariant,
             title: 'Continue >',
+            textColor: Colors.white,
             onPressed: () async {
               if (key.currentState!.validate()) {
                 await event.submitResetPassword(context);

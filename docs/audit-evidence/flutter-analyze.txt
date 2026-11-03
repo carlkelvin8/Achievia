@@ -1,0 +1,49 @@
+Analyzing achievia...                                           
+
+   info - The constant name 'level1_widget' isn't a lowerCamelCase identifier - lib\core\constants\widget_paddings.dart:3:7 - constant_identifier_names
+   info - The constant name 'level2_widget' isn't a lowerCamelCase identifier - lib\core\constants\widget_paddings.dart:4:7 - constant_identifier_names
+   info - The constant name 'auth_token' isn't a lowerCamelCase identifier - lib\core\di\local_storage_service.dart:18:16 - constant_identifier_names
+   info - The constant name 'board_exam_date' isn't a lowerCamelCase identifier - lib\core\di\local_storage_service.dart:19:16 - constant_identifier_names
+   info - The variable name 'chosen_answer' isn't a lowerCamelCase identifier - lib\data\models\quiz\qotd_dto_post.dart:7:16 - non_constant_identifier_names
+   info - The variable name 'quiz_id' isn't a lowerCamelCase identifier - lib\data\models\quiz\qotd_dto_post.dart:8:13 - non_constant_identifier_names
+   info - The variable name 'student_id' isn't a lowerCamelCase identifier - lib\data\models\quiz\qotd_dto_post.dart:9:16 - non_constant_identifier_names
+   info - The variable name 'chosen_answer' isn't a lowerCamelCase identifier - lib\data\models\quiz\qotd_dto_post.dart:11:19 - non_constant_identifier_names
+   info - The variable name 'quiz_id' isn't a lowerCamelCase identifier - lib\data\models\quiz\qotd_dto_post.dart:12:19 - non_constant_identifier_names
+   info - The variable name 'student_id' isn't a lowerCamelCase identifier - lib\data\models\quiz\qotd_dto_post.dart:13:19 - non_constant_identifier_names
+   info - The variable name 'day_subject' isn't a lowerCamelCase identifier - lib\data\models\quiz\questions_dto.dart:16:17 - non_constant_identifier_names
+   info - The variable name 'day_subject' isn't a lowerCamelCase identifier - lib\data\models\quiz\questions_dto.dart:25:19 - non_constant_identifier_names
+   info - The variable name 'chosen_ans' isn't a lowerCamelCase identifier - lib\domain\entities\api\home\qoty_entity.dart:21:16 - non_constant_identifier_names
+   info - The variable name 'quiz_id' isn't a lowerCamelCase identifier - lib\domain\entities\api\home\qoty_entity.dart:22:13 - non_constant_identifier_names
+   info - The variable name 'student_id' isn't a lowerCamelCase identifier - lib\domain\entities\api\home\qoty_entity.dart:23:16 - non_constant_identifier_names
+   info - The variable name 'chosen_ans' isn't a lowerCamelCase identifier - lib\domain\entities\api\home\qoty_entity.dart:25:19 - non_constant_identifier_names
+   info - The variable name 'quiz_id' isn't a lowerCamelCase identifier - lib\domain\entities\api\home\qoty_entity.dart:26:19 - non_constant_identifier_names
+   info - The variable name 'student_id' isn't a lowerCamelCase identifier - lib\domain\entities\api\home\qoty_entity.dart:27:19 - non_constant_identifier_names
+   info - The variable name 'day_subject' isn't a lowerCamelCase identifier - lib\domain\entities\api\home\questions_entity.dart:10:17 - non_constant_identifier_names
+   info - The variable name 'day_subject' isn't a lowerCamelCase identifier - lib\domain\entities\api\home\questions_entity.dart:18:19 - non_constant_identifier_names
+   info - The variable name 'sub_label' isn't a lowerCamelCase identifier - lib\domain\entities\widgets\questions_entity.dart:7:16 - non_constant_identifier_names
+   info - The variable name 'sub_label' isn't a lowerCamelCase identifier - lib\domain\entities\widgets\questions_entity.dart:12:19 - non_constant_identifier_names
+   info - The variable name 'quiz_id' isn't a lowerCamelCase identifier - lib\presentation\provider\questions\questions_state.dart:3:16 - non_constant_identifier_names
+   info - The variable name 'student_id' isn't a lowerCamelCase identifier - lib\presentation\provider\questions\questions_state.dart:4:16 - non_constant_identifier_names
+   info - The variable name 'chosen_answer' isn't a lowerCamelCase identifier - lib\presentation\provider\questions\questions_state.dart:5:16 - non_constant_identifier_names
+   info - The variable name 'quiz_id' isn't a lowerCamelCase identifier - lib\presentation\provider\questions\questions_state.dart:8:19 - non_constant_identifier_names
+   info - The variable name 'student_id' isn't a lowerCamelCase identifier - lib\presentation\provider\questions\questions_state.dart:9:19 - non_constant_identifier_names
+   info - The variable name 'chosen_answer' isn't a lowerCamelCase identifier - lib\presentation\provider\questions\questions_state.dart:10:19 - non_constant_identifier_names
+   info - The variable name 'quiz_id' isn't a lowerCamelCase identifier - lib\presentation\provider\questions\questions_state.dart:15:13 - non_constant_identifier_names
+   info - The variable name 'student_id' isn't a lowerCamelCase identifier - lib\presentation\provider\questions\questions_state.dart:16:13 - non_constant_identifier_names
+   info - The variable name 'chosen_answer' isn't a lowerCamelCase identifier - lib\presentation\provider\questions\questions_state.dart:17:13 - non_constant_identifier_names
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\presentation\widgets\cards\goal_card.dart:50:13 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\presentation\widgets\cards\goal_card.dart:51:13 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\presentation\widgets\cards\question_of_the_day_card.dart:57:15 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\presentation\widgets\cards\question_of_the_day_card.dart:61:15 - deprecated_member_use
+   info - The variable name 'sub_label' isn't a lowerCamelCase identifier - lib\presentation\widgets\cards\questions_card.dart:9:16 - non_constant_identifier_names
+   info - The variable name 'sub_label' isn't a lowerCamelCase identifier - lib\presentation\widgets\cards\questions_card.dart:15:19 - non_constant_identifier_names
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\presentation\widgets\cards\questions_content_list.dart:51:15 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\presentation\widgets\cards\questions_content_list.dart:59:15 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\presentation\widgets\dialogs\radio_selection_dialog.dart:39:15 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\presentation\widgets\dialogs\radio_selection_dialog.dart:40:15 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\presentation\widgets\dialogs\radio_selection_dialog.dart:68:13 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\presentation\widgets\dialogs\radio_selection_dialog.dart:69:13 - deprecated_member_use
+   info - Use interpolation to compose strings and values - lib\presentation\widgets\list_items\expandable_item.dart:104:83 - prefer_interpolation_to_compose_strings
+   info - Use interpolation to compose strings and values - lib\presentation\widgets\list_items\expandable_item.dart:105:83 - prefer_interpolation_to_compose_strings
+
+45 issues found. (ran in 6.4s)

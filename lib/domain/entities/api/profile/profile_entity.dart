@@ -42,9 +42,11 @@ class ProfileEntity {
   });
 
   String get fullName {
-    final parts = [firstName, middleName, lastName]
-        .where((s) => s != null && s.isNotEmpty)
-        .toList();
+    final parts = [
+      firstName,
+      middleName,
+      lastName,
+    ].where((s) => s != null && s.isNotEmpty).toList();
     return parts.join(' ');
   }
 

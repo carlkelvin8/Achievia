@@ -25,10 +25,12 @@ class ExamTimerDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: margin,
-      padding: padding ?? const EdgeInsets.only(left: 70, right: 70, top: 8, bottom: 8),
+      padding:
+          padding ??
+          const EdgeInsets.only(left: 70, right: 70, top: 8, bottom: 8),
       decoration: BoxDecoration(
         color: theme.colorScheme.primary,
         borderRadius: BorderRadius.circular(12),
@@ -38,10 +40,11 @@ class ExamTimerDisplay extends StatelessWidget {
         children: [
           Text(
             timeDisplay,
-            style: timeDisplayStyle ??
+            style:
+                timeDisplayStyle ??
                 theme.textTheme.displaySmall?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: Colors.white
+                  color: Colors.white,
                 ),
           ),
           if (actions != null && actions!.isNotEmpty) ...[

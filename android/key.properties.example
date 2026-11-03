@@ -1,0 +1,8 @@
+# Copy to android/key.properties (ignored by git) and fill in. Never commit the
+# real file or the keystore. Create a keystore once with:
+#   keytool -genkey -v -keystore ~/achievia-upload.jks -keyalg RSA -keysize 2048 \
+#     -validity 10000 -alias upload
+storePassword=<keystore password>
+keyPassword=<key password>
+keyAlias=upload
+storeFile=<absolute path to achievia-upload.jks>

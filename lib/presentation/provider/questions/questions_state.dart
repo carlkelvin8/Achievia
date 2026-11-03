@@ -1,27 +1,27 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class AnswerQuestionNotifier {
-  final String quiz_id;
-  final String student_id;
-  final String chosen_answer;
+  final String quizId;
+  final String studentId;
+  final String chosenAnswer;
   final bool isLoading;
   AnswerQuestionNotifier({
-    required this.quiz_id,
-    required this.student_id,
-    required this.chosen_answer,
+    required this.quizId,
+    required this.studentId,
+    required this.chosenAnswer,
     required this.isLoading,
   });
 
   AnswerQuestionNotifier copyWith({
-    String? quiz_id,
-    String? student_id,
-    String? chosen_answer,
+    String? quizId,
+    String? studentId,
+    String? chosenAnswer,
     bool? isLoading,
   }) {
     return AnswerQuestionNotifier(
       isLoading: isLoading ?? this.isLoading,
-      quiz_id: quiz_id ?? this.quiz_id,
-      student_id: student_id ?? this.student_id,
-      chosen_answer: chosen_answer ?? this.chosen_answer,
+      quizId: quizId ?? this.quizId,
+      studentId: studentId ?? this.studentId,
+      chosenAnswer: chosenAnswer ?? this.chosenAnswer,
     );
   }
 }
@@ -35,7 +35,6 @@ class ResumeQuestionState {
     required this.isFetching,
     required this.currentPage,
   });
-
 
   ResumeQuestionState copyWith({
     bool? isLoading,

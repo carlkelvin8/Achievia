@@ -9,5 +9,5 @@ final tabs = const [
 final tabsSemi = const [
   Tab(text: 'Mnemonics'),
   Tab(text: 'Abbreviations'),
-  Tab(text: 'Procedures'),
+  Tab(text: 'Computations'),
 ];

@@ -1,4 +1,5 @@
 import 'package:achievia/core/constants/app_colors.dart';
+import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/presentation/provider/profile/profile_provider.dart';
 import 'package:achievia/presentation/widgets/badges/countdown_badge.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,15 @@ class EditableBoardExamBadge extends ConsumerWidget {
     );
 
     if (pickedDate == null) return;
-    await ref.read(boardExamDateProvider.notifier).setDate(pickedDate);
+    try {
+      await ref.read(boardExamDateProvider.notifier).setDate(pickedDate);
+    } catch (_) {
+      if (!context.mounted) return;
+      AppToast.showError(
+        context,
+        'Could not save the exam date. Check your connection and try again.',
+      );
+    }
   }
 
   @override

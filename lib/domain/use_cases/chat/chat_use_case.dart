@@ -25,6 +25,13 @@ class ChatUseCase {
     return await repository.searchPeople(query);
   }
 
+  Future<List<ChatPersonEntity>> listPeople({
+    int limit = 50,
+    int offset = 0,
+  }) async {
+    return await repository.listPeople(limit: limit, offset: offset);
+  }
+
   Future<ChatConversationEntity> startDirectConversation(
     String profileId,
   ) async {

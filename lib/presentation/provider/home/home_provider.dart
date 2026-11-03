@@ -1,41 +1,58 @@
 import 'package:achievia/domain/entities/api/auth/user_entity.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:achievia/domain/entities/widgets/qotd_entity.dart';
 import 'package:achievia/domain/entities/widgets/goal_entity.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/domain/use_cases/home/goal_use_case.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-class QotdNotifier extends Notifier<QotdEntity> {
-  @override
-  QotdEntity build() {
-    return const QotdEntity(id: '', question: '', options: []);
-  }
-
-  void selectOption(int index) {
-    if (index < 0) return;
-    state = state.copyWith(selectedIndex: index);
-  }
-
-  void clearSelection() {
-    state = state.copyWith(clearSelection: true);
-  }
-}
-
-final qotdProvider = NotifierProvider<QotdNotifier, QotdEntity>(
-  () => QotdNotifier(),
-);
+import 'package:achievia/presentation/provider/task/local_day_provider.dart';
+import 'package:achievia/presentation/provider/auth/event/token_state_provider.dart';
 
 class GoalNotifier extends AsyncNotifier<GoalEntity?> {
   @override
-  Future<GoalEntity?> build() {
+  Future<GoalEntity?> build() async {
+    ref.watch(localDayProvider);
+    final token = await ref.watch(tokenStream.future);
+    if (token == null) return null;
     return sl<GoalUseCase>().getTodayGoal();
+  }
+
+  /// Returns whether the write succeeded so the caller can tell the user.
+  Future<bool> saveTodayGoal(String title, String details) async {
+    try {
+      await sl<GoalUseCase>().saveTodayGoal(title, details);
+    } catch (error) {
+      debugPrint('Goal save failed: $error');
+      return false;
+    }
+    ref.invalidateSelf();
+    return true;
+  }
+
+  Future<bool> clearGoal() async {
+    final goal = state.value;
+    if (goal == null) return true;
+    try {
+      await sl<GoalUseCase>().clearGoal(goal.id);
+    } catch (error) {
+      debugPrint('Goal clear failed: $error');
+      return false;
+    }
+    ref.invalidateSelf();
+    return true;
   }
 
   Future<void> toggleChecked() async {
     final goal = state.value;
     if (goal == null) return;
-    await sl<GoalUseCase>().setChecked(goal.id, !goal.isChecked);
+    try {
+      await sl<GoalUseCase>().setChecked(goal.id, !goal.isChecked);
+    } catch (error) {
+      // A failed write keeps the current card state instead of surfacing an
+      // unhandled error from a tap.
+      debugPrint('Goal toggle failed: $error');
+      return;
+    }
     ref.invalidateSelf();
   }
 }
@@ -44,28 +61,66 @@ final goalProvider = AsyncNotifierProvider<GoalNotifier, GoalEntity?>(
   () => GoalNotifier(),
 );
 
+/// One leaderboard entry: the student's ID card and, where the ranking has
+/// a value worth showing (study time), that value next to the rank.
+class LeaderboardEntry {
+  final UserEntity profile;
+  final String? detail;
+
+  const LeaderboardEntry(this.profile, {this.detail});
+}
+
 final topMockboardAchieviansProvider =
-    FutureProvider.autoDispose<List<UserEntity>>((ref) async {
+    FutureProvider.autoDispose<List<LeaderboardEntry>>((ref) async {
       return _fetchAchievianLeaderboard('get_weekly_mockboard_achievians');
     });
 
-final topStreakAchieviansProvider =
-    FutureProvider.autoDispose<List<UserEntity>>((ref) async {
-      return _fetchAchievianLeaderboard('get_monthly_streak_achievians');
+/// Top 10 by total time spent in the app (hours and minutes), all time.
+final topStudyTimeAchieviansProvider =
+    FutureProvider.autoDispose<List<LeaderboardEntry>>((ref) async {
+      return _fetchAchievianLeaderboard(
+        'get_top_study_time_achievians',
+        detail: (row) {
+          final minutes = num.tryParse('${row['total_minutes']}')?.toInt();
+          return minutes == null ? null : formatStudyTime(minutes);
+        },
+      );
     });
 
-Future<List<UserEntity>> _fetchAchievianLeaderboard(String rpcName) async {
+/// "12h 05m", "45m".
+String formatStudyTime(int minutes) {
+  final safe = minutes < 0 ? 0 : minutes;
+  final hours = safe ~/ 60;
+  final rest = (safe % 60).toString().padLeft(hours > 0 ? 2 : 1, '0');
+  return hours > 0 ? '${hours}h ${rest}m' : '${rest}m';
+}
+
+Future<List<LeaderboardEntry>> _fetchAchievianLeaderboard(
+  String rpcName, {
+  String? Function(Map<String, dynamic> row)? detail,
+}) async {
   final supabase = Supabase.instance.client;
   final session = supabase.auth.currentSession;
   if (session == null || session.isExpired) return [];
 
-  final response = await supabase.rpc(rpcName, params: {'p_limit': 10});
+  final Object? response;
+  try {
+    response = await supabase.rpc(rpcName, params: {'p_limit': 10});
+  } on PostgrestException catch (error) {
+    // A ranking whose database function is not deployed yet shows as empty
+    // instead of an error.
+    if (error.code == 'PGRST202' || error.code == '42883') return [];
+    rethrow;
+  }
   if (response is! List) return [];
 
-  return response
-      .whereType<Map>()
-      .map((row) => _leaderboardUserFromJson(Map<String, dynamic>.from(row)))
-      .toList();
+  return response.whereType<Map>().map((raw) {
+    final row = Map<String, dynamic>.from(raw);
+    return LeaderboardEntry(
+      _leaderboardUserFromJson(row),
+      detail: detail?.call(row),
+    );
+  }).toList();
 }
 
 UserEntity _leaderboardUserFromJson(Map<String, dynamic> json) {

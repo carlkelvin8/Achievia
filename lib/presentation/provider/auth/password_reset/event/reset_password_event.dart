@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/di/injection.dart';
+import 'package:achievia/core/utils/auth_error_utils.dart';
 import 'package:achievia/core/utils/snack_bar_utils.dart';
 import 'package:achievia/domain/use_cases/auth/user_use_case.dart';
 import 'package:achievia/presentation/provider/auth/password_reset/state/reset_password_state.dart';
@@ -19,13 +20,13 @@ final userUseCaseProvider = Provider<UserUseCase>((ref) => sl<UserUseCase>());
 class ResetPasswordEvent extends Notifier<ResetPasswordState> {
   static const int otpCooldownSeconds = 60;
 
-  late final TextEditingController emailAddressController;
-  late final TextEditingController passwordController;
-  late final TextEditingController confirmPasswordController;
-  late final PageController pageController;
-  late final TextEditingController otpControllers;
-  late final List<Color> otpBorderColors;
-  late final UserUseCase useCase;
+  late TextEditingController emailAddressController;
+  late TextEditingController passwordController;
+  late TextEditingController confirmPasswordController;
+  late PageController pageController;
+  late TextEditingController otpControllers;
+  late List<Color> otpBorderColors;
+  late UserUseCase useCase;
   Timer? _otpTimer;
 
   @override
@@ -88,6 +89,10 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
     _otpTimer?.cancel();
     state = state.copyWith(otpSecondsRemaining: otpCooldownSeconds);
     _otpTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!ref.mounted) {
+        timer.cancel();
+        return;
+      }
       final remaining = state.otpSecondsRemaining;
 
       if (remaining <= 1) {
@@ -108,7 +113,7 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
     }
 
     if (code.length != 8) {
-      return 'Enter the 6-digit OTP code';
+      return 'Enter the 8-digit OTP code';
     }
 
     if (!RegExp(r'^\d{8}$').hasMatch(code)) {
@@ -119,12 +124,14 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
   }
 
   Future<void> submitOtp(BuildContext context) async {
+    if (state.isLoading) return;
     try {
       state = state.copyWith(isLoading: true);
       await useCase.validateOtp(
         otpControllers.text.trim(),
         emailAddressController.text.trim(),
       );
+      if (!ref.mounted) return;
       state = state.copyWith(isLoading: false);
 
       if (pageController.hasClients) {
@@ -132,9 +139,9 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.showError(context, '$e');
+        AppToast.showError(context, userFacingAuthError(e));
       }
-      state = state.copyWith(isLoading: false);
+      if (ref.mounted) state = state.copyWith(isLoading: false);
     }
   }
 
@@ -154,33 +161,38 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
     BuildContext context, {
     required bool shouldAdvance,
   }) async {
+    if (state.isLoading) return;
     try {
       state = state.copyWith(isLoading: true);
       await useCase.sendResetPasswordToEmail(
         emailAddressController.text.trim(),
       );
+      if (!ref.mounted) return;
       _startOtpTimer();
       if (shouldAdvance && pageController.hasClients) {
         nextPage();
       }
       state = state.copyWith(isLoading: false);
       if (context.mounted) {
-        AppToast.showSuccess(context, 'Password reset code sent to your email.');
+        AppToast.showSuccess(
+          context,
+          'Password reset code sent to your email.',
+        );
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.showError(context, '$e');
+        AppToast.showError(context, userFacingAuthError(e));
       }
-      state = state.copyWith(isLoading: false);
+      if (ref.mounted) state = state.copyWith(isLoading: false);
     }
   }
 
   Future<void> changePassword(BuildContext context) async {
+    if (state.isLoading) return;
     try {
       state = state.copyWith(isLoading: true);
-      await useCase.changePassword(
-        passwordController.text,
-      );
+      await useCase.changePassword(passwordController.text);
+      if (!ref.mounted) return;
       passwordController.clear();
       confirmPasswordController.clear();
       state = state.copyWith(isLoading: false);
@@ -190,9 +202,9 @@ class ResetPasswordEvent extends Notifier<ResetPasswordState> {
         context.go(RouteConstants.main);
       }
     } catch (e) {
-      state = state.copyWith(isLoading: false);
+      if (ref.mounted) state = state.copyWith(isLoading: false);
       if (context.mounted) {
-        AppToast.showError(context, '$e');
+        AppToast.showError(context, userFacingAuthError(e));
       }
     }
   }

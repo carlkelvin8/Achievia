@@ -5,61 +5,76 @@ import 'package:google_fonts/google_fonts.dart';
 
 class QuestionsCard extends StatelessWidget {
   final IconData icon;
+  final String? iconAsset;
   final String label;
-  final String sub_label;
+  final String subLabel;
   final void Function(BuildContext context)? callback;
   const QuestionsCard({
     super.key,
     required this.icon,
+    this.iconAsset,
     required this.label,
-    required this.sub_label,
-    this.callback
+    required this.subLabel,
+    this.callback,
   });
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: callback == null ? null : () => callback!.call(context),
       child: Container(
-      width: MediaQuery.of(context).size.width,
-      padding: level1_widget,
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.all(
-            Radius.circular(10)
-          )
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 70, color: Theme.of(context).colorScheme.secondary,),
-                const SizedBox(height: 10,),
-                Text(label,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  fontSize: 15,
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-                ),
-                const SizedBox(height: 10,),
-                Text(sub_label,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  fontSize: 11,
-                  color: Theme.of(context).colorScheme.primary
-                ),
-                )
-              ],
+        width: MediaQuery.of(context).size.width,
+        padding: level1Widget,
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.all(Radius.circular(10)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (iconAsset != null)
+                    Image.asset(
+                      iconAsset!,
+                      width: 70,
+                      height: 70,
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
+                      excludeFromSemantics: true,
+                    )
+                  else
+                    Icon(
+                      icon,
+                      size: 70,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  const SizedBox(height: 10),
+                  Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    subLabel,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          
           ),
         ),
       ),
-    ),
     );
   }
 }

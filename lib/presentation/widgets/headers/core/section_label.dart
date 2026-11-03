@@ -21,7 +21,8 @@ class SectionLabel extends StatelessWidget {
       padding: padding ?? const EdgeInsets.fromLTRB(12, 8, 12, 6),
       child: Text(
         title,
-        style: style ??
+        style:
+            style ??
             theme.textTheme.titleSmall?.copyWith(
               color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w700,

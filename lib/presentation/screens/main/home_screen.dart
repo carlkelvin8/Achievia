@@ -1,12 +1,10 @@
-import 'package:achievia/core/utils/formatters.dart';
-import 'package:achievia/domain/entities/api/auth/user_entity.dart';
 import 'package:achievia/presentation/widgets/banners/build_banner.dart';
 import 'package:achievia/presentation/widgets/cards/question_of_the_day_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/presentation/provider/home/home_provider.dart';
 import 'package:achievia/presentation/widgets/headers/core/section_label.dart';
-import 'package:achievia/presentation/widgets/cards/goal_card.dart';
+import 'package:achievia/presentation/widgets/home/today_goal_section.dart';
 import 'package:achievia/presentation/widgets/cards/ranked_profile_card.dart';
 import 'package:achievia/presentation/widgets/list_items/horizontal_card_list.dart';
 
@@ -16,10 +14,8 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final qotd = ref.watch(qotdProvider);
-    final goalAsync = ref.watch(goalProvider);
     final topMockboards = ref.watch(topMockboardAchieviansProvider);
-    final topStreaks = ref.watch(topStreakAchieviansProvider);
+    final topStudyTime = ref.watch(topStudyTimeAchieviansProvider);
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -37,28 +33,13 @@ class HomeScreen extends ConsumerWidget {
               const SectionLabel(title: 'Question of the day'),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: QuestionOfTheDayCard(selectedIndex: qotd.selectedIndex),
+                child: const QuestionOfTheDayCard(),
               ),
               const SizedBox(height: 12),
               const SectionLabel(title: "Today's Achievian Goal"),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: goalAsync.when(
-                  loading: () => const _HomeMessage(message: 'Loading goal...'),
-                  error: (_, __) => const _HomeMessage(
-                    message: 'Unable to load today\'s goal',
-                  ),
-                  data: (goal) => goal == null
-                      ? const _HomeMessage(message: 'No goal set for today')
-                      : GoalCard(
-                          date: Formatters().formatDate(goal.date),
-                          title: goal.title,
-                          details: goal.details,
-                          isChecked: goal.isChecked,
-                          onToggle: () =>
-                              ref.read(goalProvider.notifier).toggleChecked(),
-                        ),
-                ),
+                child: const TodayGoalSection(),
               ),
               const SizedBox(height: 12),
               Center(
@@ -77,8 +58,8 @@ class HomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               _LeaderboardSection(
-                title: "This Month's Top 10 Streak Achievians",
-                entries: topStreaks,
+                title: 'Top 10 Achievians by Study Time',
+                entries: topStudyTime,
               ),
             ],
           ),
@@ -88,23 +69,9 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class _HomeMessage extends StatelessWidget {
-  final String message;
-
-  const _HomeMessage({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Center(child: Text(message)),
-    );
-  }
-}
-
 class _LeaderboardSection extends StatelessWidget {
   final String title;
-  final AsyncValue<List<UserEntity>> entries;
+  final AsyncValue<List<LeaderboardEntry>> entries;
 
   const _LeaderboardSection({required this.title, required this.entries});
 
@@ -121,9 +88,15 @@ class _LeaderboardSection extends StatelessWidget {
             }
 
             return HorizontalCardList(
+              // The whole card, plus room for its shadow.
+              height: RankedProfileCard.defaultHeight + 8,
+              padding: const EdgeInsets.fromLTRB(12, 2, 12, 6),
               itemCount: users.length,
-              itemBuilder: (context, index) =>
-                  RankedProfileCard(rank: index + 1, mockProfile: users[index]),
+              itemBuilder: (context, index) => RankedProfileCard(
+                rank: index + 1,
+                mockProfile: users[index].profile,
+                rankDetail: users[index].detail,
+              ),
             );
           },
           loading: () => const _LeaderboardMessage(

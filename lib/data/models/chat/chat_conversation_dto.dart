@@ -10,6 +10,9 @@ class ChatConversationDto {
   final DateTime? lastMessageAt;
   final String? latestMessage;
 
+  /// Picture of the other person in a direct conversation.
+  final String? profileImage;
+
   const ChatConversationDto({
     required this.id,
     required this.type,
@@ -19,6 +22,7 @@ class ChatConversationDto {
     this.createdBy,
     this.lastMessageAt,
     this.latestMessage,
+    this.profileImage,
   });
 
   factory ChatConversationDto.fromJson(Map<String, dynamic> json) {
@@ -33,6 +37,7 @@ class ChatConversationDto {
           ? null
           : DateTime.parse(json['last_message_at'] as String),
       latestMessage: json['latest_message'] as String?,
+      profileImage: json['profile_image'] as String?,
     );
   }
 
@@ -46,6 +51,9 @@ class ChatConversationDto {
       updatedAt: updatedAt,
       lastMessageAt: lastMessageAt,
       latestMessage: latestMessage,
+      profileImage: profileImage?.trim().isNotEmpty == true
+          ? profileImage
+          : null,
     );
   }
 

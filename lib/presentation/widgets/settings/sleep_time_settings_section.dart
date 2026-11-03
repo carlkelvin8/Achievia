@@ -20,14 +20,8 @@ class SleepTimeSettingsSection extends ConsumerWidget {
             title: 'Sleep time',
             trailing: _buildSleepTimeButton(context, ref, sleepTime),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Sleep Time automatically sends notifications and reminds you to rest, promoting healthier study habits and balanced screen time.',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-              height: 1.4,
-            ),
+          const SettingsDescription(
+            'While Achievia is open, Sleep Time shows a reminder on screen at your chosen time to help you rest, promoting healthier study habits and balanced screen time. Reminders do not appear when the app is closed or in the background.',
           ),
         ],
       ),
@@ -46,7 +40,7 @@ class SleepTimeSettingsSection extends ConsumerWidget {
           initialTime: sleepTime,
         );
         if (picked != null) {
-          ref.read(sleepTimeProvider.notifier).state = picked;
+          await ref.read(sleepTimeProvider.notifier).save(picked);
         }
       },
       child: Container(

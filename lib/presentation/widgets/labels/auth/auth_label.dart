@@ -14,7 +14,7 @@ class AuthLabel extends StatelessWidget {
       style: GoogleFonts.poppins(
         fontSize: 15,
         fontWeight: FontWeight.w500,
-        color: const Color(0xFF6B7280),
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
         height: 1.5,
       ),
     );

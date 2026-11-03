@@ -21,10 +21,10 @@ class TextSizeSettingsSection extends ConsumerWidget {
           TextSizeSlider(
             value: textSize,
             onChanged: (value) {
-              ref.read(textSizeProvider.notifier).state = value;
+              ref.read(textSizeProvider.notifier).setSize(value);
             },
             description:
-                'Text Size lets you adjust the font size for a more comfortable reading experience. Customize it to suit your preference and reduce eye strain while studying.',
+                'Adjusts the size of questions, answer choices, rationales and notes in Study Deck, Take an Exam and Mock Boards. Other text in the app, such as headings, buttons and labels, does not change.',
           ),
         ],
       ),

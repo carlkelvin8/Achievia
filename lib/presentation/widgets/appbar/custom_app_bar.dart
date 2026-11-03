@@ -1,3 +1,4 @@
+import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -5,6 +6,9 @@ import 'package:go_router/go_router.dart';
 /// Supports back button, title, and optional actions
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+
+  /// Replaces the text [title] (used for the exam countdown).
+  final Widget? titleWidget;
   final List<Widget>? actions;
   final VoidCallback? onBackPressed;
   final bool showBackButton;
@@ -17,6 +21,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
     super.key,
     required this.title,
+    this.titleWidget,
     this.actions,
     this.onBackPressed,
     this.showBackButton = true,
@@ -26,6 +31,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.centerTitle,
     this.leadingWidth,
   });
+
+  /// Pops when there is a page below; otherwise (a screen that is the only
+  /// page, e.g. after a restore or a deep link) goes to the main screen so the
+  /// arrow is never a dead button.
+  static void _goBack(BuildContext context) {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(RouteConstants.main);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,19 +68,21 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       minWidth: 40,
                       minHeight: 40,
                     ),
-                    onPressed: onBackPressed ?? () => context.pop(),
+                    onPressed: onBackPressed ?? () => _goBack(context),
                   ),
                 ))
           : leading,
-      title: Text(
-        title,
-        style:
-            titleStyle ??
-            theme.textTheme.headlineMedium?.copyWith(
-              color: theme.colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-            ),
-      ),
+      title:
+          titleWidget ??
+          Text(
+            title,
+            style:
+                titleStyle ??
+                theme.textTheme.headlineMedium?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
       actions: actions,
     );
   }

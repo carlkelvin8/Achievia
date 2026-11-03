@@ -1,4 +1,4 @@
-import 'package:achievia/presentation/screens/screen_contents/contents/author_content_screen.dart';
+import 'package:achievia/presentation/screens/screen_contents/contents/study_tips_content_screen.dart';
 import 'package:achievia/presentation/screens/screen_contents/contents/achievia_content_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +11,7 @@ class TabBarAbout extends StatefulWidget {
 
 class _TabBarAboutState extends State<TabBarAbout>
     with SingleTickerProviderStateMixin {
-  final _tabs = const [Tab(text: 'Author'), Tab(text: 'Achievia')];
+  final _tabs = const [Tab(text: 'Study Tips'), Tab(text: 'Achievia')];
 
   late TabController _controller;
 
@@ -45,7 +45,7 @@ class _TabBarAboutState extends State<TabBarAbout>
         Expanded(
           child: TabBarView(
             controller: _controller,
-            children: const [AuthorContentScreen(), AchieviaContentScreen()],
+            children: const [StudyTipsContentScreen(), AchieviaContentScreen()],
           ),
         ),
       ],

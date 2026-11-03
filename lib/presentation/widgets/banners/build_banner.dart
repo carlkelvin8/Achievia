@@ -1,4 +1,6 @@
+import 'package:achievia/presentation/provider/home/daily_motivation_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class BuildBanner extends StatelessWidget {
@@ -16,7 +18,7 @@ class BuildBanner extends StatelessWidget {
           color: theme.colorScheme.primary,
           borderRadius: BorderRadius.circular(9),
         ),
-          child: Text(
+        child: Text(
           'Medical Technology Dashboard',
           textAlign: TextAlign.center,
           style: theme.textTheme.titleMedium?.copyWith(
@@ -31,8 +33,27 @@ class BuildBanner extends StatelessWidget {
   }
 }
 
-class MotivationQuoteBanner extends StatelessWidget {
+/// Homepage Daily Motivation. Keeps the banner frame while loading (no layout
+/// jump) and collapses when there is nothing to show.
+class MotivationQuoteBanner extends ConsumerWidget {
   const MotivationQuoteBanner({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final motivation = ref.watch(dailyMotivationProvider);
+    if (motivation.isLoading && !motivation.hasValue) {
+      return const MotivationQuoteCard(message: '');
+    }
+    final message = motivation.value?.message ?? '';
+    if (message.isEmpty) return const SizedBox.shrink();
+    return MotivationQuoteCard(message: message);
+  }
+}
+
+class MotivationQuoteCard extends StatelessWidget {
+  const MotivationQuoteCard({super.key, required this.message});
+
+  final String message;
 
   @override
   Widget build(BuildContext context) {
@@ -53,15 +74,31 @@ class MotivationQuoteBanner extends StatelessWidget {
               Align(
                 alignment: const Alignment(0, 0.15),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Text(
-                    'You did not come this far to only come this far. Every late night, every sacrificed moment — they are all shaping your victory. Keep going.',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: const Color(0xFF0C1E62),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12,
-                      height: 1.35,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 16,
+                  ),
+                  // Scales down instead of overflowing for long messages or
+                  // large system text sizes.
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: (MediaQuery.sizeOf(context).width - 84).clamp(
+                          0.0,
+                          double.infinity,
+                        ),
+                      ),
+                      child: Text(
+                        message,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: const Color(0xFF0C1E62),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                          height: 1.35,
+                        ),
+                      ),
                     ),
                   ),
                 ),

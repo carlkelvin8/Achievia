@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:achievia/presentation/widgets/cards/info_card.dart';
 import 'package:achievia/presentation/widgets/settings/pomodoro_timer_controls_section.dart';
 import 'package:achievia/presentation/widgets/settings/pomodoro_customize_section.dart';
-import 'package:achievia/presentation/widgets/settings/pomodoro_comfort_music_section.dart';
 
 class PomodoroTimerScreen extends ConsumerWidget {
   const PomodoroTimerScreen({super.key});
@@ -33,10 +32,6 @@ class PomodoroTimerScreen extends ConsumerWidget {
 
               // Customize Section
               PomodoroCustomizeSection(),
-              SizedBox(height: 16),
-
-              // Comfort Music Section
-              PomodoroComfortMusicSection(),
             ],
           ),
         ),

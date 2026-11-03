@@ -40,11 +40,12 @@ class _NewReminderScreenState extends ConsumerState<NewReminderScreen> {
       return;
     }
 
-    // Build deadline from selected date + time
+    // Build deadline: use selected date if enabled, otherwise today
+    final baseDate = _isDateEnabled ? _selectedDate : DateTime.now();
     final deadline = DateTime(
-      _selectedDate.year,
-      _selectedDate.month,
-      _selectedDate.day,
+      baseDate.year,
+      baseDate.month,
+      baseDate.day,
       _isTimeEnabled ? _selectedTime.hour : 0,
       _isTimeEnabled ? _selectedTime.minute : 0,
     );

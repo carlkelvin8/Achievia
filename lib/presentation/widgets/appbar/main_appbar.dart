@@ -30,6 +30,9 @@ class MainAppbar extends StatelessWidget implements PreferredSizeWidget {
             backgroundImage: profileImageUrl.isNotEmpty
                 ? NetworkImage(profileImageUrl)
                 : null,
+            onBackgroundImageError: profileImageUrl.isNotEmpty
+                ? (_, _) {}
+                : null,
             child: profileImageUrl.isEmpty
                 ? Icon(
                     Icons.person,
@@ -57,13 +60,13 @@ class MainAppbar extends StatelessWidget implements PreferredSizeWidget {
                 icon: Icon(
                   Icons.notifications_outlined,
                   color: Theme.of(context).colorScheme.primary,
-                  size: 24,
+                  size: 32,
                 ),
               ),
               if (notificationCount > 0)
                 Positioned(
-                  right: 8,
-                  top: 8,
+                  right: 6,
+                  top: 6,
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(
@@ -93,7 +96,7 @@ class MainAppbar extends StatelessWidget implements PreferredSizeWidget {
             icon: Icon(
               Icons.settings_outlined,
               color: Theme.of(context).colorScheme.primary,
-              size: 24,
+              size: 32,
             ),
           ),
         ],

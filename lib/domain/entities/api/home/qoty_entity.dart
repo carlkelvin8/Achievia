@@ -18,12 +18,12 @@ class QotyEntity {
 }
 
 class QotyEntityPost {
-  final String chosen_ans;
-  final int quiz_id;
-  final String student_id;
+  final String chosenAns;
+  final int quizId;
+  final String studentId;
   QotyEntityPost({
-    required this.chosen_ans,
-    required this.quiz_id,
-    required this.student_id,
+    required this.chosenAns,
+    required this.quizId,
+    required this.studentId,
   });
 }

@@ -25,7 +25,7 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: margin,
       padding: padding ?? const EdgeInsets.all(16),

@@ -34,13 +34,21 @@ class MessageListItem extends StatelessWidget {
             backgroundColor: Theme.of(
               context,
             ).colorScheme.primary.withValues(alpha: 0.1),
-            child: Text(
-              _avatarInitial(conversation.title),
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            backgroundImage: conversation.profileImage == null
+                ? null
+                : NetworkImage(conversation.profileImage!),
+            onBackgroundImageError: conversation.profileImage == null
+                ? null
+                : (_, _) {},
+            child: conversation.profileImage == null
+                ? Text(
+                    _avatarInitial(conversation.title),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  )
+                : null,
           ),
           title: Text(
             conversation.title,

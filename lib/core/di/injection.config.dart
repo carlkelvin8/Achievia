@@ -105,6 +105,9 @@ extension GetItInjectableX on _i174.GetIt {
       preResolve: true,
     );
     gh.factory<_i528.UserRemoteDatasource>(() => _i528.UserRemoteDatasource());
+    gh.factory<_i536.ModuleRemoteDatasource>(
+      () => _i536.ModuleRemoteDatasource(),
+    );
     gh.factory<_i741.SupabaseUserContext>(
       () => const _i741.SupabaseUserContext(),
     );
@@ -118,6 +121,10 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i982.LocalStorageService>(
       () => _i982.LocalStorageService(gh<_i460.SharedPreferences>()),
     );
+    gh.lazySingleton<_i739.ChatDataSource>(() => _i739.ChatRemoteDatasource());
+    gh.lazySingleton<_i439.ChatRepositoryImpl>(
+      () => _i439.ChatRepositoryImpl(gh<_i739.ChatDataSource>()),
+    );
     gh.lazySingleton<_i790.NetworkInfo>(
       () => _i790.NetworkInfoImpl(gh<_i895.Connectivity>()),
     );
@@ -126,8 +133,8 @@ extension GetItInjectableX on _i174.GetIt {
         userContext: gh<_i741.SupabaseUserContext>(),
       ),
     );
-    gh.factory<_i536.ModuleRemoteDatasource>(
-      () => _i536.ModuleRemoteDatasource(
+    gh.lazySingleton<_i977.GoalRemoteDatasource>(
+      () => _i977.GoalRemoteDatasource(
         userContext: gh<_i741.SupabaseUserContext>(),
       ),
     );
@@ -136,23 +143,13 @@ extension GetItInjectableX on _i174.GetIt {
         userContext: gh<_i741.SupabaseUserContext>(),
       ),
     );
-    gh.lazySingleton<_i781.ProgressRemoteDatasource>(
-      () => _i781.ProgressRemoteDatasource(
-        userContext: gh<_i741.SupabaseUserContext>(),
-      ),
-    );
-    gh.lazySingleton<_i1006.TaskRemoteDatasource>(
-      () => _i1006.TaskRemoteDatasource(
-        userContext: gh<_i741.SupabaseUserContext>(),
-      ),
-    );
-    gh.lazySingleton<_i977.GoalRemoteDatasource>(
-      () => _i977.GoalRemoteDatasource(
-        userContext: gh<_i741.SupabaseUserContext>(),
-      ),
-    );
     gh.lazySingleton<_i532.NotificationRemoteDatasource>(
       () => _i532.NotificationRemoteDatasource(
+        userContext: gh<_i741.SupabaseUserContext>(),
+      ),
+    );
+    gh.lazySingleton<_i781.ProgressRemoteDatasource>(
+      () => _i781.ProgressRemoteDatasource(
         userContext: gh<_i741.SupabaseUserContext>(),
       ),
     );
@@ -161,7 +158,11 @@ extension GetItInjectableX on _i174.GetIt {
         userContext: gh<_i741.SupabaseUserContext>(),
       ),
     );
-    gh.lazySingleton<_i739.ChatDataSource>(() => _i739.ChatRemoteDatasource());
+    gh.lazySingleton<_i1006.TaskRemoteDatasource>(
+      () => _i1006.TaskRemoteDatasource(
+        userContext: gh<_i741.SupabaseUserContext>(),
+      ),
+    );
     gh.lazySingleton<_i548.QotRepositoryImpl>(
       () => _i548.QotRepositoryImpl(
         remoteDatasource: gh<_i557.QuestionsRemoteDatasource>(),
@@ -171,6 +172,17 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i656.ModuleRepositoryImpl(
         remoteDatasource: gh<_i536.ModuleRemoteDatasource>(),
         network: gh<_i790.NetworkInfo>(),
+      ),
+    );
+    gh.factory<_i416.QuestionsEntity>(
+      () => _i416.QuestionsEntity(
+        id: gh<String>(),
+        title: gh<String>(),
+        courseId: gh<String>(),
+        description: gh<String>(),
+        image: gh<String>(),
+        daySubject: gh<String>(),
+        createdAt: gh<String>(),
       ),
     );
     gh.lazySingleton<_i754.ProgressRepositoryImpl>(
@@ -210,17 +222,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i532.NotificationRemoteDatasource>(),
       ),
     );
-    gh.factory<_i416.QuestionsEntity>(
-      () => _i416.QuestionsEntity(
-        id: gh<String>(),
-        title: gh<String>(),
-        courseId: gh<String>(),
-        description: gh<String>(),
-        image: gh<String>(),
-        day_subject: gh<String>(),
-        createdAt: gh<String>(),
-      ),
-    );
     gh.lazySingleton<_i96.GoalRepositoryImpl>(
       () => _i96.GoalRepositoryImpl(gh<_i977.GoalRemoteDatasource>()),
     );
@@ -234,6 +235,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i930.SupplementalRepositoryImpl(
         gh<_i124.SupplementalRemoteDatasource>(),
       ),
+    );
+    gh.factory<_i181.ChatUseCase>(
+      () => _i181.ChatUseCase(gh<_i439.ChatRepositoryImpl>()),
     );
     gh.lazySingleton<_i130.AuthorRepositoryImpl>(
       () => _i130.AuthorRepositoryImpl(gh<_i67.AuthorRemoteDatasource>()),
@@ -264,9 +268,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i501.ProfileUseCase>(
       () => _i501.ProfileUseCase(impl: gh<_i662.ProfileRepositoryImpl>()),
     );
-    gh.lazySingleton<_i439.ChatRepositoryImpl>(
-      () => _i439.ChatRepositoryImpl(gh<_i739.ChatDataSource>()),
-    );
     gh.factory<_i803.QuestionsUseCase>(
       () => _i803.QuestionsUseCase(
         gh<_i1000.QuestionsRepositoryImpl>(),
@@ -287,9 +288,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i377.StudySessionUseCase>(
       () => _i377.StudySessionUseCase(gh<_i86.StudySessionRepositoryImpl>()),
-    );
-    gh.factory<_i181.ChatUseCase>(
-      () => _i181.ChatUseCase(gh<_i439.ChatRepositoryImpl>()),
     );
     return this;
   }

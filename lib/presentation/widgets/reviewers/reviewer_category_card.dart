@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
 class ReviewerCategoryCard extends StatelessWidget {
-  final IconData icon;
+  /// Leading icon; omitted for plain rows such as subtopics.
+  final IconData? icon;
+  final String? iconAsset;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
 
   const ReviewerCategoryCard({
     super.key,
-    required this.icon,
+    this.icon,
+    this.iconAsset,
     required this.title,
     required this.subtitle,
     required this.onTap,
@@ -41,16 +44,27 @@ class ReviewerCategoryCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(12),
+              if (icon != null || iconAsset != null) ...[
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: iconAsset != null
+                      ? Image.asset(
+                          iconAsset!,
+                          width: 46,
+                          height: 46,
+                          fit: BoxFit.contain,
+                          filterQuality: FilterQuality.high,
+                          excludeFromSemantics: true,
+                        )
+                      : Icon(icon, color: theme.colorScheme.primary, size: 24),
                 ),
-                child: Icon(icon, color: theme.colorScheme.primary, size: 24),
-              ),
-              const SizedBox(width: 16),
+                const SizedBox(width: 16),
+              ],
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

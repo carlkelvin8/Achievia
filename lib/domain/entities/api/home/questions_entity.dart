@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 @injectable
 class QuestionsEntity {
@@ -7,7 +8,7 @@ class QuestionsEntity {
   final String courseId;
   final String description;
   final String image;
-  final String? day_subject;
+  final String? daySubject;
   final String createdAt;
   QuestionsEntity({
     required this.id,
@@ -15,7 +16,7 @@ class QuestionsEntity {
     required this.courseId,
     required this.description,
     required this.image,
-    required this.day_subject,
+    required this.daySubject,
     required this.createdAt,
   });
 }

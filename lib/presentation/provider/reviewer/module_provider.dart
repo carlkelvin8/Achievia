@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:achievia/core/utils/auth_error_utils.dart';
 import 'package:achievia/core/di/injection.dart';
 import 'package:achievia/domain/entities/api/reviewer/module_entity.dart';
 import 'package:achievia/domain/use_cases/reviewer/module_use_case.dart';
@@ -78,6 +79,10 @@ class ModulePaginationNotifier extends StateNotifier<ModulePaginationState> {
   final ModuleUseCase _moduleUseCase;
   final Set<int> _inFlightPages = {};
 
+  /// Bumped by [refresh] so a page request that was already in flight cannot
+  /// append its stale result to the freshly reloaded list.
+  int _generation = 0;
+
   ModulePaginationNotifier(this._moduleUseCase)
     : super(ModulePaginationState.initial()) {
     _loadPage(1, reset: true);
@@ -85,6 +90,8 @@ class ModulePaginationNotifier extends StateNotifier<ModulePaginationState> {
 
   Future<void> refresh() async {
     _logPagination('Refresh requested');
+    _generation++;
+    _inFlightPages.clear();
     state = ModulePaginationState.initial();
     await _loadPage(1, reset: true);
   }
@@ -119,6 +126,7 @@ class ModulePaginationNotifier extends StateNotifier<ModulePaginationState> {
   }
 
   Future<void> _loadPage(int page, {required bool reset}) async {
+    final generation = _generation;
     try {
       _inFlightPages.add(page);
 
@@ -133,7 +141,11 @@ class ModulePaginationNotifier extends StateNotifier<ModulePaginationState> {
         'API fetch success page=$page fetched=${result.items.length} total=${result.total} backendHasMore=${result.hasMore}',
       );
 
-      final nextItems = reset ? result.items : [...state.items, ...result.items];
+      if (!mounted || generation != _generation) return;
+
+      final nextItems = reset
+          ? result.items
+          : [...state.items, ...result.items];
       final reachedTotal = result.total > 0 && nextItems.length >= result.total;
 
       state = state.copyWith(
@@ -150,6 +162,7 @@ class ModulePaginationNotifier extends StateNotifier<ModulePaginationState> {
       );
       _inFlightPages.remove(page);
     } catch (e) {
+      if (!mounted || generation != _generation) return;
       _inFlightPages.remove(page);
       _logPagination('API fetch error page=$page error=$e');
       state = state.copyWith(
@@ -157,9 +170,8 @@ class ModulePaginationNotifier extends StateNotifier<ModulePaginationState> {
         isLoadingMore: false,
         // Avoid automatic repeated calls from scroll listener after a failure.
         hasMore: false,
-        errorMessage: e.toString(),
+        errorMessage: userFacingError(e),
       );
     }
   }
-
 }

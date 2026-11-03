@@ -1,0 +1,1161 @@
+[
+  {
+    "table_name": "abbreviations",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "subject_id",
+        "type": "integer",
+        "not_null": false
+      },
+      {
+        "name": "short_form",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "full_form",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "deleted_at",
+        "type": "timestamp with time zone",
+        "not_null": false
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (subject_id) REFERENCES subjects(id)"
+    ]
+  },
+  {
+    "table_name": "authors",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "bigint",
+        "not_null": true
+      },
+      {
+        "name": "name",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "university",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "achievement",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "greeting",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "message",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "image_url",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "sort_order",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "is_active",
+        "type": "boolean",
+        "not_null": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)"
+    ]
+  },
+  {
+    "table_name": "chat_conversations",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "type",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "created_by",
+        "type": "uuid",
+        "not_null": false
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "last_message_at",
+        "type": "timestamp with time zone",
+        "not_null": false
+      },
+      {
+        "name": "latest_message",
+        "type": "text",
+        "not_null": false
+      }
+    ],
+    "constraints": [
+      "FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE SET NULL",
+      "PRIMARY KEY (id)",
+      "CHECK ((type = ANY (ARRAY['group'::text, 'direct'::text])))"
+    ]
+  },
+  {
+    "table_name": "chat_members",
+    "rls": true,
+    "columns": [
+      {
+        "name": "conversation_id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "profile_id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "role",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "joined_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "last_read_at",
+        "type": "timestamp with time zone",
+        "not_null": false
+      }
+    ],
+    "constraints": [
+      "FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE",
+      "PRIMARY KEY (conversation_id, profile_id)",
+      "FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE",
+      "CHECK ((role = ANY (ARRAY['owner'::text, 'member'::text])))"
+    ]
+  },
+  {
+    "table_name": "chat_messages",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "conversation_id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "sender_id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "body",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "CHECK ((char_length(body) <= 10000)) NOT VALID",
+      "CHECK ((length(TRIM(BOTH FROM body)) > 0))",
+      "FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE",
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (sender_id) REFERENCES profiles(id) ON DELETE CASCADE"
+    ]
+  },
+  {
+    "table_name": "choices",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "question_id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "choice_text",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "is_correct",
+        "type": "boolean",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (question_id) REFERENCES questions(id)"
+    ]
+  },
+  {
+    "table_name": "goals",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "goal_date",
+        "type": "date",
+        "not_null": true
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "details",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "is_checked",
+        "type": "boolean",
+        "not_null": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+      "UNIQUE (user_id, goal_date)"
+    ]
+  },
+  {
+    "table_name": "mnemonics",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "subject_id",
+        "type": "integer",
+        "not_null": false
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "file_path",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "deleted_at",
+        "type": "timestamp with time zone",
+        "not_null": false
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (subject_id) REFERENCES subjects(id)"
+    ]
+  },
+  {
+    "table_name": "mockboards_paused",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "quiz_id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "current_page",
+        "type": "double precision",
+        "not_null": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (user_id) REFERENCES profiles(id)"
+    ]
+  },
+  {
+    "table_name": "modules",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": false
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "file",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "image",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "status",
+        "type": "module_status",
+        "not_null": true
+      },
+      {
+        "name": "subject_id",
+        "type": "integer",
+        "not_null": false
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (subject_id) REFERENCES subjects(id)",
+      "FOREIGN KEY (user_id) REFERENCES profiles(id)"
+    ]
+  },
+  {
+    "table_name": "notifications",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "message",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "notification_type",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "image_url",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "data",
+        "type": "jsonb",
+        "not_null": false
+      },
+      {
+        "name": "is_read",
+        "type": "boolean",
+        "not_null": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    ]
+  },
+  {
+    "table_name": "procedures",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "subject_id",
+        "type": "integer",
+        "not_null": false
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "file_path",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "deleted_at",
+        "type": "timestamp with time zone",
+        "not_null": false
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (subject_id) REFERENCES subjects(id)"
+    ]
+  },
+  {
+    "table_name": "profiles",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "first_name",
+        "type": "character varying(100)",
+        "not_null": false
+      },
+      {
+        "name": "middle_name",
+        "type": "character varying(100)",
+        "not_null": false
+      },
+      {
+        "name": "last_name",
+        "type": "character varying(255)",
+        "not_null": false
+      },
+      {
+        "name": "bio",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "age",
+        "type": "integer",
+        "not_null": false
+      },
+      {
+        "name": "trial",
+        "type": "integer",
+        "not_null": false
+      },
+      {
+        "name": "username",
+        "type": "character varying(100)",
+        "not_null": false
+      },
+      {
+        "name": "email",
+        "type": "character varying(255)",
+        "not_null": false
+      },
+      {
+        "name": "role",
+        "type": "character varying(50)",
+        "not_null": true
+      },
+      {
+        "name": "status",
+        "type": "character varying(50)",
+        "not_null": true
+      },
+      {
+        "name": "profile_image",
+        "type": "character varying(255)",
+        "not_null": false
+      },
+      {
+        "name": "course_id",
+        "type": "integer",
+        "not_null": false
+      },
+      {
+        "name": "university",
+        "type": "character varying(255)",
+        "not_null": false
+      },
+      {
+        "name": "purpose",
+        "type": "character varying(255)",
+        "not_null": false
+      },
+      {
+        "name": "mantra",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "date_of_examination",
+        "type": "timestamp with time zone",
+        "not_null": false
+      }
+    ],
+    "constraints": [
+      "UNIQUE (email)",
+      "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE",
+      "PRIMARY KEY (id)",
+      "CHECK (((role)::text = ANY ((ARRAY['USER'::character varying, 'ADMIN'::character varying, 'TEACHER'::character varying])::text[])))",
+      "CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'inactive'::character varying])::text[])))",
+      "UNIQUE (username)"
+    ]
+  },
+  {
+    "table_name": "progress_days",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "bigint",
+        "not_null": true
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": false
+      },
+      {
+        "name": "activity_date",
+        "type": "date",
+        "not_null": true
+      },
+      {
+        "name": "is_active",
+        "type": "boolean",
+        "not_null": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    ]
+  },
+  {
+    "table_name": "published_modules",
+    "rls": false,
+    "columns": [
+      {
+        "name": "id",
+        "type": "integer",
+        "not_null": false
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": false
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": false
+      },
+      {
+        "name": "file",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "image",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "status",
+        "type": "module_status",
+        "not_null": false
+      },
+      {
+        "name": "subject_id",
+        "type": "integer",
+        "not_null": false
+      }
+    ],
+    "constraints": null
+  },
+  {
+    "table_name": "qotd_answers",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "question_id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "quiz_id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "choice_id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "is_correct",
+        "type": "boolean",
+        "not_null": true
+      },
+      {
+        "name": "answered_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "FOREIGN KEY (choice_id) REFERENCES choices(id) ON DELETE CASCADE",
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE",
+      "FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE",
+      "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    ]
+  },
+  {
+    "table_name": "question_bank_attempts",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "subject_id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "quiz_id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "correct_answers",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "total_questions",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "score",
+        "type": "numeric(5,2)",
+        "not_null": true
+      },
+      {
+        "name": "completed_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "CHECK ((correct_answers <= total_questions))",
+      "CHECK ((correct_answers >= 0))",
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE",
+      "CHECK (((score >= (0)::numeric) AND (score <= (100)::numeric)))",
+      "FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE",
+      "CHECK ((total_questions > 0))",
+      "FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE"
+    ]
+  },
+  {
+    "table_name": "questions",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "quiz_id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "question_text",
+        "type": "text",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (quiz_id) REFERENCES quizzes(id)"
+    ]
+  },
+  {
+    "table_name": "quiz_attempts",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "bigint",
+        "not_null": true
+      },
+      {
+        "name": "quiz_id",
+        "type": "integer",
+        "not_null": false
+      },
+      {
+        "name": "student_id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "score",
+        "type": "numeric",
+        "not_null": true
+      },
+      {
+        "name": "attempted_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "answer",
+        "type": "jsonb",
+        "not_null": true
+      },
+      {
+        "name": "no_of_attempt",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "summary",
+        "type": "jsonb",
+        "not_null": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (student_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    ]
+  },
+  {
+    "table_name": "quizzes",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "subject_id",
+        "type": "integer",
+        "not_null": false
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "configured_question_count",
+        "type": "integer",
+        "not_null": false
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "CHECK ((configured_question_count >= 0))",
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (subject_id) REFERENCES subjects(id)"
+    ]
+  },
+  {
+    "table_name": "study_sessions",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "started_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "ended_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "duration_minutes",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "session_type",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "CHECK ((ended_at > started_at))",
+      "CHECK ((duration_minutes > 0))",
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    ]
+  },
+  {
+    "table_name": "subjects",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "course_id",
+        "type": "integer",
+        "not_null": false
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "image",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "day_subject",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)"
+    ]
+  },
+  {
+    "table_name": "supplemental_items",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "bigint",
+        "not_null": true
+      },
+      {
+        "name": "course_id",
+        "type": "integer",
+        "not_null": false
+      },
+      {
+        "name": "kind",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "title",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "content",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "image_url",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "file_url",
+        "type": "text",
+        "not_null": false
+      },
+      {
+        "name": "sort_order",
+        "type": "integer",
+        "not_null": true
+      },
+      {
+        "name": "is_active",
+        "type": "boolean",
+        "not_null": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "CHECK ((kind = ANY (ARRAY['mnemonic'::text, 'abbreviation'::text, 'procedure'::text])))",
+      "PRIMARY KEY (id)"
+    ]
+  },
+  {
+    "table_name": "tasks",
+    "rls": true,
+    "columns": [
+      {
+        "name": "id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "task_name",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "not_null": true
+      },
+      {
+        "name": "user_id",
+        "type": "uuid",
+        "not_null": true
+      },
+      {
+        "name": "is_done",
+        "type": "boolean",
+        "not_null": true
+      },
+      {
+        "name": "deadline",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "not_null": true
+      }
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)",
+      "FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE"
+    ]
+  }
+]

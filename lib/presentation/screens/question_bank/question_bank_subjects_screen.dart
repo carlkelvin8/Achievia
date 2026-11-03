@@ -1,3 +1,4 @@
+import 'package:achievia/core/constants/subject_icons.dart';
 import 'package:achievia/core/constants/routers/route_constants.dart';
 import 'package:achievia/core/utils/question_bank_helpers.dart';
 import 'package:achievia/domain/entities/api/reviewer/question_bank_entity.dart';
@@ -79,6 +80,7 @@ class _SubjectList extends ConsumerWidget {
             height: 104,
             child: ReviewerCategoryCard(
               icon: Icons.science_outlined,
+              iconAsset: subjectIconAsset(subject.title),
               title: subject.title,
               subtitle: normalizeQuestionBankOptionalText(subject.description),
               onTap: () => context.push(

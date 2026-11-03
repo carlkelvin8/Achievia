@@ -10,6 +10,9 @@ class GoalCard extends StatelessWidget {
   final VoidCallback? onToggle;
   final EdgeInsetsGeometry? padding;
 
+  /// Lets a checked card be tapped again to uncheck it.
+  final bool allowUncheck;
+
   const GoalCard({
     super.key,
     required this.date,
@@ -18,6 +21,7 @@ class GoalCard extends StatelessWidget {
     required this.isChecked,
     this.onToggle,
     this.padding,
+    this.allowUncheck = false,
   });
 
   @override
@@ -45,24 +49,28 @@ class GoalCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          RadioListTile<bool>(
-            value: true,
+          RadioGroup<bool>(
             groupValue: isChecked,
-            onChanged: onToggle != null ? (_) => onToggle!() : null,
-            dense: true,
-            visualDensity: VisualDensity.compact,
-            contentPadding: EdgeInsets.zero,
-            title: Text(
-              title,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface,
+            onChanged: (_) => onToggle?.call(),
+            child: RadioListTile<bool>(
+              value: true,
+              toggleable: allowUncheck,
+              enabled: onToggle != null,
+              dense: true,
+              visualDensity: VisualDensity.compact,
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                title,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
-            ),
-            subtitle: Text(
-              details,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                height: 1.2,
+              subtitle: Text(
+                details,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  height: 1.2,
+                ),
               ),
             ),
           ),

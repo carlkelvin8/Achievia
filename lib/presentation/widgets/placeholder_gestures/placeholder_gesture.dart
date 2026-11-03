@@ -27,7 +27,7 @@ class _PlaceholdergestureState extends State<Placeholdergesture> {
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.w400,
             fontSize: 14,
-            color: Colors.black,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         GestureDetector(

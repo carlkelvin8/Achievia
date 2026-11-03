@@ -10,6 +10,9 @@ class ChatConversationEntity {
   final DateTime? lastMessageAt;
   final String? latestMessage;
 
+  /// Picture of the other person in a direct conversation, when they have one.
+  final String? profileImage;
+
   const ChatConversationEntity({
     required this.id,
     required this.type,
@@ -19,5 +22,6 @@ class ChatConversationEntity {
     this.createdBy,
     this.lastMessageAt,
     this.latestMessage,
+    this.profileImage,
   });
 }

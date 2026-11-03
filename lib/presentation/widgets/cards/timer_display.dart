@@ -25,7 +25,7 @@ class TimerDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: margin,
       padding: padding ?? const EdgeInsets.all(16),
@@ -38,7 +38,8 @@ class TimerDisplay extends StatelessWidget {
         children: [
           Text(
             phaseLabel,
-            style: phaseLabelStyle ??
+            style:
+                phaseLabelStyle ??
                 theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -46,7 +47,8 @@ class TimerDisplay extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             timeDisplay,
-            style: timeDisplayStyle ??
+            style:
+                timeDisplayStyle ??
                 theme.textTheme.displaySmall?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),

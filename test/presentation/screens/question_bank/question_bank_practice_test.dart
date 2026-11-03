@@ -1,3 +1,4 @@
+import 'package:achievia/core/utils/answer_feedback.dart';
 import 'package:achievia/domain/entities/api/reviewer/question_bank_entity.dart';
 import 'package:achievia/domain/entities/api/reviewer/quiz_entity.dart';
 import 'package:achievia/presentation/provider/reviewer/question_bank_practice_provider.dart';
@@ -5,8 +6,11 @@ import 'package:achievia/presentation/screens/question_bank/question_bank_practi
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({}));
+
   testWidgets('practice requires an answer before advancing', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -36,6 +40,37 @@ void main() {
     await tester.tap(find.text('NEXT'));
     await tester.pumpAndSettle();
     expect(find.text('2 / 2'), findsOneWidget);
+  });
+
+  testWidgets('answer feedback: wrong answer sounds and vibrates once', (
+    tester,
+  ) async {
+    final out = _Recorder();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          answerFeedbackOutputProvider.overrideWithValue(out),
+          questionBankQuestionsProvider(
+            _topic.id,
+          ).overrideWith((ref) async => _questions),
+        ],
+        child: const MaterialApp(
+          home: QuestionBankPracticeScreen(selection: _selection),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Wrong answer'));
+    await tester.pumpAndSettle();
+    expect(out.sounds, [false]);
+    expect(out.vibrations, 1);
+
+    // The question is locked: another tap changes nothing and adds nothing.
+    await tester.tap(find.text('Wrong answer'), warnIfMissed: false);
+    await tester.pumpAndSettle();
+    expect(out.sounds, [false]);
+    expect(out.vibrations, 1);
   });
 
   testWidgets('confirmed leave exits the practice route', (tester) async {
@@ -128,3 +163,14 @@ final _questions = [
     ],
   ),
 ];
+
+class _Recorder implements AnswerFeedbackOutput {
+  final sounds = <bool>[];
+  int vibrations = 0;
+
+  @override
+  Future<void> playSound({required bool correct}) async => sounds.add(correct);
+
+  @override
+  Future<void> vibrate() async => vibrations++;
+}

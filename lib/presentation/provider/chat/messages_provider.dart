@@ -58,7 +58,7 @@ class MessagesViewState {
 const Object _unchanged = Object();
 
 class MessagesNotifier extends Notifier<MessagesViewState> {
-  late final TextEditingController searchController;
+  late TextEditingController searchController;
 
   @override
   MessagesViewState build() {

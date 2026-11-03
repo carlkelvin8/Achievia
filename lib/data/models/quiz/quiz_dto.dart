@@ -25,6 +25,8 @@ class QuizDto {
                     (q) => QuestionItemEntity(
                       id: q.id,
                       questionText: q.questionText,
+                      imagePath: q.imagePath,
+                      rationale: q.rationale,
                       choices: q.choices
                           .map(
                             (c) => ChoiceEntity(
@@ -59,6 +61,8 @@ class QuizDto {
                     (question) => QuestionsItemsDto(
                       id: question['id'] as int,
                       questionText: question['questionText'] ?? "",
+                      imagePath: (question['imagePath'] ?? '').toString(),
+                      rationale: (question['rationale'] ?? '').toString(),
                       choices: (question['choices'] as List<dynamic>)
                           .map(
                             (choice) => ChoicesDto.fromJson(
@@ -104,20 +108,32 @@ class QuizDtoItems {
           .map(
             (question) => QuestionsItemsDto(
               id: question['id'] as int,
-                      questionText: question['questionText'] ?? "",
-                      choices: (question['choices'] as List<dynamic>)
-                          .map(
-                            (choice) => ChoicesDto.fromJson(
-                              choice as Map<String, dynamic>,
-                              questionId: question['id'] as int,
-                            ),
-                          )
+              questionText: question['questionText'] ?? "",
+              imagePath: (question['imagePath'] ?? '').toString(),
+              rationale: (question['rationale'] ?? '').toString(),
+              choices: (question['choices'] as List<dynamic>)
+                  .map(
+                    (choice) => ChoicesDto.fromJson(
+                      choice as Map<String, dynamic>,
+                      questionId: question['id'] as int,
+                    ),
+                  )
                   .toList(),
             ),
           )
           .toList(),
     );
   }
+
+  /// Inverse of [QuizDtoItems.fromJson] (used to keep a board on the device).
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'description': description,
+    'createdAt': createdAt,
+    'subjectId': subjectId,
+    'questions': [for (final q in questions) q.toJson()],
+  };
 
   static QuizDtoItems fromEntity(QuizItemEntity entity) {
     return QuizDtoItems(
@@ -144,6 +160,8 @@ class QuizDtoItems {
             (q) => QuestionItemEntity(
               id: q.id,
               questionText: q.questionText,
+              imagePath: q.imagePath,
+              rationale: q.rationale,
               choices: q.choices
                   .map(
                     (c) => ChoiceEntity(
@@ -165,16 +183,26 @@ class QuestionsItemsDto {
   final int id;
   final String questionText;
   final List<ChoicesDto> choices;
+
+  /// Storage path of the picture attached to the question ('' when none).
+  final String imagePath;
+
+  /// Explanation of the answer ('' when none), shown in the summary.
+  final String rationale;
   QuestionsItemsDto({
     required this.id,
     required this.questionText,
     required this.choices,
+    this.imagePath = '',
+    this.rationale = '',
   });
 
   factory QuestionsItemsDto.fromJson(Map<String, dynamic> json) {
     return QuestionsItemsDto(
       id: json['id'] as int,
       questionText: json['questionText'] ?? "",
+      imagePath: (json['imagePath'] ?? '').toString(),
+      rationale: (json['rationale'] ?? '').toString(),
       choices: (json['choices'] as List<dynamic>)
           .map(
             (choice) => ChoicesDto.fromJson(
@@ -186,10 +214,20 @@ class QuestionsItemsDto {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'questionText': questionText,
+    'imagePath': imagePath,
+    'rationale': rationale,
+    'choices': [for (final c in choices) c.toJson()],
+  };
+
   static QuestionsItemsDto fromEntity(QuestionItemEntity entity) {
     return QuestionsItemsDto(
       id: entity.id,
       questionText: entity.questionText,
+      imagePath: entity.imagePath,
+      rationale: entity.rationale,
       choices: entity.choices.map((c) => ChoicesDto.fromEntity(c)).toList(),
     );
   }
@@ -207,10 +245,7 @@ class ChoicesDto {
     required this.questionId,
   });
 
-  factory ChoicesDto.fromJson(
-    Map<String, dynamic> json, {
-    int? questionId,
-  }) {
+  factory ChoicesDto.fromJson(Map<String, dynamic> json, {int? questionId}) {
     return ChoicesDto(
       id: json['id'] as int,
       choiceText: json['choiceText'] ?? "",
@@ -218,6 +253,13 @@ class ChoicesDto {
       questionId: (json['questionId'] as int?) ?? questionId!,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'choiceText': choiceText,
+    'is_correct': isCorrect,
+    'questionId': questionId,
+  };
 
   static ChoicesDto fromEntity(ChoiceEntity entity) {
     return ChoicesDto(

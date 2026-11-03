@@ -8,10 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class MantraCard extends ConsumerStatefulWidget {
   final String? initialMantra;
 
-  const MantraCard({
-    super.key,
-    this.initialMantra,
-  });
+  const MantraCard({super.key, this.initialMantra});
 
   @override
   ConsumerState<MantraCard> createState() => _MantraCardState();
@@ -62,7 +59,8 @@ class _MantraCardState extends ConsumerState<MantraCard> {
 
       AppToast.showSuccess(context, message);
     } catch (_) {
-      // Intentionally no error toast for mantra errors.
+      if (!mounted) return;
+      AppToast.showError(context, 'Could not save your mantra. Try again.');
     }
   }
 
@@ -98,8 +96,8 @@ class _MantraCardState extends ConsumerState<MantraCard> {
               ),
             ),
           ),
-          // Header
 
+          // Header
           const SizedBox(height: 8),
 
           // Description
@@ -117,11 +115,17 @@ class _MantraCardState extends ConsumerState<MantraCard> {
 
           // Mantra Text
           Text(
-            _mantraText,
+            _mantraText.isEmpty
+                ? 'Tap the ⋯ button to write your mantra.'
+                : _mantraText,
             textAlign: TextAlign.center,
             style: textTheme.labelLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: colorScheme.onSurface,
+              fontWeight: _mantraText.isEmpty
+                  ? FontWeight.w400
+                  : FontWeight.w600,
+              color: _mantraText.isEmpty
+                  ? colorScheme.onSurfaceVariant
+                  : colorScheme.onSurface,
               height: 1.5,
             ),
           ),

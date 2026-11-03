@@ -1,0 +1,190 @@
+{
+  "format": 1,
+  "history": [
+    {
+      "file": "20260601171702_users.sql",
+      "sha256_lf": "d5dcf68afe761c4b9d65b90028fa840a6cc3ba63686ffb48515accc3d519c597",
+      "disposition": "Destructive profiles reset; replaced by non-destructive profile definition."
+    },
+    {
+      "file": "20260601172733_modify_profile.sql",
+      "sha256_lf": "c70cd9f2fccbfa68bf437473c8b3f0510483eaa6d5aed450d10474680b122ca5",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20260601172906_drop_unnecessary_tables.sql",
+      "sha256_lf": "ad61059881af4e5d03f31ee21a93a4d4e23690801fe644c2400b3aea4957ab53",
+      "disposition": "Unconditional sessions/verification drops; obsolete and omitted."
+    },
+    {
+      "file": "20260603003208_add_mantra_table.sql",
+      "sha256_lf": "18e5bdb9c7f266291a8ee412b803b16972ccf8afc7f4942122eaa076f8f95021",
+      "disposition": "Duplicate mantra; included by modify_profile."
+    },
+    {
+      "file": "20260603011346_add_tasks_table.sql",
+      "sha256_lf": "165b69e885c98989d436d3ae17e976b72a6d1ac1e2e03350b01695700e64fe73",
+      "disposition": "Extract UUID CREATE plus indexes/policies; omit destructive DROP and contradictory bigint CREATE."
+    },
+    {
+      "file": "20260603011601_add_tasks_table.sql",
+      "sha256_lf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "disposition": "Empty no-op."
+    },
+    {
+      "file": "20260605000000_add_chat_tables.sql",
+      "sha256_lf": "300c24997a7992eed86f64592a3abe9bb5ea7ea50fb3a0059a5d5eec957374c1",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20260606000000_add__atler_userid.sql",
+      "sha256_lf": "300b08e457c16e8dda6600ead4759d0f6a6de5fac3389c55792ea94f49f8646a",
+      "disposition": "Absent modules dependency and unsafe UUID cast; canonical modules uses UUID."
+    },
+    {
+      "file": "20260606000001_add_chat_person_search.sql",
+      "sha256_lf": "de48689139335759ea584222e8f00e96f24bef776644861e839b67e2e8cc2db3",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20260606010000_allow_authenticated_read_choices.sql",
+      "sha256_lf": "ccc424c67e09ab79d712b7e8e76876fdb128ae985163e8d631e091794fc86bb3",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20260607000000_fix_quiz_attempts_student_id_rls.sql",
+      "sha256_lf": "779601827f5d18c9602f50fe070fe4da26b23bd95661285d318c7822bfeaf1b0",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20260607001000_make_quiz_attempt_quiz_id_optional.sql",
+      "sha256_lf": "c4b9a804f7a71e3cbb4d72a32ac129fa82291043bc9a5c54550c51180da48430",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20260607150148_account_that_have_mockboard_ended.sql",
+      "sha256_lf": "b4ed9bcdda53ff235613d3e56983583ffa21fdc0d39f343a047075ddcdab879e",
+      "disposition": "UUID quiz_id incompatible with Dart; replaced by canonical paused schema."
+    },
+    {
+      "file": "20260608033923_account_that_mockboards_paused.sql",
+      "sha256_lf": "a7ef0e789082b85b3b8d50d69b43ee9275a20d08d0d1fead368b67af81ff1ad6",
+      "disposition": "Integer row id conflicts with DTO and duplicate policy; canonical replacement."
+    },
+    {
+      "file": "20260610044531_add_token_column_to_resume.sql",
+      "sha256_lf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "disposition": "Empty no-op."
+    },
+    {
+      "file": "20260707002000_weekly_achievements_and_streak_rpc.sql",
+      "sha256_lf": "1f4853ed1dcca2e90522ca2122981a77babb65e4de9dfd94e965ce20551e6616",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20260814000000_add_question_bank_attempts.sql",
+      "sha256_lf": "79f8043614203d2ddff90705a18e97113937764fea6288d62a9c5856ae037b09",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20260814001000_fix_progress_days_user_id.sql",
+      "sha256_lf": "8342b28eaa1551bf9884b6a2f0d132ad61a5af9e26b9abd5dbd7d3a93cd59ae9",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20260827000000_dynamic_application_data.sql",
+      "sha256_lf": "3587a336208fd548bd7f43001e10521677c23dc81547ce0b5607b14e09a86f99",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20260829000000_username_availability.sql",
+      "sha256_lf": "8403b2a72bc07fcbcbb6b55a05f992fb88bdd615296cd24e2a7c2417dc230ad6",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20260930000000_create_modules_table.sql",
+      "sha256_lf": "44a397ea95c3dd2bc38bfbef1fbce641c90fe881eaa8646141113bc4bb37b06e",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20261001000000_production_security.sql",
+      "sha256_lf": "f60331fe1d0c4467577b4ec2ae58bd18a33bf66c3297fa8ff4b05e8dd70c832d",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20261001001000_rpc_privacy_and_streaks.sql",
+      "sha256_lf": "e778eabbbd2fdda7f030e9f26a3f7c3a5d9ba7f1ee51671964a2fc1346cd180d",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20261001002000_module_access.sql",
+      "sha256_lf": "7f049eeb7f0d60393f5a688ed4a9537def193a25964f5869b9dbfc3fc510f6ab",
+      "disposition": "Included unchanged in empty-install baseline."
+    },
+    {
+      "file": "20261002000000_schema_consistency.sql",
+      "sha256_lf": "9ddd8846cf4138fb32b3961d1a5bc78292f5b7fe1cdf86fe16419b5045783c43",
+      "disposition": "Included unchanged in empty-install baseline."
+    }
+  ],
+  "install": [
+    {
+      "path": "supabase/migrations/20260601172733_modify_profile.sql"
+    },
+    {
+      "path": "supabase/schema/content.sql"
+    },
+    {
+      "path": "supabase/schema/mockboards_paused.sql"
+    },
+    {
+      "path": "supabase/migrations/20260603011346_add_tasks_table.sql",
+      "transform": "tasks_uuid_only"
+    },
+    {
+      "path": "supabase/migrations/20260605000000_add_chat_tables.sql"
+    },
+    {
+      "path": "supabase/migrations/20260606000001_add_chat_person_search.sql"
+    },
+    {
+      "path": "supabase/migrations/20260606010000_allow_authenticated_read_choices.sql"
+    },
+    {
+      "path": "supabase/migrations/20260607000000_fix_quiz_attempts_student_id_rls.sql"
+    },
+    {
+      "path": "supabase/migrations/20260607001000_make_quiz_attempt_quiz_id_optional.sql"
+    },
+    {
+      "path": "supabase/migrations/20260707002000_weekly_achievements_and_streak_rpc.sql"
+    },
+    {
+      "path": "supabase/migrations/20260814000000_add_question_bank_attempts.sql"
+    },
+    {
+      "path": "supabase/migrations/20260814001000_fix_progress_days_user_id.sql"
+    },
+    {
+      "path": "supabase/migrations/20260827000000_dynamic_application_data.sql"
+    },
+    {
+      "path": "supabase/migrations/20260829000000_username_availability.sql"
+    },
+    {
+      "path": "supabase/migrations/20260930000000_create_modules_table.sql"
+    },
+    {
+      "path": "supabase/migrations/20261001000000_production_security.sql"
+    },
+    {
+      "path": "supabase/migrations/20261001001000_rpc_privacy_and_streaks.sql"
+    },
+    {
+      "path": "supabase/migrations/20261001002000_module_access.sql"
+    },
+    {
+      "path": "supabase/migrations/20261002000000_schema_consistency.sql"
+    }
+  ]
+}

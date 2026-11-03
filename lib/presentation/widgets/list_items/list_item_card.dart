@@ -33,7 +33,7 @@ class ListItemCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: padding ?? level2_widget,
+        padding: padding ?? level2Widget,
         margin: margin,
         decoration: BoxDecoration(
           color: theme.colorScheme.onSecondary,
@@ -45,23 +45,14 @@ class ListItemCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  icon,
-                  color: iconColor ?? theme.colorScheme.primary,
-                ),
+                Icon(icon, color: iconColor ?? theme.colorScheme.primary),
                 const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: theme.textTheme.labelMedium,
-                ),
+                Text(label, style: theme.textTheme.labelMedium),
               ],
             ),
             trailing ??
                 (trailingText != null
-                    ? Text(
-                        trailingText!,
-                        style: theme.textTheme.labelMedium,
-                      )
+                    ? Text(trailingText!, style: theme.textTheme.labelMedium)
                     : const SizedBox.shrink()),
           ],
         ),
